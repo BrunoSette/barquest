@@ -1,6 +1,6 @@
-import { resend } from './resend';
-import { InviteUserEmail } from '@/emails/invite';
-import { ResetPasswordEmail } from '@/emails/reset-password';
+import { resend } from "./resend";
+import { InviteUserEmail } from "@/emails/invite";
+import { ResetPasswordEmail } from "@/emails/reset-password";
 
 export async function sendInvitationEmail(
   to: string,
@@ -11,10 +11,10 @@ export async function sendInvitationEmail(
   inviteId: string,
   role: string
 ) {
-  const subject = `${invitedByUsername} has invited you to join ${teamName} on ACME`;
+  const subject = `${invitedByUsername} has invited you to join ${teamName} on BARQUEST`;
 
   if (!process.env.RESEND_AUTHORIZED_EMAIL) {
-    return { error: 'RESEND_AUTHORIZED_EMAIL is not set' };
+    return { error: "RESEND_AUTHORIZED_EMAIL is not set" };
   }
 
   const { data, error } = await resend.emails.send({
@@ -43,10 +43,10 @@ export async function sendResetPasswordEmail(
   username: string,
   token: string
 ) {
-  const subject = `Reset your password on ACME`;
+  const subject = `Reset your password on BARQUEST`;
 
   if (!process.env.RESEND_AUTHORIZED_EMAIL) {
-    return { error: 'RESEND_AUTHORIZED_EMAIL is not set' };
+    return { error: "RESEND_AUTHORIZED_EMAIL is not set" };
   }
 
   const { data, error } = await resend.emails.send({
