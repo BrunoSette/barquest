@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -33,6 +32,7 @@ type Question = {
   question: string;
   choices: string[];
   correctAnswer: number;
+  comments: string; // Add comments field
 };
 
 const subjects = [
@@ -55,6 +55,7 @@ export function CreateQuestionsComponent() {
     question: "",
     choices: ["", "", "", ""],
     correctAnswer: 0, // Initialize as 0
+    comments: "", // Initialize comments
   });
 
   const [toasts, setToasts] = useState<
@@ -81,6 +82,10 @@ export function CreateQuestionsComponent() {
 
   const handleCorrectAnswerChange = (value: string) => {
     setCurrentQuestion({ ...currentQuestion, correctAnswer: parseInt(value) });
+  };
+
+  const handleCommentsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCurrentQuestion({ ...currentQuestion, comments: e.target.value });
   };
 
   const handleSaveQuestion = async () => {
@@ -113,6 +118,7 @@ export function CreateQuestionsComponent() {
             answer3: currentQuestion.choices[2],
             answer4: currentQuestion.choices[3],
             correctAnswer: currentQuestion.correctAnswer,
+            comments: currentQuestion.comments, // Include comments in the request
           }),
         });
 
@@ -124,6 +130,7 @@ export function CreateQuestionsComponent() {
             question: "",
             choices: ["", "", "", ""],
             correctAnswer: 0,
+            comments: "", // Reset comments
           });
           addToast(
             "Question Saved",
@@ -159,6 +166,7 @@ export function CreateQuestionsComponent() {
       question: "",
       choices: ["", "", "", ""],
       correctAnswer: 0,
+      comments: "", // Reset comments
     });
   };
 
@@ -205,11 +213,12 @@ export function CreateQuestionsComponent() {
             {currentQuestion.choices.map((choice, index) => (
               <div key={index}>
                 <Label htmlFor={`choice-${index}`}>Choice {index + 1}</Label>
-                <Input
+                <Textarea
                   id={`choice-${index}`}
                   value={choice}
                   onChange={(e) => handleChoiceChange(index, e.target.value)}
                   placeholder={`Enter choice ${index + 1}`}
+                  className="min-h-[100px]"
                 />
               </div>
             ))}
@@ -232,6 +241,18 @@ export function CreateQuestionsComponent() {
                 ))}
               </RadioGroup>
             </div>
+            {currentQuestion.correctAnswer > 0 && (
+              <div>
+                <Label htmlFor="comments">Comments</Label>
+                <Textarea
+                  id="comments"
+                  value={currentQuestion.comments}
+                  onChange={handleCommentsChange}
+                  placeholder="Enter comments for the correct answer"
+                  className="min-h-[100px]"
+                />
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button

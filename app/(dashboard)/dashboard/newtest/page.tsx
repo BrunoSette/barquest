@@ -1,19 +1,13 @@
 "use client";
 
-import { startTransition, useActionState, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/lib/auth";
-import { updateAccount } from "@/app/(login)/actions";
-import Link from "next/link";
-
-type ActionState = {
-  error?: string;
-  success?: string;
-};
 
 const subjects = [
   "Constitutional Law",
@@ -30,16 +24,16 @@ const subjects = [
 
 export default function GeneralPage() {
   const { user } = useUser();
-  const [isTutor, setIsTutor] = useState(false);
-  const [isTimed, setIsTimed] = useState(false);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const router = useRouter();
+  const [isTutor, setIsTutor] = useState(true);
+  const [isTimed, setIsTimed] = useState(true);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(subjects); // All subjects selected by default
   const [questionMode, setQuestionMode] = useState("Unused");
-  const [numberOfQuestions, setNumberOfQuestions] = useState("");
-
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    updateAccount,
-    { error: "", success: "" }
-  );
+  const [numberOfQuestions, setNumberOfQuestions] = useState("5");
+  const [secondsPerQuestion, setSecondsPerQuestion] = useState("75");
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubjectChange = (subject: string) => {
     setSelectedSubjects((prev) =>
@@ -49,11 +43,50 @@ export default function GeneralPage() {
     );
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSelectAllSubjects = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault(); // Prevent form submission
+    if (selectedSubjects.length === subjects.length) {
+      setSelectedSubjects([]); // Deselect all if all are selected
+    } else {
+      setSelectedSubjects(subjects); // Select all
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    startTransition(() => {
-      formAction(new FormData(event.currentTarget));
-    });
+    setIsPending(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      // Simulate form action
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setSuccess("Test created successfully");
+
+      // Map selected subjects to their indices
+      const selectedSubjectIndices = selectedSubjects.map((subject) =>
+        subjects.indexOf(subject)
+      );
+
+      // Construct query parameters
+      const queryParams = new URLSearchParams({
+        isTutor: String(isTutor),
+        isTimed: String(isTimed),
+        selectedSubjects: JSON.stringify(selectedSubjectIndices),
+        questionMode,
+        numberOfQuestions,
+        secondsPerQuestion,
+      });
+
+      // Navigate to the /create page with the state as query parameters
+      router.push(`/dashboard/teste?${queryParams.toString()}`);
+    } catch (error) {
+      setError("Failed to create test");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -86,6 +119,20 @@ export default function GeneralPage() {
                   onCheckedChange={(checked) => setIsTimed(checked)}
                   className="w-12 h-6"
                 />
+                {isTimed && (
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="secondsPerQuestion">
+                      Seconds per Question
+                    </Label>
+                    <input
+                      type="number"
+                      id="secondsPerQuestion"
+                      value={secondsPerQuestion}
+                      onChange={(e) => setSecondsPerQuestion(e.target.value)}
+                      className="border border-gray-300 rounded p-2 w-20"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -102,12 +149,23 @@ export default function GeneralPage() {
                   <input
                     type="checkbox"
                     id={subject}
+                    className="h-4 w-4 rounded"
                     checked={selectedSubjects.includes(subject)}
                     onChange={() => handleSubjectChange(subject)}
                   />
                   <Label htmlFor={subject}>{subject}</Label>
                 </div>
               ))}
+            </div>
+            <div className="flex justify-between mb-4">
+              <Button
+                className="bg-orange-500 mt-4 hover:bg-orange-600 text-white"
+                onClick={handleSelectAllSubjects}
+              >
+                {selectedSubjects.length === subjects.length
+                  ? "Deselect All"
+                  : "Select All"}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -173,22 +231,20 @@ export default function GeneralPage() {
           </CardContent>
         </Card>
 
-        <Link href="/dashboard/teste" passHref>
-          <Button
-            type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
-            disabled={isPending}
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              "Create Test"
-            )}
-          </Button>
-        </Link>
+        <Button
+          type="submit"
+          className="bg-orange-500 hover:bg-orange-600 text-white"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating...
+            </>
+          ) : (
+            "Create Test"
+          )}
+        </Button>
       </form>
     </section>
   );

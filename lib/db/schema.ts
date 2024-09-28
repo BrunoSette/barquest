@@ -37,6 +37,7 @@ export const questions = pgTable("questions", {
   answer2: text("answer2").notNull(),
   answer3: text("answer3").notNull(),
   answer4: text("answer4").notNull(),
+  comments: text("comments").notNull(),
   correctAnswer: integer("correct_answer").notNull(), // Stores the index of the correct answer (1-4)
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

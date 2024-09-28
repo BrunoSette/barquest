@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -42,6 +41,7 @@ type Question = {
   question: string;
   choices: string[];
   correctAnswer: string;
+  comments: string; // Add comments field
 };
 
 const subjects = [
@@ -89,6 +89,7 @@ export function ManageQuestionsComponent() {
             question: item.question_text,
             choices: [item.answer1, item.answer2, item.answer3, item.answer4],
             correctAnswer: item[`answer${item.correct_answer}`],
+            comments: item.comments, // Map comments field
           }));
 
           setQuestions(mappedQuestions);
@@ -176,6 +177,7 @@ export function ManageQuestionsComponent() {
             correctAnswer:
               editingQuestion.choices.indexOf(editingQuestion.correctAnswer) +
               1,
+            comments: editingQuestion.comments, // Include comments in the request
           }),
         });
 
@@ -241,6 +243,9 @@ export function ManageQuestionsComponent() {
                     </li>
                   ))}
                 </ul>
+                <p className="mt-4">
+                  <strong>Comments:</strong> {question.comments}
+                </p>
               </CardContent>
               <CardFooter className="flex justify-end space-x-2">
                 <Button onClick={() => handleEdit(question)} variant="outline">
@@ -291,7 +296,7 @@ export function ManageQuestionsComponent() {
                 </div>
                 <div>
                   <Label htmlFor="edit-question">Question</Label>
-                  <Textarea
+                  <Input
                     id="edit-question"
                     value={editingQuestion.question}
                     onChange={(e) =>
@@ -300,7 +305,7 @@ export function ManageQuestionsComponent() {
                         question: e.target.value,
                       })
                     }
-                    className="min-h-[100px]"
+                    className="w-full"
                   />
                 </div>
                 {editingQuestion.choices.map((choice, index) => (
@@ -345,6 +350,20 @@ export function ManageQuestionsComponent() {
                       </div>
                     ))}
                   </RadioGroup>
+                </div>
+                <div>
+                  <Label htmlFor="edit-comments">Comments</Label>
+                  <Input
+                    id="edit-comments"
+                    value={editingQuestion.comments}
+                    onChange={(e) =>
+                      setEditingQuestion({
+                        ...editingQuestion,
+                        comments: e.target.value,
+                      })
+                    }
+                    className="w-full"
+                  />
                 </div>
               </div>
             )}

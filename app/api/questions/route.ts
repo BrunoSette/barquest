@@ -14,14 +14,15 @@ export async function POST(req: NextRequest) {
     answer3,
     answer4,
     correctAnswer,
+    comments,
   } = await req.json();
 
   try {
     const client = await pool.connect();
 
     const query = `
-      INSERT INTO questions (subject_id, question_text, answer1, answer2, answer3, answer4, correct_answer, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      INSERT INTO questions (subject_id, question_text, answer1, answer2, answer3, answer4, correct_answer, comments, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       RETURNING id;
     `;
 
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
       answer3,
       answer4,
       correctAnswer,
+      comments,
     ];
 
     const result = await client.query(query, values);
@@ -64,6 +66,7 @@ export async function PUT(req: NextRequest) {
     answer2,
     answer3,
     answer4,
+    comments,
     correctAnswer,
   } = await req.json();
 
@@ -72,8 +75,8 @@ export async function PUT(req: NextRequest) {
 
     const query = `
       UPDATE questions
-      SET subject_id = $1, question_text = $2, answer1 = $3, answer2 = $4, answer3 = $5, answer4 = $6, correct_answer = $7, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $8;
+      SET subject_id = $1, question_text = $2, answer1 = $3, answer2 = $4, answer3 = $5, answer4 = $6, comments = $7, correct_answer = $8, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $9;
     `;
 
     const values = [
@@ -83,6 +86,7 @@ export async function PUT(req: NextRequest) {
       answer2,
       answer3,
       answer4,
+      comments,
       correctAnswer,
       id,
     ];
@@ -139,10 +143,12 @@ export async function GET(req: NextRequest) {
     const client = await pool.connect();
 
     const query = `
-      SELECT * FROM questions;
+      SELECT id, subject_id AS "subjectId", question_text AS "questionText", answer1, answer2, answer3, answer4, correct_answer AS "correctAnswer", comments
+      FROM questions;
     `;
 
     const result = await client.query(query);
+    console.log("Fetched questions:", result.rows); // Log the fetched data
 
     client.release();
 

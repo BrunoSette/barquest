@@ -1,108 +1,195 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts'
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
-// Mock data for the test with longer questions and answers
-const testQuestions = [
-  {
-    id: 1,
-    question: "In the context of Canadian constitutional law, the doctrine of parliamentary sovereignty plays a crucial role in shaping the legal landscape. This principle, inherited from the British legal system, asserts that the Parliament has the authority to make or unmake any law. However, the Canadian legal system has evolved to include certain limitations on this sovereignty. Consider the following scenario: The federal Parliament passes a law that appears to infringe on provincial jurisdiction as outlined in the Constitution Act, 1867. Which of the following statements most accurately describes the potential outcome of this situation under Canadian constitutional law?",
-    choices: [
-      "The law would be automatically void as Parliament cannot legislate in areas of provincial jurisdiction. The principle of parliamentary sovereignty is absolute and allows Parliament to override constitutional divisions of power.",
-      "The law would be valid as long as it serves a national interest, regardless of provincial jurisdiction. The doctrine of parliamentary sovereignty allows Parliament to legislate in any area it deems necessary for the country's welfare.",
-      "The law could be challenged in court, and if found to truly infringe on provincial jurisdiction, it may be struck down as ultra vires. This reflects the balance between parliamentary sovereignty and constitutional supremacy in Canada.",
-      "The law would remain in force unless unanimously opposed by all provinces. The principle of cooperative federalism requires consensus between federal and provincial governments for any law affecting provincial jurisdictions."
-    ],
-    correctAnswer: "The law could be challenged in court, and if found to truly infringe on provincial jurisdiction, it may be struck down as ultra vires. This reflects the balance between parliamentary sovereignty and constitutional supremacy in Canada."
-  },
-  {
-    id: 2,
-    question: "The Canadian legal system's approach to Aboriginal rights and title has evolved significantly over the past few decades. The Supreme Court of Canada has played a pivotal role in shaping this area of law through several landmark decisions. One such case is the 1997 decision in Delgamuukw v. British Columbia, which provided important clarifications on the nature of Aboriginal title. Consider a hypothetical situation where a First Nation is claiming Aboriginal title over a specific territory that is currently being used for resource development by a provincial government. Based on the principles established in Delgamuukw and subsequent jurisprudence, which of the following statements most accurately reflects the current state of Canadian law regarding Aboriginal title?",
-    choices: [
-      "Aboriginal title is a right of exclusive use and occupation of the land, including the right to choose how the land can be used. However, this right is absolute and cannot be infringed upon under any circumstances, meaning the resource development must cease immediately.",
-      "Aboriginal title is a sui generis right that falls short of fee simple ownership. While it includes the right to exclusive use and occupation of the land, it can be infringed upon by the Crown if the infringement is justified according to the test established in R. v. Sparrow.",
-      "Aboriginal title is merely a right to be consulted about land use decisions. The provincial government can continue its resource development activities as long as it engages in meaningful consultation with the First Nation, regardless of the outcome of these consultations.",
-      "Aboriginal title is equivalent to fee simple ownership and includes mineral rights. The First Nation has the unilateral right to evict the provincial government and take over the resource development project without compensation."
-    ],
-    correctAnswer: "Aboriginal title is a sui generis right that falls short of fee simple ownership. While it includes the right to exclusive use and occupation of the land, it can be infringed upon by the Crown if the infringement is justified according to the test established in R. v. Sparrow."
-  },
-  // Add more questions here...
-]
+const COLORS = ["#4CAF50", "#F44336"];
 
-const COLORS = ['#4CAF50', '#F44336']
+type Question = {
+  id: string;
+  subjectId: [number];
+  questionText: string;
+  answer1: string;
+  answer2: string;
+  answer3: string;
+  answer4: string;
+  correctAnswer: number;
+  comments: string;
+};
 
-export function MultipleChoiceTest() {
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState("")
-  const [score, setScore] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(180) // 3 minutes in seconds
-  const [isTestComplete, setIsTestComplete] = useState(false)
+export default function MultipleChoiceTest() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get parameters from URL
+  const isTutor = searchParams.get("isTutor") === "true";
+  const isTimed = searchParams.get("isTimed") === "true";
+  const selectedSubjects = JSON.parse(
+    searchParams.get("selectedSubjects") || "[]"
+  ).map((id: string) => parseInt(id, 10));
+  const questionMode = searchParams.get("questionMode") || "Unused";
+  const numberOfQuestions = parseInt(
+    searchParams.get("numberOfQuestions") || "1",
+    10
+  );
+  const secondsPerQuestion = parseInt(
+    searchParams.get("secondsPerQuestion") || "75",
+    10
+  );
+
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedTime = localStorage.getItem("timeLeft");
+    return savedTime ? parseInt(savedTime, 10) : secondsPerQuestion;
+  });
+  const [isTestComplete, setIsTestComplete] = useState(false);
+  const [isAnswered, setIsAnswered] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timer)
-          handleNextQuestion()
-          return 180
-        }
-        return prevTime - 1
-      })
-    }, 1000)
+    let didCancel = false;
 
-    return () => clearInterval(timer)
-  }, [currentQuestion])
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch("/api/filteredquestions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            subjectIds: selectedSubjects,
+            maxQuestions: numberOfQuestions,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Fetched questions:", data);
+
+        if (!didCancel) {
+          if (Array.isArray(data)) {
+            setQuestions(data);
+          } else {
+            console.error("Unexpected response format:", data);
+          }
+        }
+      } catch (error) {
+        if (!didCancel) {
+          console.error("Error fetching questions:", error);
+        }
+      }
+    };
+
+    fetchQuestions();
+
+    return () => {
+      didCancel = true;
+    };
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  useEffect(() => {
+    if (isTimed) {
+      const timer = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            handleNextQuestion();
+            return secondsPerQuestion; // Reset to time from URL
+          }
+          const newTime = prevTime - 1;
+          localStorage.setItem("timeLeft", newTime.toString());
+          return newTime;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [currentQuestion, secondsPerQuestion, isTimed]);
 
   const handleAnswerSelection = (value: string) => {
-    setSelectedAnswer(value)
-  }
+    setSelectedAnswer(value);
+    setIsAnswered(true); // Mark the question as answered
+  };
 
   const handleNextQuestion = () => {
-    if (selectedAnswer === testQuestions[currentQuestion].correctAnswer) {
-      setScore(score + 1)
+    if (questions.length === 0 || currentQuestion >= questions.length) {
+      return;
     }
-    if (currentQuestion === testQuestions.length - 1) {
-      setIsTestComplete(true)
+
+    const currentQ = questions[currentQuestion];
+    const correctAnswer =
+      currentQ[`answer${currentQ.correctAnswer}` as keyof Question];
+
+    if (selectedAnswer === correctAnswer) {
+      setScore(score + 1);
+    }
+
+    if (currentQuestion === questions.length - 1) {
+      setIsTestComplete(true);
+      localStorage.removeItem("timeLeft"); // Clear the timer when the test is complete
     } else {
-      setCurrentQuestion(currentQuestion + 1)
-      setSelectedAnswer("")
-      setTimeLeft(180) // Reset timer for next question
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer("");
+      setIsAnswered(false); // Reset the answered state for the next question
+      setTimeLeft(secondsPerQuestion); // Reset timer for next question
+      localStorage.setItem("timeLeft", secondsPerQuestion.toString());
     }
-  }
+  };
 
   const handlePreviousQuestion = () => {
-    setSelectedAnswer("")
-    setCurrentQuestion(currentQuestion - 1)
-    setTimeLeft(180) // Reset timer for previous question
-  }
+    if (currentQuestion === 0) {
+      return;
+    }
 
-  const isLastQuestion = currentQuestion === testQuestions.length - 1
+    setSelectedAnswer("");
+    setCurrentQuestion(currentQuestion - 1);
+    setIsAnswered(false); // Reset the answered state for the previous question
+    setTimeLeft(secondsPerQuestion); // Reset timer for previous question
+    localStorage.setItem("timeLeft", secondsPerQuestion.toString());
+  };
+
+  const isLastQuestion = currentQuestion === questions.length - 1;
 
   const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`
-  }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
 
   const resultData = [
-    { name: 'Correct', value: score },
-    { name: 'Incorrect', value: testQuestions.length - score },
-  ]
+    { name: "Correct", value: score },
+    { name: "Incorrect", value: questions.length - score },
+  ];
 
   if (isTestComplete) {
     return (
       <div className="container mx-auto p-4 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-6 text-center">Canadian Bar Exam Practice Test Results</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          Canadian Bar Exam Practice Test Results
+        </h1>
         <Card>
           <CardHeader>
-            <CardTitle>Your Score: {score} / {testQuestions.length}</CardTitle>
+            <CardTitle>
+              Your Score: {score} / {questions.length}
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center">
             <div className="w-64 h-64">
@@ -113,13 +200,18 @@ export function MultipleChoiceTest() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                    }
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
                   >
                     {resultData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Legend />
@@ -129,48 +221,84 @@ export function MultipleChoiceTest() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
+
+  if (questions.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  console.log("Current question:", questions[currentQuestion]);
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">Canadian Bar Exam Practice Test</h1>
-      
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Canadian Bar Exam Practice Test
+      </h1>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
-            <span>Question {currentQuestion + 1} of {testQuestions.length}</span>
-            <span className="text-xl font-bold">{formatTime(timeLeft)}</span>
+            <span>
+              Question {currentQuestion + 1} of {questions.length}
+            </span>
+            {isTimed && (
+              <span className="text-xl font-bold">{formatTime(timeLeft)}</span>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Progress value={(timeLeft / 180) * 100} className="mb-4" />
-          <p className="text-lg mb-6">{testQuestions[currentQuestion].question}</p>
-          <RadioGroup value={selectedAnswer} onValueChange={handleAnswerSelection}>
-            {testQuestions[currentQuestion].choices.map((choice, index) => (
+          {isTimed && (
+            <Progress
+              value={(timeLeft / secondsPerQuestion) * 100}
+              className="mb-4"
+            />
+          )}
+          <p className="text-lg mb-6">
+            {questions[currentQuestion]?.questionText}
+          </p>
+          <RadioGroup
+            value={selectedAnswer}
+            onValueChange={handleAnswerSelection}
+          >
+            {[
+              questions[currentQuestion]?.answer1,
+              questions[currentQuestion]?.answer2,
+              questions[currentQuestion]?.answer3,
+              questions[currentQuestion]?.answer4,
+            ].map((choice, index) => (
               <div key={index} className="flex items-start space-x-2 mb-4">
-                <RadioGroupItem value={choice} id={`choice-${index}`} className="mt-1" />
-                <Label htmlFor={`choice-${index}`} className="flex-1">{choice}</Label>
+                <RadioGroupItem
+                  value={choice}
+                  id={`choice-${index}`}
+                  className="mt-1"
+                />
+                <Label htmlFor={`choice-${index}`} className="flex-1">
+                  {choice}
+                </Label>
               </div>
             ))}
           </RadioGroup>
+          {isAnswered && (
+            <p className="text-sm mb-6 text-gray-600">
+              {questions[currentQuestion]?.comments}
+            </p>
+          )}
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button 
-            onClick={handlePreviousQuestion} 
+          <Button
+            onClick={handlePreviousQuestion}
             disabled={currentQuestion === 0}
             variant="outline"
           >
             <ChevronLeft className="mr-2 h-4 w-4" /> Previous
           </Button>
-          <Button 
-            onClick={handleNextQuestion} 
-            disabled={!selectedAnswer}
-          >
-            {isLastQuestion ? "Finish" : "Next"} <ChevronRight className="ml-2 h-4 w-4" />
+          <Button onClick={handleNextQuestion} disabled={!selectedAnswer}>
+            {isLastQuestion ? "Finish" : "Next"}{" "}
+            <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
