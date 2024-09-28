@@ -40,6 +40,7 @@
     "postgres": "^3.4.4",
     "react": "19.0.0-rc-7771d3a7-20240827",
     "react-dom": "19.0.0-rc-7771d3a7-20240827",
+    "recharts": "^2.12.7",
     "resend": "^4.0.0",
     "responsive-react-email": "^0.0.5",
     "server-only": "^0.0.1",

@@ -36,13 +36,11 @@ export default function DashboardLayout({
       label: "Create a New Test",
     },
     {
-      href: "/dashboard/previoustest/",
-      icon: BadgeCheck,
-      label: "Previous Tests",
+      href: "/dashboard/subscription",
+      icon: BookCheck,
+      label: "My Subscription",
     },
-    { href: "/dashboard/subscription", icon: BookCheck, label: "Subscription" },
-    { href: "/dashboard/general", icon: Settings, label: "General" },
-    { href: "/dashboard/security", icon: Shield, label: "Security" },
+    { href: "/dashboard/general", icon: Settings, label: "Settings" },
   ];
 
   const adminNavItems = [
