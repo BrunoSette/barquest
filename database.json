@@ -1,0 +1,11 @@
+{
+  "dev": {
+    "driver": "pg",
+    "user": "default",
+    "password": "cwFba19YZHyr",
+    "host": "ep-old-cake-a4443i0g-pooler.us-east-1.aws.neon.tech",
+    "database": "verceldb",
+    "port": 5432,
+    "ssl": true
+  }
+}

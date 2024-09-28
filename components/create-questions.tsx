@@ -26,26 +26,26 @@ import {
   Toast,
   ToastTitle,
   ToastDescription,
-} from "@/components/ui/toast"; // Import the shadcn toast components
+} from "@/components/ui/toast";
 
 type Question = {
   subject: string;
   question: string;
   choices: string[];
-  correctAnswer: string;
+  correctAnswer: number;
 };
 
 const subjects = [
-  "Constitutional Law",
-  "Criminal Law",
-  "Civil Procedure",
-  "Contract Law",
-  "Tort Law",
-  "Property Law",
-  "Administrative Law",
-  "Evidence",
-  "Professional Responsibility",
-  "Business Associations",
+  { id: 1, name: "Constitutional Law" },
+  { id: 2, name: "Criminal Law" },
+  { id: 3, name: "Civil Procedure" },
+  { id: 4, name: "Contract Law" },
+  { id: 5, name: "Tort Law" },
+  { id: 6, name: "Property Law" },
+  { id: 7, name: "Administrative Law" },
+  { id: 8, name: "Evidence" },
+  { id: 9, name: "Professional Responsibility" },
+  { id: 10, name: "Business Associations" },
 ];
 
 export function CreateQuestionsComponent() {
@@ -54,7 +54,7 @@ export function CreateQuestionsComponent() {
     subject: "",
     question: "",
     choices: ["", "", "", ""],
-    correctAnswer: "",
+    correctAnswer: 0, // Initialize as 0
   });
 
   const [toasts, setToasts] = useState<
@@ -80,24 +80,62 @@ export function CreateQuestionsComponent() {
   };
 
   const handleCorrectAnswerChange = (value: string) => {
-    setCurrentQuestion({ ...currentQuestion, correctAnswer: value });
+    setCurrentQuestion({ ...currentQuestion, correctAnswer: parseInt(value) });
   };
 
-  const handleSaveQuestion = () => {
+  const handleSaveQuestion = async () => {
     if (
       currentQuestion.subject &&
       currentQuestion.question &&
       currentQuestion.choices.every((choice) => choice.trim() !== "") &&
       currentQuestion.correctAnswer
     ) {
-      setQuestions([...questions, currentQuestion]);
-      setCurrentQuestion({
-        subject: currentQuestion.subject,
-        question: "",
-        choices: ["", "", "", ""],
-        correctAnswer: "",
-      });
-      addToast("Question Saved", "The question has been added to the list.");
+      try {
+        const subject = subjects.find(
+          (subj) => subj.name === currentQuestion.subject
+        );
+
+        if (!subject) {
+          addToast("Error", "Invalid subject selected.", "destructive");
+          return;
+        }
+
+        const response = await fetch("/api/questions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            subjectId: subject.id,
+            questionText: currentQuestion.question,
+            answer1: currentQuestion.choices[0],
+            answer2: currentQuestion.choices[1],
+            answer3: currentQuestion.choices[2],
+            answer4: currentQuestion.choices[3],
+            correctAnswer: currentQuestion.correctAnswer,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setQuestions([...questions, currentQuestion]);
+          setCurrentQuestion({
+            subject: currentQuestion.subject,
+            question: "",
+            choices: ["", "", "", ""],
+            correctAnswer: 0,
+          });
+          addToast(
+            "Question Saved",
+            "The question has been added to the list."
+          );
+        } else {
+          addToast("Error", "Failed to save the question.", "destructive");
+        }
+      } catch (error) {
+        console.error("Error saving question:", error);
+        addToast("Error", "Failed to save the question.", "destructive");
+      }
     } else {
       addToast(
         "Incomplete Question",
@@ -120,7 +158,7 @@ export function CreateQuestionsComponent() {
       subject: "",
       question: "",
       choices: ["", "", "", ""],
-      correctAnswer: "",
+      correctAnswer: 0,
     });
   };
 
@@ -147,8 +185,8 @@ export function CreateQuestionsComponent() {
                 </SelectTrigger>
                 <SelectContent>
                   {subjects.map((subject) => (
-                    <SelectItem key={subject} value={subject}>
-                      {subject}
+                    <SelectItem key={subject.id} value={subject.name}>
+                      {subject.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -179,11 +217,14 @@ export function CreateQuestionsComponent() {
               <Label>Correct Answer</Label>
               <RadioGroup
                 onValueChange={handleCorrectAnswerChange}
-                value={currentQuestion.correctAnswer}
+                value={currentQuestion.correctAnswer.toString()} // Convert to string for RadioGroup
               >
                 {currentQuestion.choices.map((choice, index) => (
                   <div className="flex items-center space-x-2" key={index}>
-                    <RadioGroupItem value={choice} id={`correct-${index}`} />
+                    <RadioGroupItem
+                      value={(index + 1).toString()}
+                      id={`correct-${index}`}
+                    />
                     <Label htmlFor={`correct-${index}`}>
                       {choice || `Choice ${index + 1}`}
                     </Label>

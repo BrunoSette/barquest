@@ -65,40 +65,43 @@ export function ManageQuestionsComponent() {
   const [toasts, setToasts] = useState<
     { title: string; description: string; variant?: string }[]
   >([]);
+  const [questionToDelete, setQuestionToDelete] = useState<Question | null>(
+    null
+  );
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const addToast = (title: string, description: string, variant?: string) => {
     setToasts([...toasts, { title, description, variant }]);
   };
 
   useEffect(() => {
-    // In a real application, you would fetch questions from an API or database here
-    const mockQuestions: Question[] = [
-      {
-        id: "1",
-        subject: "Constitutional Law",
-        question: "What is the supreme law of Canada?",
-        choices: [
-          "The Charter of Rights and Freedoms",
-          "The Constitution Act, 1867",
-          "The Constitution Act, 1982",
-          "The Canada Act 1982",
-        ],
-        correctAnswer: "The Constitution Act, 1982",
-      },
-      {
-        id: "2",
-        subject: "Criminal Law",
-        question: "What is the minimum mens rea required for murder in Canada?",
-        choices: [
-          "Recklessness",
-          "Negligence",
-          "Intent to cause bodily harm",
-          "Intent to kill",
-        ],
-        correctAnswer: "Intent to cause bodily harm",
-      },
-    ];
-    setQuestions(mockQuestions);
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch("/api/questions");
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched data:", data); // Log the fetched data
+
+          // Map the fetched data to the expected structure
+          const mappedQuestions = data.map((item: any) => ({
+            id: item.id.toString(),
+            subject: subjects[item.subject_id - 1], // Assuming subject_id is 1-based index
+            question: item.question_text,
+            choices: [item.answer1, item.answer2, item.answer3, item.answer4],
+            correctAnswer: item[`answer${item.correct_answer}`],
+          }));
+
+          setQuestions(mappedQuestions);
+        } else {
+          addToast("Error", "Failed to fetch questions.", "destructive");
+        }
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+        addToast("Error", "Failed to fetch questions.", "destructive");
+      }
+    };
+
+    fetchQuestions();
   }, []);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,8 +110,10 @@ export function ManageQuestionsComponent() {
 
   const filteredQuestions = questions.filter(
     (q) =>
-      q.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      q.question.toLowerCase().includes(searchTerm.toLowerCase())
+      (q.subject &&
+        q.subject.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (q.question &&
+        q.question.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleEdit = (question: Question) => {
@@ -116,27 +121,84 @@ export function ManageQuestionsComponent() {
     setIsEditDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    setQuestions(questions.filter((q) => q.id !== id));
-    addToast(
-      "Question Deleted",
-      "The question has been removed from the list."
-    );
+  const handleDelete = (question: Question) => {
+    setQuestionToDelete(question);
+    setIsDeleteDialogOpen(true);
   };
 
-  const handleSaveEdit = () => {
+  const confirmDelete = async () => {
+    if (questionToDelete) {
+      try {
+        const response = await fetch(`/api/questions`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: questionToDelete.id }),
+        });
+
+        if (response.ok) {
+          setQuestions(questions.filter((q) => q.id !== questionToDelete.id));
+          addToast(
+            "Question Deleted",
+            "The question has been removed from the list."
+          );
+        } else {
+          addToast("Error", "Failed to delete question.", "destructive");
+        }
+      } catch (error) {
+        console.error("Error deleting question:", error);
+        addToast("Error", "Failed to delete question.", "destructive");
+      } finally {
+        setIsDeleteDialogOpen(false);
+        setQuestionToDelete(null);
+      }
+    }
+  };
+
+  const handleSaveEdit = async () => {
     if (editingQuestion) {
-      setQuestions(
-        questions.map((q) =>
-          q.id === editingQuestion.id ? editingQuestion : q
-        )
-      );
-      setIsEditDialogOpen(false);
-      setEditingQuestion(null);
-      addToast(
-        "Question Updated",
-        "The question has been successfully updated."
-      );
+      try {
+        const subjectId = subjects.indexOf(editingQuestion.subject) + 1;
+        const response = await fetch(`/api/questions`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: editingQuestion.id,
+            subjectId,
+            questionText: editingQuestion.question,
+            answer1: editingQuestion.choices[0],
+            answer2: editingQuestion.choices[1],
+            answer3: editingQuestion.choices[2],
+            answer4: editingQuestion.choices[3],
+            correctAnswer:
+              editingQuestion.choices.indexOf(editingQuestion.correctAnswer) +
+              1,
+          }),
+        });
+
+        if (response.ok) {
+          setQuestions(
+            questions.map((q) =>
+              q.id === editingQuestion.id ? editingQuestion : q
+            )
+          );
+          addToast(
+            "Question Updated",
+            "The question has been successfully updated."
+          );
+        } else {
+          addToast("Error", "Failed to update question.", "destructive");
+        }
+      } catch (error) {
+        console.error("Error updating question:", error);
+        addToast("Error", "Failed to update question.", "destructive");
+      } finally {
+        setIsEditDialogOpen(false);
+        setEditingQuestion(null);
+      }
     }
   };
 
@@ -157,41 +219,45 @@ export function ManageQuestionsComponent() {
           />
         </div>
 
-        {filteredQuestions.map((question) => (
-          <Card key={question.id} className="mb-4">
-            <CardHeader>
-              <CardTitle>{question.subject}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="font-semibold mb-2">{question.question}</p>
-              <ul className="list-disc pl-5">
-                {question.choices.map((choice, index) => (
-                  <li
-                    key={index}
-                    className={
-                      choice === question.correctAnswer
-                        ? "text-green-600 font-semibold"
-                        : ""
-                    }
-                  >
-                    {choice}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter className="flex justify-end space-x-2">
-              <Button onClick={() => handleEdit(question)} variant="outline">
-                Edit
-              </Button>
-              <Button
-                onClick={() => handleDelete(question.id)}
-                variant="destructive"
-              >
-                Delete
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+        {questions.length > 0 ? (
+          filteredQuestions.map((question) => (
+            <Card key={question.id} className="mb-4">
+              <CardHeader>
+                <CardTitle>{question.subject}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="font-semibold mb-2">{question.question}</p>
+                <ul className="list-disc pl-5">
+                  {question.choices.map((choice, index) => (
+                    <li
+                      key={index}
+                      className={
+                        choice === question.correctAnswer
+                          ? "text-green-600 font-semibold"
+                          : ""
+                      }
+                    >
+                      {choice}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter className="flex justify-end space-x-2">
+                <Button onClick={() => handleEdit(question)} variant="outline">
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => handleDelete(question)}
+                  variant="destructive"
+                >
+                  Delete
+                </Button>
+              </CardFooter>
+            </Card>
+          ))
+        ) : (
+          <p>No questions found.</p>
+        )}
 
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
@@ -284,6 +350,26 @@ export function ManageQuestionsComponent() {
             )}
             <DialogFooter>
               <Button onClick={handleSaveEdit}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Delete</DialogTitle>
+            </DialogHeader>
+            <p>Are you sure you want to delete this question?</p>
+            <DialogFooter>
+              <Button
+                onClick={() => setIsDeleteDialogOpen(false)}
+                variant="outline"
+              >
+                Cancel
+              </Button>
+              <Button onClick={confirmDelete} variant="destructive">
+                Delete
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
