@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, XCircle } from "lucide-react";
@@ -188,7 +189,10 @@ export default function MultipleChoiceTest() {
         <Card>
           <CardHeader>
             <CardTitle>
-              Your Score: {score} / {questions.length}
+              <div>
+                Your Score: {score} / {questions.length} (
+                {Math.round((score / questions.length) * 100)}%)
+              </div>{" "}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center">
@@ -217,6 +221,18 @@ export default function MultipleChoiceTest() {
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
+            </div>
+            <div className="flex flex-col items-center justify-end mt-4 h-full">
+              <Link href="/dashboard">
+                <div className="bg-blue-500 text-white px-4 py-2 rounded mb-2">
+                  Go to Dashboard
+                </div>
+              </Link>
+              <Link href="/dashboard/newtest">
+                <div className="bg-orange-500 text-white px-4 py-2 rounded">
+                  Start New Test
+                </div>
+              </Link>
             </div>
           </CardContent>
         </Card>

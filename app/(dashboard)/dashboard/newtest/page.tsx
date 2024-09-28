@@ -30,7 +30,7 @@ export default function GeneralPage() {
     subjects.map((subject) => subject.id)
   ); // All subjects selected by default
   const [questionMode, setQuestionMode] = useState("Unused");
-  const [numberOfQuestions, setNumberOfQuestions] = useState("5");
+  const [numberOfQuestions, setNumberOfQuestions] = useState("1");
   const [secondsPerQuestion, setSecondsPerQuestion] = useState("75");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
