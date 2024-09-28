@@ -5,8 +5,8 @@ import { ManageQuestionsComponent } from "@/components/manage-questions";
 export default async function SubscriptionPage() {
   const user = await getUser();
 
-  if (!user) {
-    redirect("/login");
+  if (!user || user.role !== "admin") {
+    redirect("/sign-in");
   }
 
   return <ManageQuestionsComponent />;
