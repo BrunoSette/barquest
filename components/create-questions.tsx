@@ -36,16 +36,15 @@ type Question = {
 };
 
 const subjects = [
-  { id: 1, name: "Constitutional Law" },
+  { id: 1, name: "Business Law" },
   { id: 2, name: "Criminal Law" },
-  { id: 3, name: "Civil Procedure" },
-  { id: 4, name: "Contract Law" },
-  { id: 5, name: "Tort Law" },
-  { id: 6, name: "Property Law" },
-  { id: 7, name: "Administrative Law" },
-  { id: 8, name: "Evidence" },
-  { id: 9, name: "Professional Responsibility" },
-  { id: 10, name: "Business Associations" },
+  { id: 3, name: "Civil Litigation" },
+  { id: 4, name: "Estate Planning" },
+  { id: 5, name: "Family Law" },
+  { id: 6, name: "Professional Responsibility - Barristers" },
+  { id: 7, name: "Professional Responsibility - Solicitors" },
+  { id: 8, name: "Public Law" },
+  { id: 9, name: "Real Estate" },
 ];
 
 export function CreateQuestionsComponent() {

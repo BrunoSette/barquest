@@ -10,16 +10,15 @@ import { Loader2 } from "lucide-react";
 import { useUser } from "@/lib/auth";
 
 const subjects = [
-  "Constitutional Law",
-  "Criminal Law",
-  "Family Law",
-  "Civil Procedure",
-  "Evidence",
-  "Professional Responsibility",
-  "Real Estate",
   "Business Law",
-  "Wills and Estates",
-  "Administrative Law",
+  "Criminal Law",
+  "Civil Litigation",
+  "Estate Planing",
+  "Family Law",
+  "Professional Responsibility - Barristers",
+  "Professional Responsibility - Solicitors",
+  "Public Law",
+  "Real Estate",
 ];
 
 export default function GeneralPage() {

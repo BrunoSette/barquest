@@ -45,16 +45,15 @@ type Question = {
 };
 
 const subjects = [
-  "Constitutional Law",
+  "Business Law",
   "Criminal Law",
-  "Civil Procedure",
-  "Contract Law",
-  "Tort Law",
-  "Property Law",
-  "Administrative Law",
-  "Evidence",
-  "Professional Responsibility",
-  "Business Associations",
+  "Civil Litigation",
+  "Estate Planing",
+  "Family Law",
+  "Professional Responsibility - Barristers",
+  "Professional Responsibility - Solicitors",
+  "Public Law",
+  "Real Estate",
 ];
 
 export function ManageQuestionsComponent() {
