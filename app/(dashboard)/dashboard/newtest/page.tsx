@@ -10,15 +10,15 @@ import { Loader2 } from "lucide-react";
 import { useUser } from "@/lib/auth";
 
 const subjects = [
-  "Business Law",
-  "Criminal Law",
-  "Civil Litigation",
-  "Estate Planing",
-  "Family Law",
-  "Professional Responsibility - Barristers",
-  "Professional Responsibility - Solicitors",
-  "Public Law",
-  "Real Estate",
+  { id: 1, name: "Business Law" },
+  { id: 2, name: "Criminal Law" },
+  { id: 3, name: "Civil Litigation" },
+  { id: 4, name: "Estate Planning" },
+  { id: 5, name: "Family Law" },
+  { id: 6, name: "Professional Responsibility - Barristers" },
+  { id: 7, name: "Professional Responsibility - Solicitors" },
+  { id: 8, name: "Public Law" },
+  { id: 9, name: "Real Estate" },
 ];
 
 export default function GeneralPage() {
@@ -26,7 +26,9 @@ export default function GeneralPage() {
   const router = useRouter();
   const [isTutor, setIsTutor] = useState(true);
   const [isTimed, setIsTimed] = useState(true);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(subjects); // All subjects selected by default
+  const [selectedSubjects, setSelectedSubjects] = useState<number[]>(
+    subjects.map((subject) => subject.id)
+  ); // All subjects selected by default
   const [questionMode, setQuestionMode] = useState("Unused");
   const [numberOfQuestions, setNumberOfQuestions] = useState("5");
   const [secondsPerQuestion, setSecondsPerQuestion] = useState("75");
@@ -34,11 +36,11 @@ export default function GeneralPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubjectChange = (subject: string) => {
+  const handleSubjectChange = (subjectId: number) => {
     setSelectedSubjects((prev) =>
-      prev.includes(subject)
-        ? prev.filter((s) => s !== subject)
-        : [...prev, subject]
+      prev.includes(subjectId)
+        ? prev.filter((id) => id !== subjectId)
+        : [...prev, subjectId]
     );
   };
 
@@ -49,7 +51,7 @@ export default function GeneralPage() {
     if (selectedSubjects.length === subjects.length) {
       setSelectedSubjects([]); // Deselect all if all are selected
     } else {
-      setSelectedSubjects(subjects); // Select all
+      setSelectedSubjects(subjects.map((subject) => subject.id)); // Select all
     }
   };
 
@@ -64,16 +66,11 @@ export default function GeneralPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setSuccess("Test created successfully");
 
-      // Map selected subjects to their indices
-      const selectedSubjectIndices = selectedSubjects.map((subject) =>
-        subjects.indexOf(subject)
-      );
-
       // Construct query parameters
       const queryParams = new URLSearchParams({
         isTutor: String(isTutor),
         isTimed: String(isTimed),
-        selectedSubjects: JSON.stringify(selectedSubjectIndices),
+        selectedSubjects: JSON.stringify(selectedSubjects),
         questionMode,
         numberOfQuestions,
         secondsPerQuestion,
@@ -144,15 +141,15 @@ export default function GeneralPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               {subjects.map((subject) => (
-                <div key={subject} className="flex items-center space-x-2">
+                <div key={subject.id} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    id={subject}
+                    id={subject.name}
                     className="h-4 w-4 rounded"
-                    checked={selectedSubjects.includes(subject)}
-                    onChange={() => handleSubjectChange(subject)}
+                    checked={selectedSubjects.includes(subject.id)}
+                    onChange={() => handleSubjectChange(subject.id)}
                   />
-                  <Label htmlFor={subject}>{subject}</Label>
+                  <Label htmlFor={subject.name}>{subject.name}</Label>
                 </div>
               ))}
             </div>
