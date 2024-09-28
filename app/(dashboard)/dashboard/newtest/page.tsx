@@ -140,6 +140,17 @@ export default function GeneralPage() {
                 />
                 <Label htmlFor="all">All Questions</Label>
               </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="wrong"
+                  name="questionMode"
+                  value="Wrong"
+                  checked={questionMode === "Wrong"}
+                  onChange={(e) => setQuestionMode(e.target.value)}
+                />
+                <Label htmlFor="wrong">Only My Mistakes</Label>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -51,19 +51,14 @@ export default function DashboardLayout({
       label: "Questions",
       subItems: [
         {
-          href: "/dashboard/questions/category",
+          href: "/dashboard/questions/create",
           icon: List,
-          label: "Category",
+          label: "Create",
         },
         {
-          href: "/dashboard/questions/questions",
+          href: "/dashboard/questions/edit",
           icon: HelpCircle,
-          label: "Questions",
-        },
-        {
-          href: "/dashboard/questions/answers",
-          icon: FileText,
-          label: "Answers",
+          label: "Edit",
         },
       ],
     },
