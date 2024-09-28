@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/lib/auth";
 import { updateAccount } from "@/app/(login)/actions";
+import Link from "next/link";
 
 type ActionState = {
   error?: string;
@@ -161,20 +162,22 @@ export default function GeneralPage() {
           </CardContent>
         </Card>
 
-        <Button
-          type="submit"
-          className="bg-orange-500 hover:bg-orange-600 text-white"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
-            </>
-          ) : (
-            "Create Test"
-          )}
-        </Button>
+        <Link href="/dashboard/teste" passHref>
+          <Button
+            type="submit"
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+            disabled={isPending}
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Create Test"
+            )}
+          </Button>
+        </Link>
       </form>
     </section>
   );
