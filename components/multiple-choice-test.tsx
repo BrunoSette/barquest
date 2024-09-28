@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,7 +32,6 @@ type Question = {
 };
 
 export default function MultipleChoiceTest() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Get parameters from URL
@@ -266,21 +266,50 @@ export default function MultipleChoiceTest() {
               questions[currentQuestion]?.answer2,
               questions[currentQuestion]?.answer3,
               questions[currentQuestion]?.answer4,
-            ].map((choice, index) => (
-              <div key={index} className="flex items-start space-x-2 mb-4">
-                <RadioGroupItem
-                  value={choice}
-                  id={`choice-${index}`}
-                  className="mt-1"
-                />
-                <Label htmlFor={`choice-${index}`} className="flex-1">
-                  {choice}
-                </Label>
-              </div>
-            ))}
+            ].map((choice, index) => {
+              const correctAnswer =
+                questions[currentQuestion][
+                  `answer${questions[currentQuestion].correctAnswer}` as keyof Question
+                ];
+              const isCorrect = choice === correctAnswer;
+              const isSelected = choice === selectedAnswer;
+              const textColorClass =
+                isTutor && isAnswered
+                  ? isCorrect
+                    ? "text-green-600"
+                    : isSelected
+                      ? "text-red-600"
+                      : "text-gray-900"
+                  : "text-gray-900";
+
+              return (
+                <div
+                  key={index}
+                  className={`flex items-center space-x-2 mb-4 ${textColorClass}`}
+                >
+                  <RadioGroupItem
+                    value={choice}
+                    id={`choice-${index}`}
+                    className="mt-1"
+                  />
+                  <Label htmlFor={`choice-${index}`} className="flex-1">
+                    {choice}
+                  </Label>
+                  {isTutor && isAnswered && (
+                    <div className="ml-2">
+                      {isCorrect ? (
+                        <CheckCircle className="text-green-600 h-5 w-5" />
+                      ) : isSelected ? (
+                        <XCircle className="text-red-600 h-5 w-5" />
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </RadioGroup>
           {isAnswered && (
-            <p className="text-sm mb-6 text-gray-600">
+            <p className="text-lg mb-6 text-gray-600">
               {questions[currentQuestion]?.comments}
             </p>
           )}
