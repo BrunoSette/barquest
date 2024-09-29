@@ -34,6 +34,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 
 type Question = {
   id: string;
@@ -41,14 +42,15 @@ type Question = {
   questionText: string;
   choices: string[];
   correctAnswer: string;
-  comments: string; // Add comments field
+  isApproved: boolean; // Updated field name
+  comments: string;
 };
 
 const subjects = [
   "Business Law",
   "Criminal Law",
   "Civil Litigation",
-  "Estate Planing",
+  "Estate Planning",
   "Family Law",
   "Professional Responsibility - Barristers",
   "Professional Responsibility - Solicitors",
@@ -82,13 +84,13 @@ export function ManageQuestionsComponent() {
           console.log("Fetched data:", data); // Log the fetched data
 
           // Map the fetched data to the expected structure
-          // Map the fetched data to the expected structure
           const mappedQuestions = data.map((item: any) => ({
             id: item.id.toString(),
             subject: subjects[item.subjectId - 1], // Assuming subjectId is 1-based index
             questionText: item.questionText,
             choices: [item.answer1, item.answer2, item.answer3, item.answer4],
             correctAnswer: item[`answer${item.correctAnswer}`],
+            isApproved: item.isApproved, // Map isApproved field
             comments: item.comments,
           }));
 
@@ -177,7 +179,8 @@ export function ManageQuestionsComponent() {
             correctAnswer:
               editingQuestion.choices.indexOf(editingQuestion.correctAnswer) +
               1,
-            comments: editingQuestion.comments, // Include comments in the request
+            isApproved: editingQuestion.isApproved, // Include isApproved in the request
+            comments: editingQuestion.comments,
           }),
         });
 
@@ -246,6 +249,10 @@ export function ManageQuestionsComponent() {
                 <p className="mt-4">
                   <strong>Comments:</strong> {question.comments}
                 </p>
+                <p className="mt-2">
+                  <strong>Approved:</strong>{" "}
+                  {question.isApproved ? "Yes" : "No"}
+                </p>
               </CardContent>
               <CardFooter className="flex justify-end space-x-2">
                 <Button onClick={() => handleEdit(question)} variant="outline">
@@ -265,7 +272,7 @@ export function ManageQuestionsComponent() {
         )}
 
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Edit Question</DialogTitle>
             </DialogHeader>
@@ -363,6 +370,19 @@ export function ManageQuestionsComponent() {
                       })
                     }
                     className="w-full"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="edit-approved">Approved</Label>
+                  <Switch
+                    id="edit-approved"
+                    checked={editingQuestion.isApproved}
+                    onCheckedChange={(checked) =>
+                      setEditingQuestion({
+                        ...editingQuestion,
+                        isApproved: checked,
+                      })
+                    }
                   />
                 </div>
               </div>

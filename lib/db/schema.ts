@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   uniqueIndex,
+  boolean as pgBoolean, // Import boolean as pgBoolean to avoid conflicts
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -39,6 +40,7 @@ export const questions = pgTable("questions", {
   answer4: text("answer4").notNull(),
   comments: text("comments").notNull(),
   correctAnswer: integer("correct_answer").notNull(), // Stores the index of the correct answer (1-4)
+  isApproved: pgBoolean("is_approved").notNull().default(false), // Use pgBoolean for boolean type
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

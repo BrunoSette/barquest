@@ -68,6 +68,7 @@ export async function PUT(req: NextRequest) {
     answer4,
     comments,
     correctAnswer,
+    isApproved, // Extract isApproved from the request body
   } = await req.json();
 
   try {
@@ -75,8 +76,8 @@ export async function PUT(req: NextRequest) {
 
     const query = `
       UPDATE questions
-      SET subject_id = $1, question_text = $2, answer1 = $3, answer2 = $4, answer3 = $5, answer4 = $6, comments = $7, correct_answer = $8, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $9;
+      SET subject_id = $1, question_text = $2, answer1 = $3, answer2 = $4, answer3 = $5, answer4 = $6, comments = $7, correct_answer = $8, isaprooved = $9, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $10;
     `;
 
     const values = [
@@ -88,6 +89,7 @@ export async function PUT(req: NextRequest) {
       answer4,
       comments,
       correctAnswer,
+      isApproved, // Add isApproved to the values array
       id,
     ];
 

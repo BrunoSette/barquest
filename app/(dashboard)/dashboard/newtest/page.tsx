@@ -117,12 +117,12 @@ export default function GeneralPage() {
                 />
                 {isTimed && (
                   <div className="flex items-center space-x-2">
-                    <Label htmlFor="secondsPerQuestion">
-                      Seconds per Question
-                    </Label>
+                    <Label htmlFor="secondsPerQuestion">Seconds</Label>
                     <input
                       type="number"
                       id="secondsPerQuestion"
+                      max={600}
+                      min={30}
                       value={secondsPerQuestion}
                       onChange={(e) => setSecondsPerQuestion(e.target.value)}
                       className="border border-gray-300 rounded p-2 w-20"
@@ -219,6 +219,8 @@ export default function GeneralPage() {
               <input
                 type="number"
                 id="numberOfQuestions"
+                max={120}
+                min={1}
                 value={numberOfQuestions}
                 onChange={(e) => setNumberOfQuestions(e.target.value)}
                 className="border border-gray-300 rounded p-2"

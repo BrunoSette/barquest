@@ -8,15 +8,12 @@ import {
   Users,
   Settings,
   LayoutDashboard,
-  Shield,
-  Menu,
   BookCheck,
   BadgeCheck,
   ChevronDown,
   ChevronRight,
   List,
   HelpCircle,
-  FileText,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -68,17 +65,32 @@ export default function DashboardLayout({
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 p-4">
-        <div className="flex items-center">
-          <span className="font-medium">Settings</span>
+        <div className="flex items-center space-x-4">
+          <Link href="/dashboard/" passHref>
+            <Button
+              variant={pathname === "/dashboard/" ? "secondary" : "ghost"}
+              className={`my-1 ${
+                pathname === "/dashboard/" ? "bg-gray-100" : ""
+              }`}
+            >
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Dashboard
+            </Button>
+          </Link>
+          <Link href="/dashboard/newtest/" passHref>
+            <Button
+              variant={
+                pathname === "/dashboard/newtest/" ? "secondary" : "ghost"
+              }
+              className={`my-1 ${
+                pathname === "/dashboard/newtest/" ? "bg-gray-100" : ""
+              }`}
+            >
+              <BadgeCheck className="mr-2 h-4 w-4" />
+              Create a Test
+            </Button>
+          </Link>
         </div>
-        <Button
-          className="-mr-3"
-          variant="ghost"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          <Menu className="h-6 w-6" />
-          <span className="sr-only">Toggle sidebar</span>
-        </Button>
       </div>
 
       <div className="flex flex-1 overflow-hidden h-full">
