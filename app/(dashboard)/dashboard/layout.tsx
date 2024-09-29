@@ -42,7 +42,6 @@ export default function DashboardLayout({
   ];
 
   const adminNavItems = [
-    { href: "/dashboard/users", icon: Users, label: "Users" },
     {
       icon: FileQuestion,
       label: "Questions",
@@ -59,6 +58,7 @@ export default function DashboardLayout({
         },
       ],
     },
+    { href: "/dashboard/users", icon: Users, label: "Users" },
   ];
 
   return (
