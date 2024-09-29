@@ -1,12 +1,6 @@
 import { Button } from "@/components/ui/button";
 import PricingPage from "@/app/(dashboard)/pricing/page";
-import {
-  ArrowRight,
-  FileQuestion,
-  Database,
-  ChartArea,
-  Menu,
-} from "lucide-react";
+import { ArrowRight, FileQuestion, Database, ChartArea } from "lucide-react";
 import Image from "next/image";
 import pic from "../public/imagem2.png";
 import Link from "next/link";
@@ -170,6 +164,9 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        <section>
+          <PricingPage />
+        </section>
 
         <section className="py-16 bg-orange-500">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -194,9 +191,6 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </section>
-        <section>
-          <PricingPage />
         </section>
       </main>
 
@@ -307,9 +301,9 @@ export default function HomePage() {
           </div>
           <div className="mt-8 border-t border-gray-700 pt-8 flex justify-between items-center">
             <p className="text-base text-gray-400">
-              &copy; 2023 BarPrep. All rights reserved.
+              &copy; 2024 BarPrep. All rights reserved.
             </p>
-            <p className="text-base text-gray-400">Designed for success</p>
+            {/* <p className="text-base text-gray-400">Designed for success</p> */}
           </div>
         </div>
       </footer>

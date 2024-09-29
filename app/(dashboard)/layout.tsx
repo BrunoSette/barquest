@@ -57,14 +57,6 @@ function Header() {
           </Link>
         </div>
         <div className="flex items-center space-x-2">
-          {/* {!user && (
-            <Link
-              href="/pricing"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900"
-            >
-              Pricing
-            </Link>
-          )} */}
           {user ? (
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>

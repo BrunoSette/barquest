@@ -12,9 +12,30 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type Team = {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  stripe_customer_id: string;
+  stripe_subscription_id: string;
+  stripe_product_id: string;
+  plan_name: string;
+  subscription_status: string;
+};
+
 export default function UsersTableAndGraphs() {
-  const [users, setUsers] = useState([]);
-  const [teams, setTeams] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {

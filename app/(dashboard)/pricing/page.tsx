@@ -38,7 +38,7 @@ export default async function PricingPage() {
             "Unlimited Workspace Members",
             "Email Support",
           ]}
-          priceId={monthlyPrice?.id}
+          priceId={monthlyPriceId}
         />
         <PricingCard
           name={barQuest?.name || "Plus"}
@@ -50,7 +50,7 @@ export default async function PricingPage() {
             "Early Access to New Features",
             "24/7 Support + Slack Access",
           ]}
-          priceId={quaterlyPrice?.id}
+          priceId={quaterlyPriceId}
         />
       </div>
     </main>
