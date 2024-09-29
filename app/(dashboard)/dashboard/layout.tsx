@@ -63,7 +63,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">
-      {/* Mobile header */}
+      {/* Mobile header
       <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 p-4">
         <div className="flex items-center space-x-4">
           <Link href="/dashboard/" passHref>
@@ -91,7 +91,7 @@ export default function DashboardLayout({
             </Button>
           </Link>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex flex-1 overflow-hidden h-full">
         {/* Sidebar */}

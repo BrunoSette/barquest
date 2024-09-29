@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CircleIcon, Settings, BookCheck, LogOut } from "lucide-react";
+import {
+  CircleIcon,
+  Settings,
+  BookCheck,
+  LogOut,
+  LayoutDashboard,
+  BadgeCheck,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +42,20 @@ function Header() {
             BarQuest
           </span>
         </Link>
+        <div className="flex items-center space-x-4 lg:hidden">
+          <Link href="/dashboard/" passHref>
+            <Button variant="ghost" className="my-1">
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Dashboard
+            </Button>
+          </Link>
+          <Link href="/dashboard/newtest/" passHref>
+            <Button variant="ghost" className="my-1">
+              <BadgeCheck className="mr-2 h-4 w-4" />
+              Create a Test
+            </Button>
+          </Link>
+        </div>
         <div className="flex items-center space-x-4">
           {!user && (
             <Link
