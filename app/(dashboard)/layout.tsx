@@ -35,26 +35,28 @@ function Header() {
 
   return (
     <header className="border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <CircleIcon className="h-6 w-6 text-orange-500" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">
+          <span className="ml-1 text-lg lg:text-xl font-semibold text-gray-900">
             BarQuest
           </span>
         </Link>
-        <div className="flex items-center space-x-2 lg:hidden">
+        <div className="flex items-center lg:hidden">
           <Link href="/dashboard/" passHref>
             <Button variant="ghost" className="my-1">
+              <LayoutDashboard className="mr-1 h-4 w-4" />
               Dashboard
             </Button>
           </Link>
           <Link href="/dashboard/newtest/" passHref>
             <Button variant="ghost" className="my-1">
-              Create a Test
+              <BadgeCheck className="mr-1 h-4 w-4" />
+              New Test
             </Button>
           </Link>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
           {!user && (
             <Link
               href="/pricing"
@@ -66,7 +68,7 @@ function Header() {
           {user ? (
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer size-9">
+                <Avatar className="cursor-pointer size-8">
                   <AvatarImage alt={user.name || ""} />
                   <AvatarFallback>
                     {user.email

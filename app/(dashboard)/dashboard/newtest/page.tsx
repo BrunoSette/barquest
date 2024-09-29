@@ -214,8 +214,8 @@ export default function GeneralPage() {
             <CardTitle>Number of Questions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="numberOfQuestions">Number of Questions</Label>
+            <div className="flex items-center space-x-5">
+              <Label htmlFor="numberOfQuestions"></Label>
               <input
                 type="number"
                 id="numberOfQuestions"
@@ -225,24 +225,23 @@ export default function GeneralPage() {
                 onChange={(e) => setNumberOfQuestions(e.target.value)}
                 className="border border-gray-300 rounded p-2"
               />
+              <Button
+                type="submit"
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Test"
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
-
-        <Button
-          type="submit"
-          className="bg-orange-500 hover:bg-orange-600 text-white"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
-            </>
-          ) : (
-            "Create Test"
-          )}
-        </Button>
       </form>
     </section>
   );
