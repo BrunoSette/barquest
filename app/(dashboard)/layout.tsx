@@ -42,16 +42,14 @@ function Header() {
             BarQuest
           </span>
         </Link>
-        <div className="flex items-center space-x-4 lg:hidden">
+        <div className="flex items-center space-x-2 lg:hidden">
           <Link href="/dashboard/" passHref>
             <Button variant="ghost" className="my-1">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
               Dashboard
             </Button>
           </Link>
           <Link href="/dashboard/newtest/" passHref>
             <Button variant="ghost" className="my-1">
-              <BadgeCheck className="mr-2 h-4 w-4" />
               Create a Test
             </Button>
           </Link>
@@ -74,7 +72,8 @@ function Header() {
                     {user.email
                       .split(" ")
                       .map((n) => n[0])
-                      .join("")}
+                      .join("")
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>

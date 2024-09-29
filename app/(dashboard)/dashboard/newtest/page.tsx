@@ -125,7 +125,7 @@ export default function GeneralPage() {
                       min={30}
                       value={secondsPerQuestion}
                       onChange={(e) => setSecondsPerQuestion(e.target.value)}
-                      className="border border-gray-300 rounded p-2 w-20"
+                      className="border border-gray-300 rounded p-2 w-13"
                     />
                   </div>
                 )}
