@@ -25,7 +25,7 @@ import {
   Toast,
   ToastTitle,
   ToastDescription,
-} from "@/components/ui/toast"; // Import the shadcn toast components
+} from "@/components/ui/toast";
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,7 @@ import {
 type Question = {
   id: string;
   subject: string;
-  question: string;
+  questionText: string;
   choices: string[];
   correctAnswer: string;
   comments: string; // Add comments field
@@ -82,13 +82,14 @@ export function ManageQuestionsComponent() {
           console.log("Fetched data:", data); // Log the fetched data
 
           // Map the fetched data to the expected structure
+          // Map the fetched data to the expected structure
           const mappedQuestions = data.map((item: any) => ({
             id: item.id.toString(),
-            subject: subjects[item.subject_id - 1], // Assuming subject_id is 1-based index
-            question: item.question_text,
+            subject: subjects[item.subjectId - 1], // Assuming subjectId is 1-based index
+            questionText: item.questionText,
             choices: [item.answer1, item.answer2, item.answer3, item.answer4],
-            correctAnswer: item[`answer${item.correct_answer}`],
-            comments: item.comments, // Map comments field
+            correctAnswer: item[`answer${item.correctAnswer}`],
+            comments: item.comments,
           }));
 
           setQuestions(mappedQuestions);
@@ -112,8 +113,8 @@ export function ManageQuestionsComponent() {
     (q) =>
       (q.subject &&
         q.subject.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (q.question &&
-        q.question.toLowerCase().includes(searchTerm.toLowerCase()))
+      (q.questionText &&
+        q.questionText.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleEdit = (question: Question) => {
@@ -168,7 +169,7 @@ export function ManageQuestionsComponent() {
           body: JSON.stringify({
             id: editingQuestion.id,
             subjectId,
-            questionText: editingQuestion.question,
+            questionText: editingQuestion.questionText,
             answer1: editingQuestion.choices[0],
             answer2: editingQuestion.choices[1],
             answer3: editingQuestion.choices[2],
@@ -227,7 +228,7 @@ export function ManageQuestionsComponent() {
                 <CardTitle>{question.subject}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="font-semibold mb-2">{question.question}</p>
+                <p className="font-semibold mb-2">{question.questionText}</p>
                 <ul className="list-disc pl-5">
                   {question.choices.map((choice, index) => (
                     <li
@@ -297,11 +298,11 @@ export function ManageQuestionsComponent() {
                   <Label htmlFor="edit-question">Question</Label>
                   <Input
                     id="edit-question"
-                    value={editingQuestion.question}
+                    value={editingQuestion.questionText}
                     onChange={(e) =>
                       setEditingQuestion({
                         ...editingQuestion,
-                        question: e.target.value,
+                        questionText: e.target.value,
                       })
                     }
                     className="w-full"
