@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -189,14 +189,14 @@ export default function MultipleChoiceTest() {
         <Card>
           <CardHeader>
             <CardTitle>
-              <div>
+              <div className="text-center">
                 Your Score: {score} / {questions.length} (
                 {Math.round((score / questions.length) * 100)}%)
-              </div>{" "}
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center">
-            <div className="w-64 h-64">
+          <CardContent className="flex flex-col items-center">
+            <div className="w-64 h-64 mb-4">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -204,9 +204,6 @@ export default function MultipleChoiceTest() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
-                    }
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
@@ -222,9 +219,9 @@ export default function MultipleChoiceTest() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex flex-col items-center justify-end mt-4 h-full">
+            <div className="flex space-x-4">
               <Link href="/dashboard">
-                <div className="bg-blue-500 text-white px-4 py-2 rounded mb-2">
+                <div className="bg-blue-500 text-white px-4 py-2 rounded">
                   Go to Dashboard
                 </div>
               </Link>
