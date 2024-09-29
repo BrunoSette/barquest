@@ -6,14 +6,15 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Users,
+  FileQuestion,
   Settings,
+  Pencil,
+  FolderPlus,
   LayoutDashboard,
   BookCheck,
   BadgeCheck,
   ChevronDown,
   ChevronRight,
-  List,
-  HelpCircle,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -41,20 +42,19 @@ export default function DashboardLayout({
   ];
 
   const adminNavItems = [
-    { href: "/dashboard/users/", icon: Users, label: "Users" },
+    { href: "/dashboard/users", icon: Users, label: "Users" },
     {
-      href: "#",
-      icon: Users,
+      icon: FileQuestion,
       label: "Questions",
       subItems: [
         {
           href: "/dashboard/questions/create",
-          icon: List,
+          icon: FolderPlus,
           label: "Create",
         },
         {
           href: "/dashboard/questions/edit",
-          icon: HelpCircle,
+          icon: Pencil,
           label: "Edit",
         },
       ],
