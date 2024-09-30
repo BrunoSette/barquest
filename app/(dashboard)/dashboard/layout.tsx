@@ -59,6 +59,7 @@ export default function DashboardLayout({
         },
       ],
     },
+    { href: "/dashboard/users", icon: Users, label: "Users" },
   ];
 
   return (

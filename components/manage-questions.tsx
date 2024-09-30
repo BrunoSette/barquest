@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -72,9 +72,15 @@ export function ManageQuestionsComponent() {
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const addToast = (title: string, description: string, variant?: string) => {
-    setToasts([...toasts, { title, description, variant }]);
-  };
+  const addToast = useCallback(
+    (title: string, description: string, variant?: string) => {
+      setToasts((prevToasts) => [
+        ...prevToasts,
+        { title, description, variant },
+      ]);
+    },
+    []
+  );
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -106,7 +112,7 @@ export function ManageQuestionsComponent() {
     };
 
     fetchQuestions();
-  }, []);
+  }, [addToast]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
