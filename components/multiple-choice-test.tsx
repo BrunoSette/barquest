@@ -54,7 +54,7 @@ export default function MultipleChoiceTest() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(() => {
     const savedTime = localStorage.getItem("timeLeft");
@@ -62,6 +62,9 @@ export default function MultipleChoiceTest() {
   });
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [submittedAnswers, setSubmittedAnswers] = useState<Set<number>>(
+    new Set()
+  );
 
   useEffect(() => {
     let didCancel = false;
@@ -126,9 +129,40 @@ export default function MultipleChoiceTest() {
     }
   }, [currentQuestion, secondsPerQuestion, isTimed]);
 
-  const handleAnswerSelection = (value: string) => {
+  const handleAnswerSelection = async (value: number) => {
     setSelectedAnswer(value);
     setIsAnswered(true); // Mark the question as answered
+
+    const currentQ = questions[currentQuestion];
+    const isCorrect = value === currentQ.correctAnswer;
+
+    if (!submittedAnswers.has(Number(currentQ.id))) {
+      try {
+        const response = await fetch("/api/users-answers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: 1, // Replace with actual user ID
+            question_id: currentQ.id,
+            selected_answer: value,
+            is_correct: isCorrect,
+            answered_at: new Date().toISOString(),
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Answer submitted:", data);
+        setSubmittedAnswers((prev) => new Set(prev).add(Number(currentQ.id)));
+      } catch (error) {
+        console.error("Error submitting answer:", error);
+      }
+    }
   };
 
   const handleNextQuestion = () => {
@@ -137,8 +171,7 @@ export default function MultipleChoiceTest() {
     }
 
     const currentQ = questions[currentQuestion];
-    const correctAnswer =
-      currentQ[`answer${currentQ.correctAnswer}` as keyof Question];
+    const correctAnswer = currentQ.correctAnswer;
 
     if (selectedAnswer === correctAnswer) {
       setScore(score + 1);
@@ -149,7 +182,7 @@ export default function MultipleChoiceTest() {
       localStorage.removeItem("timeLeft"); // Clear the timer when the test is complete
     } else {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer("");
+      setSelectedAnswer(null);
       setIsAnswered(false); // Reset the answered state for the next question
       setTimeLeft(secondsPerQuestion); // Reset timer for next question
       localStorage.setItem("timeLeft", secondsPerQuestion.toString());
@@ -161,7 +194,7 @@ export default function MultipleChoiceTest() {
       return;
     }
 
-    setSelectedAnswer("");
+    setSelectedAnswer(null);
     setCurrentQuestion(currentQuestion - 1);
     setIsAnswered(false); // Reset the answered state for the previous question
     setTimeLeft(secondsPerQuestion); // Reset timer for previous question
@@ -272,8 +305,8 @@ export default function MultipleChoiceTest() {
             {questions[currentQuestion]?.questionText}
           </p>
           <RadioGroup
-            value={selectedAnswer}
-            onValueChange={handleAnswerSelection}
+            value={selectedAnswer?.toString() || ""}
+            onValueChange={(value) => handleAnswerSelection(parseInt(value))}
           >
             {[
               questions[currentQuestion]?.answer1,
@@ -281,12 +314,10 @@ export default function MultipleChoiceTest() {
               questions[currentQuestion]?.answer3,
               questions[currentQuestion]?.answer4,
             ].map((choice, index) => {
-              const correctAnswer =
-                questions[currentQuestion][
-                  `answer${questions[currentQuestion].correctAnswer}` as keyof Question
-                ];
-              const isCorrect = choice === correctAnswer;
-              const isSelected = choice === selectedAnswer;
+              const answerId = index + 1;
+              const correctAnswer = questions[currentQuestion].correctAnswer;
+              const isCorrect = answerId === correctAnswer;
+              const isSelected = answerId === selectedAnswer;
               const textColorClass =
                 isTutor && isAnswered
                   ? isCorrect
@@ -302,7 +333,7 @@ export default function MultipleChoiceTest() {
                   className={`flex items-center space-x-2 mb-4 ${textColorClass}`}
                 >
                   <RadioGroupItem
-                    value={choice}
+                    value={answerId.toString()}
                     id={`choice-${index}`}
                     className="mt-1"
                   />
@@ -336,7 +367,10 @@ export default function MultipleChoiceTest() {
           >
             <ChevronLeft className="mr-2 h-4 w-4" /> Previous
           </Button>
-          <Button onClick={handleNextQuestion} disabled={!selectedAnswer}>
+          <Button
+            onClick={handleNextQuestion}
+            disabled={selectedAnswer === null}
+          >
             {isLastQuestion ? "Finish" : "Next"}{" "}
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
