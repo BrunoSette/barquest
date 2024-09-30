@@ -35,14 +35,9 @@ const performanceData = [
   { subject: "Estate Planning", correct: 70, incorrect: 30 },
   { subject: "Family Law", correct: 65, incorrect: 35 },
   {
-    subject: "Professional Responsibility - Barristers",
+    subject: "Professional Responsibility",
     correct: 70,
     incorrect: 30,
-  },
-  {
-    subject: "Professional Responsibility - Solicitors",
-    correct: 65,
-    incorrect: 35,
   },
   { subject: "Public Law", correct: 65, incorrect: 35 },
   { subject: "Real Estate", correct: 65, incorrect: 35 },

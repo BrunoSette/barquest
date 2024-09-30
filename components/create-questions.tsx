@@ -41,10 +41,9 @@ const subjects = [
   { id: 3, name: "Civil Litigation" },
   { id: 4, name: "Estate Planning" },
   { id: 5, name: "Family Law" },
-  { id: 6, name: "Professional Responsibility - Barristers" },
-  { id: 7, name: "Professional Responsibility - Solicitors" },
-  { id: 8, name: "Public Law" },
-  { id: 9, name: "Real Estate" },
+  { id: 6, name: "Professional Responsibility" },
+  { id: 7, name: "Public Law" },
+  { id: 8, name: "Real Estate" },
 ];
 
 export function CreateQuestionsComponent() {

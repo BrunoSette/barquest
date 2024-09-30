@@ -53,8 +53,7 @@ const subjects = [
   "Civil Litigation",
   "Estate Planning",
   "Family Law",
-  "Professional Responsibility - Barristers",
-  "Professional Responsibility - Solicitors",
+  "Professional Responsibility",
   "Public Law",
   "Real Estate",
 ];
