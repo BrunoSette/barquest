@@ -47,7 +47,7 @@ export default async function PricingPage() {
             "Regular Content Updates",
             "Risk-Free Trial",
           ]}
-          priceId={"price_1Q4XpqIV3yprxmglrYXx5NRz"}
+          priceId={barristerPrice?.id}
         />
         <PricingCard
           name={solicitorPlan?.name || "Solicitors"}
@@ -63,7 +63,7 @@ export default async function PricingPage() {
             "Regular Content Updates",
             "Risk-Free Trial",
           ]}
-          priceId={"price_1Q4XpjIV3yprxmgl94R7sW8N"}
+          priceId={solicitorPrice?.id}
         />
         <PricingCard
           name={"Barrister + Solicitor"}
@@ -79,7 +79,7 @@ export default async function PricingPage() {
             "Regular Content Updates",
             "Risk-Free Trial",
           ]}
-          priceId={"price_1Q4XpaIV3yprxmglR8ZLWc9r"}
+          priceId={fullPrice?.id}
         />
       </div>
     </main>
