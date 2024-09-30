@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@/lib/auth";
 import { signOut } from "@/app/(login)/actions";
 import { useRouter } from "next/navigation";
+import { DashboardIcon } from "@radix-ui/react-icons";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -73,8 +74,14 @@ function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="p-0">
                 <DropdownMenuItem className="w-full cursor-pointer m-1">
+                  <Link href="/dashboard" className="flex w-full items-center">
+                    <DashboardIcon className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
-                    href="/dashboard/settings"
+                    href="/dashboard/general"
                     className="flex w-full items-center"
                   >
                     <Settings className="mr-2 h-4 w-4" />
