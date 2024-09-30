@@ -9,5 +9,5 @@ export default async function SubscriptionPage() {
     redirect("/login");
   }
 
-  return <BarExamDashboardComponent />;
+  return <BarExamDashboardComponent userId={user.id} />;
 }

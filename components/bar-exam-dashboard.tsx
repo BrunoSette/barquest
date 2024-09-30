@@ -27,26 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const performanceData = [
-  { subject: "Business Law", correct: 75, incorrect: 25 },
-  { subject: "Criminal Law", correct: 68, incorrect: 32 },
-  { subject: "Civil Litigation", correct: 82, incorrect: 18 },
-  { subject: "Estate Planning", correct: 70, incorrect: 30 },
-  { subject: "Family Law", correct: 65, incorrect: 35 },
-  {
-    subject: "Professional Responsibility",
-    correct: 70,
-    incorrect: 30,
-  },
-  { subject: "Public Law", correct: 65, incorrect: 35 },
-  { subject: "Real Estate", correct: 65, incorrect: 35 },
-];
-
-const overallPerformance = [
-  { name: "Correct", value: 72 },
-  { name: "Incorrect", value: 28 },
-];
+import { useState, useEffect } from "react";
 
 const COLORS = ["#F97316", "#3B82F6"]; // Orange and Blue
 
@@ -103,7 +84,45 @@ const performanceHistory = testHistory.map((test) => ({
   score: parseFloat(test.score),
 }));
 
-export function BarExamDashboardComponent() {
+export function BarExamDashboardComponent({ userId }: { userId: number }) {
+  const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
+  const [correctAnswers, setCorrectAnswers] = useState<number | null>(null);
+  const [answersPerSubject, setAnswersPerSubject] = useState<
+    { subject: string; total_answers: number; correct_answers: number }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchTotalAnswers = async () => {
+      try {
+        const response = await fetch(`/api/total_answers?user_id=${userId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTotalAnswers(data.total_answers);
+        setCorrectAnswers(data.correct_answers);
+        setAnswersPerSubject(data.answers_per_subject);
+      } catch (error) {
+        console.error("Error fetching total answers:", error);
+      }
+    };
+
+    fetchTotalAnswers();
+  }, [userId]);
+
+  const overallPerformance = [
+    { name: "Correct", value: correctAnswers },
+    { name: "Incorrect", value: (totalAnswers || 0) - (correctAnswers || 0) },
+  ];
+
+  const performanceData = answersPerSubject.map((subjectData) => ({
+    subject: subjectData.subject,
+    correct: subjectData.correct_answers,
+    incorrect: subjectData.total_answers - subjectData.correct_answers,
+  }));
+
+  console.log("performanceData", performanceData);
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
@@ -124,7 +143,7 @@ export function BarExamDashboardComponent() {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,284</div>
+            <div className="text-2xl font-bold">{totalAnswers}</div>
           </CardContent>
         </Card>
         <Card>
@@ -135,8 +154,16 @@ export function BarExamDashboardComponent() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">924</div>
-            <p className="text-xs text-muted-foreground">72% success rate</p>
+            <div className="text-2xl font-bold">
+              {totalAnswers !== null && correctAnswers !== null
+                ? correctAnswers
+                : "Loading..."}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {totalAnswers !== null && correctAnswers !== null
+                ? `${((correctAnswers / totalAnswers) * 100).toFixed(2)}% correct rate`
+                : "Loading..."}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -147,8 +174,16 @@ export function BarExamDashboardComponent() {
             <XCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">360</div>
-            <p className="text-xs text-muted-foreground">28% error rate</p>
+            <div className="text-2xl font-bold">
+              {totalAnswers !== null && correctAnswers !== null
+                ? totalAnswers - correctAnswers
+                : "Loading..."}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {totalAnswers !== null && correctAnswers !== null
+                ? `${(((totalAnswers - correctAnswers) / totalAnswers) * 100).toFixed(2)}% error rate`
+                : "Loading..."}
+            </div>
           </CardContent>
         </Card>
       </div>
