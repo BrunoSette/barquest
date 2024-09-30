@@ -22,6 +22,20 @@
       "when": 1727575776800,
       "tag": "0002_massive_venus",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1727729243518,
+      "tag": "0003_boring_sauron",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1727729600757,
+      "tag": "0004_absurd_praxagora",
+      "breakpoints": true
     }
   ]
 }

@@ -40,7 +40,7 @@ export const questions = pgTable("questions", {
   answer4: text("answer4").notNull(),
   comments: text("comments").notNull(),
   correctAnswer: integer("correct_answer").notNull(), // Stores the index of the correct answer (1-4)
-  isApproved: pgBoolean("is_approved").notNull().default(false), // Use pgBoolean for boolean type
+  isApproved: pgBoolean("isapproved").notNull().default(false), // Use pgBoolean for boolean type
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -113,6 +113,32 @@ export const oneTimeTokens = pgTable(
   }
 );
 
+export const userAnswers = pgTable("user_answers", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+  questionId: integer("question_id")
+    .notNull()
+    .references(() => questions.id),
+  selectedAnswer: integer("selected_answer").notNull(), // Stores the index of the selected answer (1-4)
+  isCorrect: pgBoolean("is_correct").notNull(), // Indicates if the selected answer is correct
+  answeredAt: timestamp("answered_at").notNull().defaultNow(),
+});
+
+export const testHistory = pgTable("test_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+  score: integer("score").notNull(), // Stores the score as a percentage
+  questions: integer("questions").notNull(), // Number of questions in the test
+  timed: pgBoolean("timed").notNull(), // Indicates if the test was timed
+  tutor: pgBoolean("tutor").notNull(), // Indicates if a tutor was involved
+  newQuestions: integer("new_questions").notNull(), // Number of new questions in the test
+  date: timestamp("date").notNull().defaultNow(), // Date of the test attempt
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
@@ -122,6 +148,8 @@ export const teamsRelations = relations(teams, ({ many }) => ({
 export const usersRelations = relations(users, ({ many }) => ({
   teamMembers: many(teamMembers),
   invitationsSent: many(invitations),
+  userAnswers: many(userAnswers),
+  testHistory: many(testHistory),
 }));
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
@@ -164,10 +192,29 @@ export const oneTimeTokensRelations = relations(oneTimeTokens, ({ one }) => ({
   }),
 }));
 
-export const questionsRelations = relations(questions, ({ one }) => ({
+export const questionsRelations = relations(questions, ({ one, many }) => ({
   subject: one(subjects, {
     fields: [questions.subjectId],
     references: [subjects.id],
+  }),
+  userAnswers: many(userAnswers),
+}));
+
+export const userAnswersRelations = relations(userAnswers, ({ one }) => ({
+  user: one(users, {
+    fields: [userAnswers.userId],
+    references: [users.id],
+  }),
+  question: one(questions, {
+    fields: [userAnswers.questionId],
+    references: [questions.id],
+  }),
+}));
+
+export const testHistoryRelations = relations(testHistory, ({ one }) => ({
+  user: one(users, {
+    fields: [testHistory.userId],
+    references: [users.id],
   }),
 }));
 
@@ -192,6 +239,10 @@ export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
 export type Subject = typeof subjects.$inferSelect;
 export type NewSubject = typeof subjects.$inferInsert;
+export type UserAnswer = typeof userAnswers.$inferSelect;
+export type NewUserAnswer = typeof userAnswers.$inferInsert;
+export type TestHistory = typeof testHistory.$inferSelect;
+export type NewTestHistory = typeof testHistory.$inferInsert;
 
 export enum ActivityType {
   SIGN_UP = "SIGN_UP",
