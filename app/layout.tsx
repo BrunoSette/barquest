@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { UserProvider } from "@/lib/auth";
 import { getUser } from "@/lib/db/queries";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "BarQuest - Your Ultimate Prep Tool",
@@ -28,6 +29,7 @@ export default function RootLayout({
       className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
     >
       <body className="min-h-[100dvh] bg-gray-50">
+        <SpeedInsights />
         <UserProvider userPromise={userPromise}>{children}</UserProvider>
       </body>
     </html>
