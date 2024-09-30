@@ -12,45 +12,74 @@ export default async function PricingPage() {
     getStripeProducts(),
   ]);
 
-  const monthlyPriceId = "price_1Q0DnvIV3yprxmgliY3V8OpQ";
-  const quaterlyPriceId = "price_1Q4HQVIV3yprxmglnHXgrZKi";
-
-  const barQuest = products.find((product) => product.name === "BarQuest");
-
-  const monthlyPrice = prices.find(
-    (price) => price.productId === monthlyPriceId
+  const barristerPlan = products.find(
+    (product) => product.name === "BarQuest - Barrister"
+  );
+  const solicitorPlan = products.find(
+    (product) => product.name === "BarQuest - Solicitor"
+  );
+  const fullPlan = products.find(
+    (product) => product.name === "BarQuest - Full"
   );
 
-  const quaterlyPrice = prices.find(
-    (price) => price.productId === quaterlyPriceId
+  const barristerPrice = prices.find(
+    (price) => price.productId === barristerPlan?.id
   );
+  const solicitorPrice = prices.find(
+    (price) => price.productId === solicitorPlan?.id
+  );
+  const fullPrice = prices.find((price) => price.productId === fullPlan?.id);
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
+      <div className="flex flex-wrap justify-center gap-8">
         <PricingCard
-          name={barQuest?.name || "Base"}
-          price={monthlyPrice?.unitAmount || 800}
-          interval={monthlyPrice?.interval || "month"}
-          trialDays={monthlyPrice?.trialPeriodDays || 7}
+          name={barristerPlan?.name || "Barrister"}
+          price={barristerPrice?.unitAmount || 3900}
+          interval={barristerPrice?.interval || "month"}
+          trialDays={barristerPrice?.trialPeriodDays || 7}
           features={[
+            "+1000 Barrister questions with commentary",
             "Unlimited Usage",
-            "Unlimited Workspace Members",
-            "Email Support",
+            "Real-Time Progress Tracking",
+            "Mobile-Friendly Access",
+            "Instant Feedback",
+            "Regular Content Updates",
+            "Risk-Free Trial",
           ]}
-          priceId={monthlyPriceId}
+          priceId={"price_1Q4XpqIV3yprxmglrYXx5NRz"}
         />
         <PricingCard
-          name={barQuest?.name || "Plus"}
-          price={quaterlyPrice?.unitAmount || 1200}
-          interval={quaterlyPrice?.interval || "month"}
-          trialDays={quaterlyPrice?.trialPeriodDays || 7}
+          name={solicitorPlan?.name || "Solicitors"}
+          price={solicitorPrice?.unitAmount || 3900}
+          interval={solicitorPrice?.interval || "month"}
+          trialDays={solicitorPrice?.trialPeriodDays || 7}
           features={[
-            "Everything in Base, and:",
-            "Early Access to New Features",
-            "24/7 Support + Slack Access",
+            "+1200 Solicitor questions with commentary",
+            "Unlimited Usage",
+            "Real-Time Progress Tracking",
+            "Mobile-Friendly Access",
+            "Instant Feedback",
+            "Regular Content Updates",
+            "Risk-Free Trial",
           ]}
-          priceId={quaterlyPriceId}
+          priceId={"price_1Q4XpjIV3yprxmgl94R7sW8N"}
+        />
+        <PricingCard
+          name={"Barrister + Solicitor"}
+          price={fullPrice?.unitAmount || 6900}
+          interval={fullPrice?.interval || "month"}
+          trialDays={fullPrice?.trialPeriodDays || 7}
+          features={[
+            "+2200 Barrister & Solicitor Questions with Commentary",
+            "Unlimited Usage",
+            "Real-Time Progress Tracking",
+            "Mobile-Friendly Access",
+            "Instant Feedback",
+            "Regular Content Updates",
+            "Risk-Free Trial",
+          ]}
+          priceId={"price_1Q4XpaIV3yprxmglR8ZLWc9r"}
         />
       </div>
     </main>
@@ -72,7 +101,7 @@ export default async function PricingPage() {
     priceId?: string;
   }) {
     return (
-      <div className="pt-6">
+      <div className="pt-6 flex-1 min-w-[300px] max-w-[400px]">
         <h2 className="text-2xl font-medium text-gray-900 mb-2">{name}</h2>
         <p className="text-sm text-gray-600 mb-4">
           with {trialDays} day free trial
@@ -80,7 +109,7 @@ export default async function PricingPage() {
         <p className="text-4xl font-medium text-gray-900 mb-6">
           ${price / 100}{" "}
           <span className="text-xl font-normal text-gray-600">
-            per user / {interval}
+            / {interval}
           </span>
         </p>
         <ul className="space-y-4 mb-8">
