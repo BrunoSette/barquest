@@ -9,6 +9,7 @@ import {
   FileQuestion,
   Settings,
   Pencil,
+  Video,
   FolderPlus,
   LayoutDashboard,
   BookCheck,
@@ -33,6 +34,7 @@ export default function DashboardLayout({
       icon: BadgeCheck,
       label: "Create a New Test",
     },
+    { href: "/dashboard/videos", icon: Video, label: "User Guide" },
     {
       href: "/dashboard/subscription",
       icon: BookCheck,
@@ -42,7 +44,6 @@ export default function DashboardLayout({
   ];
 
   const adminNavItems = [
-    { href: "/dashboard/users", icon: Users, label: "Users" },
     {
       icon: FileQuestion,
       label: "Questions",

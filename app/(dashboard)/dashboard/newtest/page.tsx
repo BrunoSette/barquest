@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@/lib/auth";
+import React from "react";
 
 const subjects = [
   { id: 1, name: "Business Law" },
