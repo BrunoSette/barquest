@@ -42,6 +42,7 @@ export default function DashboardLayout({
   ];
 
   const adminNavItems = [
+    { href: "/dashboard/users", icon: Users, label: "Users" },
     {
       icon: FileQuestion,
       label: "Questions",

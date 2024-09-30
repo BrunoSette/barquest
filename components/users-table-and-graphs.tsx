@@ -36,6 +36,24 @@ type Team = {
 export default function UsersTableAndGraphs() {
   const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+
+import { User } from "@/lib/db/schema";
+
+export default function UsersTableAndGraphs() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [teams, setTeams] = useState<
+    {
+      id: string;
+      name: string;
+      created_at: string;
+      updated_at: string;
+      stripe_customer_id: string;
+      stripe_subscription_id: string;
+      stripe_product_id: string;
+      plan_name: string;
+      subscription_status: string;
+    }[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
