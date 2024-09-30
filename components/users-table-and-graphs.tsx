@@ -35,12 +35,6 @@ type Team = {
 
 export default function UsersTableAndGraphs() {
   const [users, setUsers] = useState<User[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
-
-import { User } from "@/lib/db/schema";
-
-export default function UsersTableAndGraphs() {
-  const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<
     {
       id: string;
