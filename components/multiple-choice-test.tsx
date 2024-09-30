@@ -33,9 +33,8 @@ type Question = {
   comments: string;
 };
 
-export default function MultipleChoiceTest() {
+export default function MultipleChoiceTest(userId: any) {
   const searchParams = useSearchParams();
-
   // Get parameters from URL
   const isTutor = searchParams.get("isTutor") === "true";
   const isTimed = searchParams.get("isTimed") === "true";
@@ -144,11 +143,10 @@ export default function MultipleChoiceTest() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            user_id: 1, // Replace with actual user ID
+            user_id: userId.userId, // This is passed as a prop
             question_id: currentQ.id,
             selected_answer: value,
             is_correct: isCorrect,
-            answered_at: new Date().toISOString(),
           }),
         });
 

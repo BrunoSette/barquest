@@ -9,5 +9,5 @@ export default async function TestePage() {
     redirect("/login");
   }
 
-  return <MultipleChoiceTest />;
+  return <MultipleChoiceTest userId={user.id as number} />;
 }
