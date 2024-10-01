@@ -44,6 +44,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
       questions: number;
       timed: boolean;
       tutor: boolean;
+      questionmode: string;
       new_questions: number;
       date: string;
     }[]
@@ -57,10 +58,12 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+
         setTotalAnswers(data.total_answers);
         setCorrectAnswers(data.correct_answers);
         setAnswersPerSubject(data.answers_per_subject);
         setTestHistory(data.test_history);
+        console.log("Data test history", data.test_history);
       } catch (error) {
         console.error("Error fetching total answers:", error);
       }
@@ -69,7 +72,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
     if (userId) {
       fetchTotalAnswers();
     }
-  }, [userId]);
+  }, [userId]); // Ensure this runs only when userId changes
 
   const overallPerformance = [
     { name: "Correct", value: correctAnswers },
@@ -83,8 +86,8 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
   }));
 
   const performanceHistory = testHistory.map((test) => ({
-    date: test.date,
-    score: test.score,
+    date: new Date(test.date).toLocaleString(), // Format the date
+    score: (test.score / test.questions) * 100, // Calculate the score
   }));
 
   console.log("performanceData", performanceData);
@@ -250,34 +253,59 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                 <TableHead className="text-center">Questions</TableHead>
                 <TableHead className="text-center">Timed</TableHead>
                 <TableHead className="text-center">Tutor</TableHead>
-                <TableHead className="text-center">New Questions</TableHead>
+                <TableHead className="text-center">Test Mode</TableHead>
                 <TableHead className="text-center">Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {testHistory.map((test, index) => (
-                <TableRow key={test.id}>
-                  <TableCell className="text-center">{index + 1}</TableCell>
-                  <TableCell className="text-center">
-                    {((test.score / test.questions) * 100).toFixed(2)}%
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {test.questions}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {test.timed ? "Yes" : "No"}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {test.tutor ? "Yes" : "No"}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {test.new_questions}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {new Date(test.date).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {testHistory
+                .slice()
+                .sort((a, b) => +new Date(b.date) - +new Date(a.date))
+                .map((test, index, array) => (
+                  <TableRow key={`${test.id}-${index}`}>
+                    <TableCell className="text-center">
+                      {array.length - index}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {((test.score / test.questions) * 100).toFixed(2)}%
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {test.questions}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {test.timed ? "Yes" : "No"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {test.tutor ? "Yes" : "No"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {test.questionmode}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {new Date(test.date).toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              {/* New row for questions sum and score average */}
+              <TableRow>
+                <TableCell className="text-center font-bold">Total</TableCell>
+                <TableCell className="text-center font-bold">
+                  {(
+                    testHistory.reduce(
+                      (acc, test) => acc + (test.score / test.questions) * 100,
+                      0
+                    ) / testHistory.length
+                  ).toFixed(2)}
+                  %
+                </TableCell>
+                <TableCell className="text-center font-bold">
+                  {testHistory.reduce((acc, test) => acc + test.questions, 0)}
+                </TableCell>
+                <TableCell className="text-center"></TableCell>
+                <TableCell className="text-center"></TableCell>
+                <TableCell className="text-center"></TableCell>
+                <TableCell className="text-center"></TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </CardContent>

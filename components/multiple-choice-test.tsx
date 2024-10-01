@@ -69,35 +69,13 @@ export default function MultipleChoiceTest(userId: any) {
 
     const fetchQuestions = async () => {
       try {
-        const response = await fetch("/api/filteredquestions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            subjectIds: selectedSubjects,
-            maxQuestions: numberOfQuestions,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        const response = await fetch("/api/questions");
         const data = await response.json();
-        console.log("Fetched questions:", data);
-
         if (!didCancel) {
-          if (Array.isArray(data)) {
-            setQuestions(data);
-          } else {
-            console.error("Unexpected response format:", data);
-          }
+          setQuestions(data);
         }
       } catch (error) {
-        if (!didCancel) {
-          console.error("Error fetching questions:", error);
-        }
+        console.error("Error fetching questions:", error);
       }
     };
 
