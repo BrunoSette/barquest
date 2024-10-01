@@ -30,57 +30,69 @@ export default async function PricingPage() {
   );
   const fullPrice = prices.find((price) => price.productId === fullPlan?.id);
 
+  if (!barristerPlan) console.log("BarQuest - Barrister Plan not found on STRIPE. run pnpm db:seed to create stripe products");
+  if (!solicitorPlan) console.log("BarQuest - Solicitor Plan not found on STRIPE. run pnpm db:seed to create stripe products");
+  if (!fullPlan) console.log("BarQuest - Full Plan not found on STRIPE. run pnpm db:seed to create stripe products");
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-wrap justify-center gap-8">
-        <PricingCard
-          name={barristerPlan?.name || "Barrister"}
-          price={barristerPrice?.unitAmount || 3900}
-          interval={barristerPrice?.interval || "month"}
-          trialDays={barristerPrice?.trialPeriodDays || 7}
-          features={[
-            "+1000 Barrister questions with commentary",
-            "Unlimited Usage",
-            "Real-Time Progress Tracking",
-            "Mobile-Friendly Access",
-            "Instant Feedback",
-            "Regular Content Updates",
-            "Risk-Free Trial",
-          ]}
-          priceId={barristerPrice?.id}
-        />
-        <PricingCard
-          name={solicitorPlan?.name || "Solicitors"}
-          price={solicitorPrice?.unitAmount || 3900}
-          interval={solicitorPrice?.interval || "month"}
-          trialDays={solicitorPrice?.trialPeriodDays || 7}
-          features={[
-            "+1200 Solicitor questions with commentary",
-            "Unlimited Usage",
-            "Real-Time Progress Tracking",
-            "Mobile-Friendly Access",
-            "Instant Feedback",
-            "Regular Content Updates",
-            "Risk-Free Trial",
-          ]}
-          priceId={solicitorPrice?.id}
-        />
-        <PricingCard
-          name={"Barrister + Solicitor"}
-          price={fullPrice?.unitAmount || 6900}
-          interval={fullPrice?.interval || "month"}
-          trialDays={fullPrice?.trialPeriodDays || 7}
-          features={[
-            "+2200 Barrister & Solicitor Questions with Commentary",
-            "Unlimited Usage",
-            "Real-Time Progress Tracking",
-            "Mobile-Friendly Access",
-            "Instant Feedback",
-            "Regular Content Updates",
-            "Risk-Free Trial",
-          ]}
-          priceId={fullPrice?.id}
-        />
+        {barristerPlan && barristerPrice && (
+          <PricingCard
+            name={barristerPlan?.name || "Barrister"}
+            price={barristerPrice?.unitAmount || 3900}
+            interval={barristerPrice?.interval || "month"}
+            trialDays={barristerPrice?.trialPeriodDays || 7}
+            features={[
+              "+1000 Barrister questions with commentary",
+              "Unlimited Usage",
+              "Real-Time Progress Tracking",
+              "Mobile-Friendly Access",
+              "Instant Feedback",
+              "Regular Content Updates",
+              "Risk-Free Trial",
+            ]}
+            priceId={barristerPrice?.id}
+          />
+        )}
+
+        {solicitorPlan && solicitorPrice && (
+          <PricingCard
+            name={solicitorPlan?.name || "Solicitors"}
+            price={solicitorPrice?.unitAmount || 3900}
+            interval={solicitorPrice?.interval || "month"}
+            trialDays={solicitorPrice?.trialPeriodDays || 7}
+            features={[
+              "+1200 Solicitor questions with commentary",
+              "Unlimited Usage",
+              "Real-Time Progress Tracking",
+              "Mobile-Friendly Access",
+              "Instant Feedback",
+              "Regular Content Updates",
+              "Risk-Free Trial",
+            ]}
+            priceId={solicitorPrice?.id}
+          />
+        )}
+
+        {fullPlan && fullPrice && (
+          <PricingCard
+            name={"Barrister + Solicitor"}
+            price={fullPrice?.unitAmount || 6900}
+            interval={fullPrice?.interval || "month"}
+            trialDays={fullPrice?.trialPeriodDays || 7}
+            features={[
+              "+2200 Barrister & Solicitor Questions with Commentary",
+              "Unlimited Usage",
+              "Real-Time Progress Tracking",
+              "Mobile-Friendly Access",
+              "Instant Feedback",
+              "Regular Content Updates",
+              "Risk-Free Trial",
+            ]}
+            priceId={fullPrice?.id}
+          />
+        )}
       </div>
     </main>
   );
