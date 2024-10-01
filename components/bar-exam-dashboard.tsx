@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from "date-fns";
 import { PlusCircle, BookOpen, CheckCircle, XCircle } from "lucide-react";
 import {
   BarChart,
@@ -257,7 +258,11 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={performanceHistory}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" style={{ fontSize: "12px" }} />
+                    <XAxis
+                      dataKey="date"
+                      style={{ fontSize: "12px" }}
+                      tickFormatter={(date) => format(new Date(date), "dd/MM")}
+                    />
                     <YAxis type="number" style={{ fontSize: "12px" }} />
                     <Tooltip contentStyle={{ fontSize: "12px" }} />
                     <Line
@@ -306,8 +311,8 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                       </TableCell>
                       <TableCell className="text-center">
                         {totalAnswers !== null && totalAnswers > 0
-                          ? ((test.score / test.questions) * 100).toFixed(2)
-                          : "0.00"}
+                          ? ((test.score / test.questions) * 100).toFixed(0)
+                          : "0"}
                         %
                       </TableCell>
                       <TableCell className="text-center">
