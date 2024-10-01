@@ -6,14 +6,14 @@ import { hashPassword } from '@/lib/auth/session';
 async function createStripeProducts() {
   console.log('Creating Stripe products and prices...');
 
-  const baseProduct = await stripe.products.create({
-    name: 'Base',
-    description: 'Base subscription plan',
+  const barristerProduct = await stripe.products.create({
+    name: 'BarQuest - Barrister',
+    description: 'BarQuest - Barrister subscription plan',
   });
 
   await stripe.prices.create({
-    product: baseProduct.id,
-    unit_amount: 800, // $8 in cents
+    product: barristerProduct.id,
+    unit_amount: 3900, // $39 in cents
     currency: 'usd',
     recurring: {
       interval: 'month',
@@ -21,14 +21,29 @@ async function createStripeProducts() {
     },
   });
 
-  const plusProduct = await stripe.products.create({
-    name: 'Plus',
-    description: 'Plus subscription plan',
+  const solicitorProduct = await stripe.products.create({
+    name: 'BarQuest - Solicitor',
+    description: 'BarQuest - Solicitor subscription plan',
   });
 
   await stripe.prices.create({
-    product: plusProduct.id,
-    unit_amount: 1200, // $12 in cents
+    product: solicitorProduct.id,
+    unit_amount: 3900, // $39 in cents
+    currency: 'usd',
+    recurring: {
+      interval: 'month',
+      trial_period_days: 7,
+    },
+  });
+
+  const fullProduct = await stripe.products.create({
+    name: 'BarQuest - Full',
+    description: 'BarQuest - Full subscription plan',
+  });
+
+  await stripe.prices.create({
+    product: fullProduct.id,
+    unit_amount: 6900, // $69 in cents
     currency: 'usd',
     recurring: {
       interval: 'month',
