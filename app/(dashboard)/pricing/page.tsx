@@ -12,87 +12,29 @@ export default async function PricingPage() {
     getStripeProducts(),
   ]);
 
-  const barristerPlan = products.find(
-    (product) => product.name === "BarQuest - Barrister"
-  );
-  const solicitorPlan = products.find(
-    (product) => product.name === "BarQuest - Solicitor"
-  );
-  const fullPlan = products.find(
-    (product) => product.name === "BarQuest - Full"
-  );
+  const testPlan = products.find((product) => product.name === "Test");
 
-  const barristerPrice = prices.find(
-    (price) => price.productId === barristerPlan?.id
-  );
-  const solicitorPrice = prices.find(
-    (price) => price.productId === solicitorPlan?.id
-  );
-  const fullPrice = prices.find((price) => price.productId === fullPlan?.id);
-
-  if (!barristerPlan) console.log("BarQuest - Barrister Plan not found on STRIPE. run pnpm db:seed to create stripe products");
-  if (!solicitorPlan) console.log("BarQuest - Solicitor Plan not found on STRIPE. run pnpm db:seed to create stripe products");
-  if (!fullPlan) console.log("BarQuest - Full Plan not found on STRIPE. run pnpm db:seed to create stripe products");
+  const testPrice = prices.find((price) => price.productId === testPlan?.id);
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-wrap justify-center gap-8">
-        {barristerPlan && barristerPrice && (
-          <PricingCard
-            name={barristerPlan?.name || "Barrister"}
-            price={barristerPrice?.unitAmount || 3900}
-            interval={barristerPrice?.interval || "month"}
-            trialDays={barristerPrice?.trialPeriodDays || 7}
-            features={[
-              "+1000 Barrister questions with commentary",
-              "Unlimited Usage",
-              "Real-Time Progress Tracking",
-              "Mobile-Friendly Access",
-              "Instant Feedback",
-              "Regular Content Updates",
-              "Risk-Free Trial",
-            ]}
-            priceId={barristerPrice?.id}
-          />
-        )}
-
-        {solicitorPlan && solicitorPrice && (
-          <PricingCard
-            name={solicitorPlan?.name || "Solicitors"}
-            price={solicitorPrice?.unitAmount || 3900}
-            interval={solicitorPrice?.interval || "month"}
-            trialDays={solicitorPrice?.trialPeriodDays || 7}
-            features={[
-              "+1200 Solicitor questions with commentary",
-              "Unlimited Usage",
-              "Real-Time Progress Tracking",
-              "Mobile-Friendly Access",
-              "Instant Feedback",
-              "Regular Content Updates",
-              "Risk-Free Trial",
-            ]}
-            priceId={solicitorPrice?.id}
-          />
-        )}
-
-        {fullPlan && fullPrice && (
-          <PricingCard
-            name={"Barrister + Solicitor"}
-            price={fullPrice?.unitAmount || 6900}
-            interval={fullPrice?.interval || "month"}
-            trialDays={fullPrice?.trialPeriodDays || 7}
-            features={[
-              "+2200 Barrister & Solicitor Questions with Commentary",
-              "Unlimited Usage",
-              "Real-Time Progress Tracking",
-              "Mobile-Friendly Access",
-              "Instant Feedback",
-              "Regular Content Updates",
-              "Risk-Free Trial",
-            ]}
-            priceId={fullPrice?.id}
-          />
-        )}
+        <PricingCard
+          name={testPlan?.name || "TEST"}
+          price={testPrice?.unitAmount || 3900}
+          interval={testPrice?.interval || "month"}
+          trialDays={testPrice?.trialPeriodDays || 7}
+          features={[
+            "+1000 Barrister questions with commentary",
+            "Unlimited Usage",
+            "Real-Time Progress Tracking",
+            "Mobile-Friendly Access",
+            "Instant Feedback",
+            "Regular Content Updates",
+            "Risk-Free Trial",
+          ]}
+          priceId={testPrice?.id}
+        />
       </div>
     </main>
   );
