@@ -100,14 +100,14 @@ export default function DashboardLayout({
 
             {/* Admin Navigation Items */}
             {user?.role === "admin" && (
-              <>
+              <div>
                 <div className="font-medium text-gray-500 mb-2">
                   Admin Functions
                 </div>
                 {adminNavItems.map((item) => (
                   <div key={item.label}>
                     {item.subItems ? (
-                      <>
+                      <div>
                         <Button
                           variant="ghost"
                           className="my-1 w-full justify-start"
@@ -144,7 +144,7 @@ export default function DashboardLayout({
                               </Button>
                             </Link>
                           ))}
-                      </>
+                      </div>
                     ) : (
                       <Link key={item.href} href={item.href} passHref>
                         <Button
@@ -163,7 +163,7 @@ export default function DashboardLayout({
                     )}
                   </div>
                 ))}
-              </>
+              </div>
             )}
           </nav>
         </aside>

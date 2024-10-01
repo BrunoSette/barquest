@@ -85,7 +85,6 @@ export default function MultipleChoiceTest(userId: any) {
         }
 
         const data = await response.json();
-        console.log("Fetched questions:", data);
 
         if (!didCancel) {
           if (Array.isArray(data)) {
@@ -105,6 +104,7 @@ export default function MultipleChoiceTest(userId: any) {
 
     return () => {
       didCancel = true;
+      localStorage.removeItem("timeLeft"); // Remove the item from localStorage on unmount
     };
   }, []); // Empty dependency array ensures this runs only once on mount
 
@@ -319,8 +319,6 @@ export default function MultipleChoiceTest(userId: any) {
   if (questions.length === 0) {
     return <div>Loading...</div>;
   }
-
-  console.log("Current question:", questions[currentQuestion]);
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">

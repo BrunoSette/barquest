@@ -106,6 +106,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
     } catch (error) {
       setError("Failed to create test");
     } finally {
+      localStorage.removeItem("timeLeft");
       setIsPending(false);
     }
   };
