@@ -145,7 +145,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               {totalAnswers !== null &&
               correctAnswers !== null &&
               totalAnswers > 0 ? (
-                `${((correctAnswers / totalAnswers) * 100).toFixed(2)}% correct rate`
+                `${((correctAnswers / totalAnswers) * 100).toFixed(0)}% correct rate`
               ) : (
                 <div></div>
               )}
@@ -339,7 +339,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                             }
                             return acc;
                           }, 0) / testHistory.length
-                        ).toFixed(2)
+                        ).toFixed(0)
                       : "0"}
                     %
                   </TableCell>
