@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/lib/auth/";
+
 import {
   Users,
   FileQuestion,
@@ -24,6 +26,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { user } = useUser();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
 
@@ -65,36 +69,6 @@ export default function DashboardLayout({
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">
-      {/* Mobile header
-      <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 p-4">
-        <div className="flex items-center space-x-4">
-          <Link href="/dashboard/" passHref>
-            <Button
-              variant={pathname === "/dashboard/" ? "secondary" : "ghost"}
-              className={`my-1 ${
-                pathname === "/dashboard/" ? "bg-gray-100" : ""
-              }`}
-            >
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
-          </Link>
-          <Link href="/dashboard/newtest/" passHref>
-            <Button
-              variant={
-                pathname === "/dashboard/newtest/" ? "secondary" : "ghost"
-              }
-              className={`my-1 ${
-                pathname === "/dashboard/newtest/" ? "bg-gray-100" : ""
-              }`}
-            >
-              <BadgeCheck className="mr-2 h-4 w-4" />
-              Create a Test
-            </Button>
-          </Link>
-        </div>
-      </div> */}
-
       <div className="flex flex-1 overflow-hidden h-full">
         {/* Sidebar */}
         <aside
@@ -125,60 +99,72 @@ export default function DashboardLayout({
             <div className="my-4 border-t border-gray-200"></div>
 
             {/* Admin Navigation Items */}
-            <div className="font-medium text-gray-500 mb-2">
-              Admin Functions
-            </div>
-            {adminNavItems.map((item) => (
-              <div key={item.label}>
-                {item.subItems ? (
-                  <>
-                    <Button
-                      variant="ghost"
-                      className="my-1 w-full justify-start"
-                      onClick={() => setIsQuestionsOpen(!isQuestionsOpen)}
-                    >
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {item.label}
-                      {isQuestionsOpen ? (
-                        <ChevronDown className="ml-auto h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="ml-auto h-4 w-4" />
-                      )}
-                    </Button>
-                    {isQuestionsOpen &&
-                      item.subItems.map((subItem) => (
-                        <Link key={subItem.href} href={subItem.href} passHref>
-                          <Button
-                            variant={
-                              pathname === subItem.href ? "secondary" : "ghost"
-                            }
-                            className={`my-1 w-full justify-start pl-8 ${
-                              pathname === subItem.href ? "bg-gray-100" : ""
-                            }`}
-                            onClick={() => setIsSidebarOpen(false)}
-                          >
-                            <subItem.icon className="mr-2 h-4 w-4" />
-                            {subItem.label}
-                          </Button>
-                        </Link>
-                      ))}
-                  </>
-                ) : (
-                  <Link key={item.href} href={item.href} passHref>
-                    <Button
-                      variant={pathname === item.href ? "secondary" : "ghost"}
-                      className={`my-1 w-full justify-start ${
-                        pathname === item.href ? "bg-gray-100" : ""
-                      }`}
-                      onClick={() => setIsSidebarOpen(false)}
-                    >
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {item.label}
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            ))}
+            {user?.role === "admin" && (
+              <>
+                <div className="font-medium text-gray-500 mb-2">
+                  Admin Functions
+                </div>
+                {adminNavItems.map((item) => (
+                  <div key={item.label}>
+                    {item.subItems ? (
+                      <>
+                        <Button
+                          variant="ghost"
+                          className="my-1 w-full justify-start"
+                          onClick={() => setIsQuestionsOpen(!isQuestionsOpen)}
+                        >
+                          <item.icon className="mr-2 h-4 w-4" />
+                          {item.label}
+                          {isQuestionsOpen ? (
+                            <ChevronDown className="ml-auto h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="ml-auto h-4 w-4" />
+                          )}
+                        </Button>
+                        {isQuestionsOpen &&
+                          item.subItems.map((subItem) => (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              passHref
+                            >
+                              <Button
+                                variant={
+                                  pathname === subItem.href
+                                    ? "secondary"
+                                    : "ghost"
+                                }
+                                className={`my-1 w-full justify-start pl-8 ${
+                                  pathname === subItem.href ? "bg-gray-100" : ""
+                                }`}
+                                onClick={() => setIsSidebarOpen(false)}
+                              >
+                                <subItem.icon className="mr-2 h-4 w-4" />
+                                {subItem.label}
+                              </Button>
+                            </Link>
+                          ))}
+                      </>
+                    ) : (
+                      <Link key={item.href} href={item.href} passHref>
+                        <Button
+                          variant={
+                            pathname === item.href ? "secondary" : "ghost"
+                          }
+                          className={`my-1 w-full justify-start ${
+                            pathname === item.href ? "bg-gray-100" : ""
+                          }`}
+                          onClick={() => setIsSidebarOpen(false)}
+                        >
+                          <item.icon className="mr-2 h-4 w-4" />
+                          {item.label}
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </>
+            )}
           </nav>
         </aside>
 
