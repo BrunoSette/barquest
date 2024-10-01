@@ -114,7 +114,9 @@ export default function MultipleChoiceTest(userId: any) {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timer);
-            handleNextQuestion();
+            if (questions.length > 0 && currentQuestion < questions.length) {
+              handleAnswerSelection(5); // Automatically select an invalid answer
+            }
             return secondsPerQuestion; // Reset to time from URL
           }
           const newTime = prevTime - 1;
@@ -125,9 +127,13 @@ export default function MultipleChoiceTest(userId: any) {
 
       return () => clearInterval(timer);
     }
-  }, [currentQuestion, secondsPerQuestion, isTimed]);
+  }, [currentQuestion, secondsPerQuestion, isTimed, questions.length]);
 
   const handleAnswerSelection = async (value: number) => {
+    if (questions.length === 0 || currentQuestion >= questions.length) {
+      return;
+    }
+
     setSelectedAnswer(value);
     setIsAnswered(true); // Mark the question as answered
 
@@ -160,6 +166,11 @@ export default function MultipleChoiceTest(userId: any) {
         console.error("Error submitting answer:", error);
       }
     }
+
+    // Move to the next question after a short delay to show the correct answer
+    setTimeout(() => {
+      handleNextQuestion();
+    }, 1000); // Adjust the delay as needed
   };
 
   const handleNextQuestion = () => {
