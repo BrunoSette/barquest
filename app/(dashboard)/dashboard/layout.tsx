@@ -129,41 +129,54 @@ export default function DashboardLayout({
               Admin Functions
             </div>
             {adminNavItems.map((item) => (
-              <div key={item.href}>
-                <Button
-                  variant="ghost"
-                  className="my-1 w-full justify-start"
-                  onClick={() =>
-                    item.subItems && setIsQuestionsOpen(!isQuestionsOpen)
-                  }
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.label}
-                  {item.subItems &&
-                    (isQuestionsOpen ? (
-                      <ChevronDown className="ml-auto h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="ml-auto h-4 w-4" />
-                    ))}
-                </Button>
-                {item.subItems &&
-                  isQuestionsOpen &&
-                  item.subItems.map((subItem) => (
-                    <Link key={subItem.href} href={subItem.href} passHref>
-                      <Button
-                        variant={
-                          pathname === subItem.href ? "secondary" : "ghost"
-                        }
-                        className={`my-1 w-full justify-start pl-8 ${
-                          pathname === subItem.href ? "bg-gray-100" : ""
-                        }`}
-                        onClick={() => setIsSidebarOpen(false)}
-                      >
-                        <subItem.icon className="mr-2 h-4 w-4" />
-                        {subItem.label}
-                      </Button>
-                    </Link>
-                  ))}
+              <div key={item.label}>
+                {item.subItems ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      className="my-1 w-full justify-start"
+                      onClick={() => setIsQuestionsOpen(!isQuestionsOpen)}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                      {isQuestionsOpen ? (
+                        <ChevronDown className="ml-auto h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="ml-auto h-4 w-4" />
+                      )}
+                    </Button>
+                    {isQuestionsOpen &&
+                      item.subItems.map((subItem) => (
+                        <Link key={subItem.href} href={subItem.href} passHref>
+                          <Button
+                            variant={
+                              pathname === subItem.href ? "secondary" : "ghost"
+                            }
+                            className={`my-1 w-full justify-start pl-8 ${
+                              pathname === subItem.href ? "bg-gray-100" : ""
+                            }`}
+                            onClick={() => setIsSidebarOpen(false)}
+                          >
+                            <subItem.icon className="mr-2 h-4 w-4" />
+                            {subItem.label}
+                          </Button>
+                        </Link>
+                      ))}
+                  </>
+                ) : (
+                  <Link key={item.href} href={item.href} passHref>
+                    <Button
+                      variant={pathname === item.href ? "secondary" : "ghost"}
+                      className={`my-1 w-full justify-start ${
+                        pathname === item.href ? "bg-gray-100" : ""
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                )}
               </div>
             ))}
           </nav>
