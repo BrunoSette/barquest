@@ -142,10 +142,12 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               )}
             </div>
             <div className="text-xs text-muted-foreground">
-              {totalAnswers !== null && correctAnswers !== null ? (
+              {totalAnswers !== null &&
+              correctAnswers !== null &&
+              totalAnswers > 0 ? (
                 `${((correctAnswers / totalAnswers) * 100).toFixed(2)}% correct rate`
               ) : (
-                <Skeleton className="w-[100%] h-[16px]" />
+                <div></div>
               )}
             </div>
           </CardContent>
@@ -166,10 +168,12 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               )}
             </div>
             <div className="text-xs text-muted-foreground">
-              {totalAnswers !== null && correctAnswers !== null ? (
-                `${(((totalAnswers - correctAnswers) / totalAnswers) * 100).toFixed(2)}% error rate`
+              {totalAnswers !== null &&
+              correctAnswers !== null &&
+              totalAnswers > 0 ? (
+                `${(((totalAnswers - correctAnswers) / totalAnswers) * 100).toFixed(0)}% error rate`
               ) : (
-                <Skeleton className="w-[100%] h-[16px]" />
+                <div></div>
               )}
             </div>
           </CardContent>
@@ -301,7 +305,10 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                         {array.length - index}
                       </TableCell>
                       <TableCell className="text-center">
-                        {((test.score / test.questions) * 100).toFixed(2)}%
+                        {totalAnswers !== null && totalAnswers > 0
+                          ? ((test.score / test.questions) * 100).toFixed(2)
+                          : "0.00"}
+                        %
                       </TableCell>
                       <TableCell className="text-center">
                         {test.questions}
@@ -324,13 +331,16 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                 <TableRow>
                   <TableCell className="text-center font-bold">Total</TableCell>
                   <TableCell className="text-center font-bold">
-                    {(
-                      testHistory.reduce(
-                        (acc, test) =>
-                          acc + (test.score / test.questions) * 100,
-                        0
-                      ) / testHistory.length
-                    ).toFixed(2)}
+                    {testHistory.length > 0
+                      ? (
+                          testHistory.reduce((acc, test) => {
+                            if (test.questions > 0) {
+                              return acc + (test.score / test.questions) * 100;
+                            }
+                            return acc;
+                          }, 0) / testHistory.length
+                        ).toFixed(2)
+                      : "0"}
                     %
                   </TableCell>
                   <TableCell className="text-center font-bold">
