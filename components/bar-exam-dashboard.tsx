@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, BookOpen, CheckCircle, XCircle } from "lucide-react";
@@ -34,6 +35,8 @@ const COLORS = ["#F97316", "#3B82F6"]; // Orange and Blue
 export function BarExamDashboardComponent({ userId }: { userId: number }) {
   const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const [answersPerSubject, setAnswersPerSubject] = useState<
     { subject: string; total_answers: number; correct_answers: number }[]
   >([]);
@@ -66,6 +69,8 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
         console.log("Data test history", data.test_history);
       } catch (error) {
         console.error("Error fetching total answers:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -112,7 +117,13 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalAnswers}</div>
+            <div className="text-2xl font-bold">
+              {totalAnswers !== null && correctAnswers !== null ? (
+                totalAnswers
+              ) : (
+                <Skeleton className="w-[100%] h-[16px]" />
+              )}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -124,14 +135,18 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {totalAnswers !== null && correctAnswers !== null
-                ? correctAnswers
-                : "Loading..."}
+              {totalAnswers !== null && correctAnswers !== null ? (
+                correctAnswers
+              ) : (
+                <Skeleton className="w-[100%] h-[16px]" />
+              )}
             </div>
             <div className="text-xs text-muted-foreground">
-              {totalAnswers !== null && correctAnswers !== null
-                ? `${((correctAnswers / totalAnswers) * 100).toFixed(2)}% correct rate`
-                : "Loading..."}
+              {totalAnswers !== null && correctAnswers !== null ? (
+                `${((correctAnswers / totalAnswers) * 100).toFixed(2)}% correct rate`
+              ) : (
+                <Skeleton className="w-[100%] h-[16px]" />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -144,14 +159,18 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {totalAnswers !== null && correctAnswers !== null
-                ? totalAnswers - correctAnswers
-                : "Loading..."}
+              {totalAnswers !== null && correctAnswers !== null ? (
+                totalAnswers - correctAnswers
+              ) : (
+                <Skeleton className="w-[100%] h-[16px]" />
+              )}
             </div>
             <div className="text-xs text-muted-foreground">
-              {totalAnswers !== null && correctAnswers !== null
-                ? `${(((totalAnswers - correctAnswers) / totalAnswers) * 100).toFixed(2)}% error rate`
-                : "Loading..."}
+              {totalAnswers !== null && correctAnswers !== null ? (
+                `${(((totalAnswers - correctAnswers) / totalAnswers) * 100).toFixed(2)}% error rate`
+              ) : (
+                <Skeleton className="w-[100%] h-[16px]" />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -163,24 +182,28 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
             <CardTitle>Performance by Subject</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={performanceData}
-                layout="horizontal"
-                margin={{ top: 5, right: 2, left: 2, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="subject"
-                  type="category"
-                  style={{ fontSize: "12px" }}
-                />
-                <YAxis type="number" style={{ fontSize: "12px" }} />
-                <Tooltip contentStyle={{ fontSize: "12px" }} />
-                <Bar dataKey="correct" fill="#F97316" name="Correct" />
-                <Bar dataKey="incorrect" fill="#3B82F6" name="Incorrect" />
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={performanceData}
+                  layout="horizontal"
+                  margin={{ top: 5, right: 2, left: 2, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="subject"
+                    type="category"
+                    style={{ fontSize: "12px" }}
+                  />
+                  <YAxis type="number" style={{ fontSize: "12px" }} />
+                  <Tooltip contentStyle={{ fontSize: "12px" }} />
+                  <Bar dataKey="correct" fill="#F97316" name="Correct" />
+                  <Bar dataKey="incorrect" fill="#3B82F6" name="Incorrect" />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
         <div className="grid gap-4 md:grid-cols-2 mt-6">
@@ -189,30 +212,34 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               <CardTitle>Overall Performance</CardTitle>
             </CardHeader>
             <CardContent className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={overallPerformance}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {overallPerformance.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ fontSize: "12px" }} />
-                </PieChart>
-              </ResponsiveContainer>
+              {loading ? (
+                <Skeleton className="h-full w-full" />
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={overallPerformance}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                      }
+                    >
+                      {overallPerformance.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ fontSize: "12px" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
           <Card>
@@ -220,20 +247,24 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               <CardTitle>Performance History</CardTitle>
             </CardHeader>
             <CardContent className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={performanceHistory}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" style={{ fontSize: "12px" }} />
-                  <YAxis type="number" style={{ fontSize: "12px" }} />
-                  <Tooltip contentStyle={{ fontSize: "12px" }} />
-                  <Line
-                    type="monotone"
-                    dataKey="score"
-                    stroke="#F97316"
-                    name="Score"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {loading ? (
+                <Skeleton className="h-full w-full" />
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={performanceHistory}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" style={{ fontSize: "12px" }} />
+                    <YAxis type="number" style={{ fontSize: "12px" }} />
+                    <Tooltip contentStyle={{ fontSize: "12px" }} />
+                    <Line
+                      type="monotone"
+                      dataKey="score"
+                      stroke="#F97316"
+                      name="Score"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -244,70 +275,75 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
           <CardTitle>Test History</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableCaption>A list of your recent test attempts.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px] text-center">Ord.</TableHead>
-                <TableHead className="text-center">Score</TableHead>
-                <TableHead className="text-center">Questions</TableHead>
-                <TableHead className="text-center">Timed</TableHead>
-                <TableHead className="text-center">Tutor</TableHead>
-                <TableHead className="text-center">Test Mode</TableHead>
-                <TableHead className="text-center">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {testHistory
-                .slice()
-                .sort((a, b) => +new Date(b.date) - +new Date(a.date))
-                .map((test, index, array) => (
-                  <TableRow key={`${test.id}-${index}`}>
-                    <TableCell className="text-center">
-                      {array.length - index}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {((test.score / test.questions) * 100).toFixed(2)}%
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {test.questions}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {test.timed ? "Yes" : "No"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {test.tutor ? "Yes" : "No"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {test.questionmode}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {new Date(test.date).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {/* New row for questions sum and score average */}
-              <TableRow>
-                <TableCell className="text-center font-bold">Total</TableCell>
-                <TableCell className="text-center font-bold">
-                  {(
-                    testHistory.reduce(
-                      (acc, test) => acc + (test.score / test.questions) * 100,
-                      0
-                    ) / testHistory.length
-                  ).toFixed(2)}
-                  %
-                </TableCell>
-                <TableCell className="text-center font-bold">
-                  {testHistory.reduce((acc, test) => acc + test.questions, 0)}
-                </TableCell>
-                <TableCell className="text-center"></TableCell>
-                <TableCell className="text-center"></TableCell>
-                <TableCell className="text-center"></TableCell>
-                <TableCell className="text-center"></TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          {loading ? (
+            <Skeleton className="h-full w-full" />
+          ) : (
+            <Table>
+              <TableCaption>A list of your recent test attempts.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px] text-center">Ord.</TableHead>
+                  <TableHead className="text-center">Score</TableHead>
+                  <TableHead className="text-center">Questions</TableHead>
+                  <TableHead className="text-center">Timed</TableHead>
+                  <TableHead className="text-center">Tutor</TableHead>
+                  <TableHead className="text-center">Test Mode</TableHead>
+                  <TableHead className="text-center">Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {testHistory
+                  .slice()
+                  .sort((a, b) => +new Date(b.date) - +new Date(a.date))
+                  .map((test, index, array) => (
+                    <TableRow key={`${test.id}-${index}`}>
+                      <TableCell className="text-center">
+                        {array.length - index}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {((test.score / test.questions) * 100).toFixed(2)}%
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {test.questions}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {test.timed ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {test.tutor ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {test.questionmode}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {new Date(test.date).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                {/* New row for questions sum and score average */}
+                <TableRow>
+                  <TableCell className="text-center font-bold">Total</TableCell>
+                  <TableCell className="text-center font-bold">
+                    {(
+                      testHistory.reduce(
+                        (acc, test) =>
+                          acc + (test.score / test.questions) * 100,
+                        0
+                      ) / testHistory.length
+                    ).toFixed(2)}
+                    %
+                  </TableCell>
+                  <TableCell className="text-center font-bold">
+                    {testHistory.reduce((acc, test) => acc + test.questions, 0)}
+                  </TableCell>
+                  <TableCell className="text-center"></TableCell>
+                  <TableCell className="text-center"></TableCell>
+                  <TableCell className="text-center"></TableCell>
+                  <TableCell className="text-center"></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
