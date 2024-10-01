@@ -75,6 +75,9 @@ export async function createCustomerPortalSession(team: Team | null) {
         headline: "Manage your subscription",
       },
       features: {
+        payment_method_update: {
+          enabled: true,
+        },
         subscription_update: {
           enabled: true,
           default_allowed_updates: ["price", "quantity", "promotion_code"],
