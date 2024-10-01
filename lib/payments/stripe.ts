@@ -46,8 +46,8 @@ export async function createCheckoutSession({
   redirect(session.url!);
 }
 
-export async function createCustomerPortalSession(team: Team) {
-  if (!team.stripeCustomerId || !team.stripeProductId) {
+export async function createCustomerPortalSession(team: Team | null) {
+  if (!team || !team.stripeCustomerId || !team.stripeProductId) {
     redirect("/pricing");
   }
 

@@ -55,20 +55,20 @@ export function validatedActionWithUser<S extends z.ZodType<any, any>, T>(
 
 type ActionWithTeamFunction<T> = (
   formData: FormData,
-  team: TeamDataWithMembers
+  team: TeamDataWithMembers | null
 ) => Promise<T>;
 
 export function withTeam<T>(action: ActionWithTeamFunction<T>) {
   return async (formData: FormData): Promise<T> => {
     const user = await getUser();
     if (!user) {
-      redirect('/sign-in');
+      return action(formData, null);
     }
 
     const team = await getTeamForUser(user.id);
-    if (!team) {
-      throw new Error('Team not found');
-    }
+    // if (!team) {
+    //   throw new Error('Team not found');
+    // }
 
     return action(formData, team);
   };
