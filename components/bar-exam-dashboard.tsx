@@ -31,64 +31,22 @@ import { useState, useEffect } from "react";
 
 const COLORS = ["#F97316", "#3B82F6"]; // Orange and Blue
 
-const testHistory = [
-  {
-    id: 1,
-    score: "85%",
-    questions: 50,
-    timed: "Yes",
-    tutor: "No",
-    newQuestions: 10,
-    date: "2023-10-01",
-  },
-  {
-    id: 2,
-    score: "90%",
-    questions: 60,
-    timed: "No",
-    tutor: "Yes",
-    newQuestions: 15,
-    date: "2023-10-02",
-  },
-  {
-    id: 3,
-    score: "78%",
-    questions: 40,
-    timed: "Yes",
-    tutor: "No",
-    newQuestions: 5,
-    date: "2023-10-05",
-  },
-  {
-    id: 4,
-    score: "92%",
-    questions: 55,
-    timed: "No",
-    tutor: "Yes",
-    newQuestions: 20,
-    date: "2023-10-08",
-  },
-  {
-    id: 5,
-    score: "88%",
-    questions: 45,
-    timed: "Yes",
-    tutor: "No",
-    newQuestions: 8,
-    date: "2023-10-10",
-  },
-];
-
-const performanceHistory = testHistory.map((test) => ({
-  date: test.date,
-  score: parseFloat(test.score),
-}));
-
 export function BarExamDashboardComponent({ userId }: { userId: number }) {
   const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number | null>(null);
   const [answersPerSubject, setAnswersPerSubject] = useState<
     { subject: string; total_answers: number; correct_answers: number }[]
+  >([]);
+  const [testHistory, setTestHistory] = useState<
+    {
+      id: number;
+      score: number;
+      questions: number;
+      timed: boolean;
+      tutor: boolean;
+      new_questions: number;
+      date: string;
+    }[]
   >([]);
 
   useEffect(() => {
@@ -102,12 +60,15 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
         setTotalAnswers(data.total_answers);
         setCorrectAnswers(data.correct_answers);
         setAnswersPerSubject(data.answers_per_subject);
+        setTestHistory(data.test_history);
       } catch (error) {
         console.error("Error fetching total answers:", error);
       }
     };
 
-    fetchTotalAnswers();
+    if (userId) {
+      fetchTotalAnswers();
+    }
   }, [userId]);
 
   const overallPerformance = [
@@ -119,6 +80,11 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
     subject: subjectData.subject,
     correct: subjectData.correct_answers,
     incorrect: subjectData.total_answers - subjectData.correct_answers,
+  }));
+
+  const performanceHistory = testHistory.map((test) => ({
+    date: test.date,
+    score: test.score,
   }));
 
   console.log("performanceData", performanceData);
@@ -289,19 +255,27 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {testHistory.map((test) => (
+              {testHistory.map((test, index) => (
                 <TableRow key={test.id}>
-                  <TableCell className="text-center">{test.id}</TableCell>
-                  <TableCell className="text-center">{test.score}</TableCell>
+                  <TableCell className="text-center">{index + 1}</TableCell>
+                  <TableCell className="text-center">
+                    {((test.score / test.questions) * 100).toFixed(2)}%
+                  </TableCell>
                   <TableCell className="text-center">
                     {test.questions}
                   </TableCell>
-                  <TableCell className="text-center">{test.timed}</TableCell>
-                  <TableCell className="text-center">{test.tutor}</TableCell>
                   <TableCell className="text-center">
-                    {test.newQuestions}
+                    {test.timed ? "Yes" : "No"}
                   </TableCell>
-                  <TableCell className="text-center">{test.date}</TableCell>
+                  <TableCell className="text-center">
+                    {test.tutor ? "Yes" : "No"}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {test.new_questions}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {new Date(test.date).toLocaleString()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

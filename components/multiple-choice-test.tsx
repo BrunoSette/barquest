@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import Link from "next/link";
@@ -178,6 +177,17 @@ export default function MultipleChoiceTest(userId: any) {
     if (currentQuestion === questions.length - 1) {
       setIsTestComplete(true);
       localStorage.removeItem("timeLeft"); // Clear the timer when the test is complete
+
+      // Save the test result to the database
+      saveTestResult(
+        userId.userId,
+        score,
+        questions.length,
+        isTimed,
+        isTutor,
+        questionMode,
+        numberOfQuestions
+      );
     } else {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -197,6 +207,43 @@ export default function MultipleChoiceTest(userId: any) {
     setIsAnswered(false); // Reset the answered state for the previous question
     setTimeLeft(secondsPerQuestion); // Reset timer for previous question
     localStorage.setItem("timeLeft", secondsPerQuestion.toString());
+  };
+
+  const saveTestResult = async (
+    userId: number,
+    score: number,
+    questions: number,
+    timed: boolean,
+    tutor: boolean,
+    questionMode: string,
+    newQuestions: number
+  ) => {
+    try {
+      const response = await fetch("/api/save-test-results", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          score,
+          questions,
+          timed,
+          tutor,
+          questionMode,
+          newQuestions,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Test result saved:", data);
+    } catch (error) {
+      console.error("Error saving test result:", error);
+    }
   };
 
   const isLastQuestion = currentQuestion === questions.length - 1;

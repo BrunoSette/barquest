@@ -9,6 +9,7 @@ import {
   boolean as pgBoolean, // Import boolean as pgBoolean to avoid conflicts
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { string } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -135,6 +136,7 @@ export const testHistory = pgTable("test_history", {
   questions: integer("questions").notNull(), // Number of questions in the test
   timed: pgBoolean("timed").notNull(), // Indicates if the test was timed
   tutor: pgBoolean("tutor").notNull(), // Indicates if a tutor was involved
+  questionmode: varchar("questionmode", { length: 50 }).notNull(), // Indicates the type of the test
   newQuestions: integer("new_questions").notNull(), // Number of new questions in the test
   date: timestamp("date").notNull().defaultNow(), // Date of the test attempt
 });
