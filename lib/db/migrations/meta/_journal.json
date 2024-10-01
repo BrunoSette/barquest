@@ -43,6 +43,13 @@
       "when": 1727753548663,
       "tag": "0005_good_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1727809024971,
+      "tag": "0006_flat_daredevil",
+      "breakpoints": true
     }
   ]
 }
