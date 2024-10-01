@@ -398,7 +398,7 @@ export default function MultipleChoiceTest(userId: any) {
               );
             })}
           </RadioGroup>
-          {isAnswered && (
+          {isTutor && isAnswered && (
             <p className="text-lg mb-6 text-gray-600">
               {questions[currentQuestion]?.comments}
             </p>
