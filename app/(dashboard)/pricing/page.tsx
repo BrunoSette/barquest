@@ -2,6 +2,7 @@ import { checkoutAction } from "@/lib/payments/actions";
 import { Check } from "lucide-react";
 import { getStripePrices, getStripeProducts } from "@/lib/payments/stripe";
 import { SubmitButton } from "./submit-button";
+import { Products } from "@/lib/utils";
 
 // Prices are fresh for one hour max
 export const revalidate = 3600;
@@ -12,36 +13,18 @@ export default async function PricingPage() {
     getStripeProducts(),
   ]);
 
-  const barristerPlan = products.find(
-    (product) => product.name === "BarQuest - Barrister"
-  );
-  const solicitorPlan = products.find(
-    (product) => product.name === "BarQuest - Solicitor"
-  );
-  const fullPlan = products.find(
-    (product) => product.name === "BarQuest - Full"
-  );
+  const productData = Products.map((product) => {
+    const stripeProduct = products.find((p) => p.name === product.name);
+    const stripePrice = prices.find(
+      (price) => price.productId === stripeProduct?.id
+    );
 
-  const barristerPrice = prices.find(
-    (price) => price.productId === barristerPlan?.id
-  );
-  const solicitorPrice = prices.find(
-    (price) => price.productId === solicitorPlan?.id
-  );
-  const fullPrice = prices.find((price) => price.productId === fullPlan?.id);
-
-  if (!barristerPlan)
-    console.log(
-      "BarQuest - Barrister Plan not found on STRIPE. run pnpm db:seed to create stripe products"
-    );
-  if (!solicitorPlan)
-    console.log(
-      "BarQuest - Solicitor Plan not found on STRIPE. run pnpm db:seed to create stripe products"
-    );
-  if (!fullPlan)
-    console.log(
-      "BarQuest - Full Plan not found on STRIPE. run pnpm db:seed to create stripe products"
-    );
+    return {
+      ...product,
+      stripeProduct,
+      stripePrice,
+    };
+  });
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -53,61 +36,27 @@ export default async function PricingPage() {
         journey as a Barrister or Solicitor.
       </h2>
       <div className="flex flex-wrap justify-center gap-8">
-        {barristerPlan && barristerPrice && (
-          <PricingCard
-            name={barristerPlan?.name || "Barrister"}
-            price={barristerPrice?.unitAmount || 3900}
-            interval={"3 months"}
-            trialDays={barristerPrice?.trialPeriodDays || 7}
-            features={[
-              "+1000 Barrister questions with commentary",
-              "Unlimited Usage",
-              "Real-Time Progress Tracking",
-              "Mobile-Friendly Access",
-              "Instant Feedback",
-              "Regular Content Updates",
-              "7 Days Risk-Free Trial",
-            ]}
-            priceId={barristerPrice?.id}
-          />
-        )}
-
-        {solicitorPlan && solicitorPrice && (
-          <PricingCard
-            name={solicitorPlan?.name || "Solicitors"}
-            price={solicitorPrice?.unitAmount || 3900}
-            interval={"3 months"}
-            trialDays={solicitorPrice?.trialPeriodDays || 7}
-            features={[
-              "+1200 Solicitor questions with commentary",
-              "Unlimited Usage",
-              "Real-Time Progress Tracking",
-              "Mobile-Friendly Access",
-              "Instant Feedback",
-              "Regular Content Updates",
-              "7 Days Risk-Free Trial",
-            ]}
-            priceId={solicitorPrice?.id}
-          />
-        )}
-
-        {fullPlan && fullPrice && (
-          <PricingCard
-            name={"Barrister + Solicitor"}
-            price={fullPrice?.unitAmount || 6900}
-            interval={"3 months"}
-            trialDays={fullPrice?.trialPeriodDays || 7}
-            features={[
-              "+2200 Questions with Commentary",
-              "Unlimited Usage",
-              "Real-Time Progress Tracking",
-              "Mobile-Friendly Access",
-              "Instant Feedback",
-              "Regular Content Updates",
-              "7 Days Risk-Free Trial",
-            ]}
-            priceId={fullPrice?.id}
-          />
+        {productData.map(
+          ({
+            name,
+            stripePrice,
+            interval,
+            trialDays,
+            features,
+            stripeProduct,
+          }) =>
+            stripeProduct &&
+            stripePrice && (
+              <PricingCard
+                key={stripeProduct.id}
+                name={name}
+                price={stripePrice.unitAmount}
+                interval={interval}
+                trialDays={trialDays}
+                features={features}
+                priceId={stripePrice.id}
+              />
+            )
         )}
       </div>
     </main>
@@ -122,7 +71,7 @@ export default async function PricingPage() {
     priceId,
   }: {
     name: string;
-    price: number;
+    price: number | null;
     interval: string;
     trialDays: number;
     features: string[];
@@ -135,7 +84,7 @@ export default async function PricingPage() {
           with {trialDays} day free trial
         </p>
         <p className="text-4xl font-medium text-gray-900 mb-6">
-          ${price / 100}{" "}
+          ${(price ?? 0) / 100}{" "}
           <span className="text-xl font-normal text-gray-600">
             / {interval}
           </span>

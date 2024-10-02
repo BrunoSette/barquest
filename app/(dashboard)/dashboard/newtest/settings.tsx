@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { TeamDataWithMembers } from "@/lib/db/schema";
-import { subjects } from "@/lib/utils";
+import { Products, subjects } from "@/lib/utils";
 
 import React from "react";
 import Head from "next/head";
@@ -177,10 +177,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                         onChange={() => handleSubjectChange(subject.id)}
                         disabled={
                           !(
-                            (planName === "BarQuest - Barrister" &&
+                            (planName === Products[0].name &&
                               (subscriptionStatus === "active" ||
                                 subscriptionStatus === "trialing")) ||
-                            (planName === "BarQuest - Full" &&
+                            (planName === Products[2].name &&
                               (subscriptionStatus === "active" ||
                                 subscriptionStatus === "trialing"))
                           )
@@ -190,10 +190,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                     </div>
                   ))}
 
-                  {((planName === "BarQuest - Barrister" &&
+                  {((planName === Products[0].name &&
                     (subscriptionStatus === "active" ||
                       subscriptionStatus === "trialing")) ||
-                    (planName === "BarQuest - Full" &&
+                    (planName === Products[2].name &&
                       (subscriptionStatus === "active" ||
                         subscriptionStatus === "trialing"))) && (
                     <Button
@@ -224,10 +224,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                         onChange={() => handleSubjectChange(subject.id)}
                         disabled={
                           !(
-                            (planName === "BarQuest - Solicitor" &&
+                            (planName === Products[1].name &&
                               (subscriptionStatus === "active" ||
                                 subscriptionStatus === "trialing")) ||
-                            (planName === "BarQuest - Full" &&
+                            (planName === Products[2].name &&
                               (subscriptionStatus === "active" ||
                                 subscriptionStatus === "trialing"))
                           )
@@ -236,10 +236,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                       <Label htmlFor={subject.name}>{subject.name}</Label>
                     </div>
                   ))}
-                  {((planName === "BarQuest - Solicitor" &&
+                  {((planName === Products[1].name &&
                     (subscriptionStatus === "active" ||
                       subscriptionStatus === "trialing")) ||
-                    (planName === "BarQuest - Full" &&
+                    (planName === Products[2].name &&
                       (subscriptionStatus === "active" ||
                         subscriptionStatus === "trialing"))) && (
                     <Button
