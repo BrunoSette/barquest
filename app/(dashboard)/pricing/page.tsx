@@ -30,18 +30,34 @@ export default async function PricingPage() {
   );
   const fullPrice = prices.find((price) => price.productId === fullPlan?.id);
 
-  if (!barristerPlan) console.log("BarQuest - Barrister Plan not found on STRIPE. run pnpm db:seed to create stripe products");
-  if (!solicitorPlan) console.log("BarQuest - Solicitor Plan not found on STRIPE. run pnpm db:seed to create stripe products");
-  if (!fullPlan) console.log("BarQuest - Full Plan not found on STRIPE. run pnpm db:seed to create stripe products");
+  if (!barristerPlan)
+    console.log(
+      "BarQuest - Barrister Plan not found on STRIPE. run pnpm db:seed to create stripe products"
+    );
+  if (!solicitorPlan)
+    console.log(
+      "BarQuest - Solicitor Plan not found on STRIPE. run pnpm db:seed to create stripe products"
+    );
+  if (!fullPlan)
+    console.log(
+      "BarQuest - Full Plan not found on STRIPE. run pnpm db:seed to create stripe products"
+    );
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 className="text-4xl font-bold text-center mb-4">
+        Choose the Perfect BarPrep Plan for Your Ontario Legal Success
+      </h1>
+      <h2 className="text-2xl text-center mb-8">
+        Flexible, comprehensive, and risk-free pricing options tailored to your
+        journey as a Barrister or Solicitor.
+      </h2>
       <div className="flex flex-wrap justify-center gap-8">
         {barristerPlan && barristerPrice && (
           <PricingCard
             name={barristerPlan?.name || "Barrister"}
             price={barristerPrice?.unitAmount || 3900}
-            interval={barristerPrice?.interval || "month"}
+            interval={"3 months"}
             trialDays={barristerPrice?.trialPeriodDays || 7}
             features={[
               "+1000 Barrister questions with commentary",
@@ -50,7 +66,7 @@ export default async function PricingPage() {
               "Mobile-Friendly Access",
               "Instant Feedback",
               "Regular Content Updates",
-              "Risk-Free Trial",
+              "7 Days Risk-Free Trial",
             ]}
             priceId={barristerPrice?.id}
           />
@@ -60,7 +76,7 @@ export default async function PricingPage() {
           <PricingCard
             name={solicitorPlan?.name || "Solicitors"}
             price={solicitorPrice?.unitAmount || 3900}
-            interval={solicitorPrice?.interval || "month"}
+            interval={"3 months"}
             trialDays={solicitorPrice?.trialPeriodDays || 7}
             features={[
               "+1200 Solicitor questions with commentary",
@@ -69,7 +85,7 @@ export default async function PricingPage() {
               "Mobile-Friendly Access",
               "Instant Feedback",
               "Regular Content Updates",
-              "Risk-Free Trial",
+              "7 Days Risk-Free Trial",
             ]}
             priceId={solicitorPrice?.id}
           />
@@ -79,16 +95,16 @@ export default async function PricingPage() {
           <PricingCard
             name={"Barrister + Solicitor"}
             price={fullPrice?.unitAmount || 6900}
-            interval={fullPrice?.interval || "month"}
+            interval={"3 months"}
             trialDays={fullPrice?.trialPeriodDays || 7}
             features={[
-              "+2200 Barrister & Solicitor Questions with Commentary",
+              "+2200 Questions with Commentary",
               "Unlimited Usage",
               "Real-Time Progress Tracking",
               "Mobile-Friendly Access",
               "Instant Feedback",
               "Regular Content Updates",
-              "Risk-Free Trial",
+              "7 Days Risk-Free Trial",
             ]}
             priceId={fullPrice?.id}
           />

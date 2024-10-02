@@ -126,12 +126,12 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="faq" className="py-16 bg-white">
+        <section id="faq" className="py-16 bg-orange-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
               Frequently Asked Questions
             </h2>
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 bg-orange-50">
               {[
                 {
                   question: "How up-to-date is your question bank?",
@@ -144,17 +144,28 @@ export default function HomePage() {
                     "Yes, our platform is fully responsive and can be accessed on smartphones and tablets.",
                 },
                 {
-                  question: "Do you offer a money-back guarantee?",
-                  answer:
-                    "We offer a 30-day money-back guarantee if you're not satisfied with our service.",
-                },
-                {
                   question: "How does the real-time analytics feature work?",
                   answer:
                     "Our system tracks your performance across different topics and question types, providing detailed insights to help you improve.",
                 },
+                {
+                  question: "What is included in the 7-day free trial?",
+                  answer:
+                    "During your 7-day free trial, you’ll have full access to all the features of your selected plan, including our extensive question banks, real-time progress tracking, instant feedback, and mobile-friendly access. This allows you to experience the full value of BarQuest before committing to a subscription.",
+                },
+                {
+                  question:
+                    "How do I cancel my subscription if I’m not satisfied?",
+                  answer:
+                    "Canceling your subscription is easy! If you decide that BarQuest isn't the right fit for you, simply log into your account settings and follow the cancellation instructions. For assistance, our support team is always here to help.",
+                },
+                {
+                  question: "When will I be charged after the free trial?",
+                  answer:
+                    "You won’t be charged during the 7-day free trial. Your subscription will automatically begin at the end of the trial period unless you cancel beforehand.",
+                },
               ].map((item, index) => (
-                <div key={index} className="bg-gray-50 p-6 rounded-lg">
+                <div key={index} className="bg-white p-6 rounded-lg">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     {item.question}
                   </h3>

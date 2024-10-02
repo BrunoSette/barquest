@@ -13,6 +13,7 @@
     "email": "email dev --port 3001"
   },
   "dependencies": {
+    "@next/third-parties": "^14.2.14",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
@@ -43,6 +44,7 @@
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.24.2",
     "drizzle-orm": "^0.33.0",
+    "google": "link:@next/third-parties/google",
     "jose": "^5.9.2",
     "lucide-react": "^0.446.0",
     "next": "15.0.0-canary.173",

@@ -15,5 +15,9 @@ export default async function NewTestPage() {
     throw new Error("Team not found");
   }
 
-  return <Settings teamData={teamData} />;
+  return (
+    <div>
+      <Settings teamData={teamData} />;
+    </div>
+  );
 }

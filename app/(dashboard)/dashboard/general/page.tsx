@@ -12,6 +12,7 @@ import {
   updatePassword,
   deleteAccount,
 } from "@/app/(login)/actions";
+import Head from "next/head";
 
 type ActionState = {
   error?: string;
@@ -57,178 +58,189 @@ export default function SettingsPage() {
   };
 
   return (
-    <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium text-gray-900 mb-6">
-        General Settings
-      </h1>
+    <div>
+      <Head>
+        <title>Settings - BarQuest</title>
+        <meta
+          name="description"
+          content="Your Ultimate Prep Tool for the Ontario Bar Exam"
+        />
+      </Head>
+      <section className="flex-1 p-4 lg:p-8">
+        <h1 className="text-lg lg:text-2xl font-medium text-gray-900 mb-6">
+          General Settings
+        </h1>
 
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Account Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleAccountSubmit}>
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="Enter your name"
-                defaultValue={user?.name || ""}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                defaultValue={user?.email || ""}
-                required
-              />
-            </div>
-            {accountState.error && (
-              <p className="text-red-500 text-sm">{accountState.error}</p>
-            )}
-            {accountState.success && (
-              <p className="text-green-500 text-sm">{accountState.success}</p>
-            )}
-            <Button
-              type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white"
-              disabled={isAccountPending}
-            >
-              {isAccountPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Account Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handleAccountSubmit}>
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="Enter your name"
+                  defaultValue={user?.name || ""}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  defaultValue={user?.email || ""}
+                  required
+                />
+              </div>
+              {accountState.error && (
+                <p className="text-red-500 text-sm">{accountState.error}</p>
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <h1 className="text-lg lg:text-2xl font-medium bold text-gray-900 mb-6">
-        Security Settings
-      </h1>
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Password</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handlePasswordSubmit}>
-            <div>
-              <Label htmlFor="current-password">Current Password</Label>
-              <Input
-                id="current-password"
-                name="currentPassword"
-                type="password"
-                autoComplete="current-password"
-                required
-                minLength={8}
-                maxLength={100}
-              />
-            </div>
-            <div>
-              <Label htmlFor="new-password">New Password</Label>
-              <Input
-                id="new-password"
-                name="newPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={8}
-                maxLength={100}
-              />
-            </div>
-            <div>
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <Input
-                id="confirm-password"
-                name="confirmPassword"
-                type="password"
-                required
-                minLength={8}
-                maxLength={100}
-              />
-            </div>
-            {passwordState.error && (
-              <p className="text-red-500 text-sm">{passwordState.error}</p>
-            )}
-            {passwordState.success && (
-              <p className="text-green-500 text-sm">{passwordState.success}</p>
-            )}
-            <Button
-              type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white"
-              disabled={isPasswordPending}
-            >
-              {isPasswordPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <Lock className="mr-2 h-4 w-4" />
-                  Update Password
-                </>
+              {accountState.success && (
+                <p className="text-green-500 text-sm">{accountState.success}</p>
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <Button
+                type="submit"
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                disabled={isAccountPending}
+              >
+                {isAccountPending ? (
+                  <div>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </div>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Delete Account</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500 mb-4">
-            Account deletion is non-reversable. Please proceed with caution.
-          </p>
-          <form onSubmit={handleDeleteSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="delete-password">Confirm Password</Label>
-              <Input
-                id="delete-password"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                maxLength={100}
-              />
-            </div>
-            {deleteState.error && (
-              <p className="text-red-500 text-sm">{deleteState.error}</p>
-            )}
-            <Button
-              type="submit"
-              variant="destructive"
-              className="bg-red-600 hover:bg-red-700"
-              disabled={isDeletePending}
-            >
-              {isDeletePending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Account
-                </>
+        <h1 className="text-lg lg:text-2xl font-medium bold text-gray-900 mb-6">
+          Security Settings
+        </h1>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Password</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handlePasswordSubmit}>
+              <div>
+                <Label htmlFor="current-password">Current Password</Label>
+                <Input
+                  id="current-password"
+                  name="currentPassword"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  minLength={8}
+                  maxLength={100}
+                />
+              </div>
+              <div>
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  name="newPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  maxLength={100}
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Input
+                  id="confirm-password"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  minLength={8}
+                  maxLength={100}
+                />
+              </div>
+              {passwordState.error && (
+                <p className="text-red-500 text-sm">{passwordState.error}</p>
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </section>
+              {passwordState.success && (
+                <p className="text-green-500 text-sm">
+                  {passwordState.success}
+                </p>
+              )}
+              <Button
+                type="submit"
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                disabled={isPasswordPending}
+              >
+                {isPasswordPending ? (
+                  <div>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Updating...
+                  </div>
+                ) : (
+                  <div>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Update Password
+                  </div>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Delete Account</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-500 mb-4">
+              Account deletion is non-reversable. Please proceed with caution.
+            </p>
+            <form onSubmit={handleDeleteSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="delete-password">Confirm Password</Label>
+                <Input
+                  id="delete-password"
+                  name="password"
+                  type="password"
+                  required
+                  minLength={8}
+                  maxLength={100}
+                />
+              </div>
+              {deleteState.error && (
+                <p className="text-red-500 text-sm">{deleteState.error}</p>
+              )}
+              <Button
+                type="submit"
+                variant="destructive"
+                className="bg-red-600 hover:bg-red-700"
+                disabled={isDeletePending}
+              >
+                {isDeletePending ? (
+                  <div>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Deleting...
+                  </div>
+                ) : (
+                  <div>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Account
+                  </div>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
   );
 }
