@@ -7,24 +7,10 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { TeamDataWithMembers, User } from "@/lib/db/schema";
+import { TeamDataWithMembers } from "@/lib/db/schema";
+import { subjects } from "@/lib/utils";
 
 import React from "react";
-
-const subjects = [
-  { id: 1, name: "Business Law", test: "Solicitor" },
-  { id: 2, name: "Criminal Law", test: "Solicitor" },
-  { id: 3, name: "Civil Litigation", test: "Barrister" },
-  { id: 4, name: "Estate Planning", test: "Solicitor" },
-  { id: 5, name: "Family Law", test: "Barrister" },
-  {
-    id: 6,
-    name: "Professional Responsibility",
-    test: ["Barrister", "Solicitor"],
-  },
-  { id: 7, name: "Public Law", test: "Barrister" },
-  { id: 8, name: "Real Estate", test: "Solicitor" },
-];
 
 const barristerSubjects = subjects.filter(
   (subject) =>
@@ -42,7 +28,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>(
     subjects.map((subject) => subject.id)
   ); // All subjects selected by default
-  const [questionMode, setQuestionMode] = useState("Unused");
+  const [questionMode, setQuestionMode] = useState("unused");
   const [numberOfQuestions, setNumberOfQuestions] = useState("1");
   const [secondsPerQuestion, setSecondsPerQuestion] = useState("75");
   const [isPending, setIsPending] = useState(false);
@@ -274,8 +260,8 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                   type="radio"
                   id="unused"
                   name="questionMode"
-                  value="Unused"
-                  checked={questionMode === "Unused"}
+                  value="unused"
+                  checked={questionMode === "unused"}
                   onChange={(e) => setQuestionMode(e.target.value)}
                 />
                 <Label htmlFor="unused">Only Unused Questions</Label>
@@ -285,8 +271,8 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                   type="radio"
                   id="all"
                   name="questionMode"
-                  value="All"
-                  checked={questionMode === "All"}
+                  value="all"
+                  checked={questionMode === "all"}
                   onChange={(e) => setQuestionMode(e.target.value)}
                 />
                 <Label htmlFor="all">All Questions</Label>
@@ -294,13 +280,13 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
               <div className="flex items-center space-x-2">
                 <input
                   type="radio"
-                  id="wrong"
+                  id="incorrect"
                   name="questionMode"
-                  value="Wrong"
-                  checked={questionMode === "Wrong"}
+                  value="incorrect"
+                  checked={questionMode === "incorrect"}
                   onChange={(e) => setQuestionMode(e.target.value)}
                 />
-                <Label htmlFor="wrong">Only My Mistakes</Label>
+                <Label htmlFor="incorrect">Only My Mistakes</Label>
               </div>
             </div>
           </CardContent>
@@ -308,7 +294,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Number of Questions</CardTitle>
+            <CardTitle>Max Number of Questions</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-5">

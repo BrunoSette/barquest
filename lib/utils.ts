@@ -28,3 +28,18 @@ export const getURL = (path: string = '') => {
   // Concatenate the URL and the path.
   return path ? `${url}/${path}` : url;
 };
+
+export const subjects = [
+  { id: 1, name: "Business Law", test: "Solicitor" },
+  { id: 2, name: "Criminal Law", test: "Solicitor" },
+  { id: 3, name: "Civil Litigation", test: "Barrister" },
+  { id: 4, name: "Estate Planning", test: "Solicitor" },
+  { id: 5, name: "Family Law", test: "Barrister" },
+  {
+    id: 6,
+    name: "Professional Responsibility",
+    test: ["Barrister", "Solicitor"],
+  },
+  { id: 7, name: "Public Law", test: "Barrister" },
+  { id: 8, name: "Real Estate", test: "Solicitor" },
+];

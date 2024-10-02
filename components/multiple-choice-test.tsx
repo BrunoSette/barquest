@@ -40,7 +40,7 @@ export default function MultipleChoiceTest(userId: any) {
   const selectedSubjects = JSON.parse(
     searchParams.get("selectedSubjects") || "[]"
   ).map((id: string) => parseInt(id, 10));
-  const questionMode = searchParams.get("questionMode") || "Unused";
+  const questionMode = searchParams.get("questionMode") || "unused";
   const numberOfQuestions = parseInt(
     searchParams.get("numberOfQuestions") || "1",
     10
@@ -77,6 +77,8 @@ export default function MultipleChoiceTest(userId: any) {
           body: JSON.stringify({
             subjectIds: selectedSubjects,
             maxQuestions: numberOfQuestions,
+            questionMode: questionMode,
+            userId: userId.userId,
           }),
         });
 
