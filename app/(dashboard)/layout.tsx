@@ -8,8 +8,8 @@ import {
   Settings,
   BookCheck,
   LogOut,
-  LayoutDashboard,
   BadgeCheck,
+  Video,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -43,20 +43,6 @@ function Header() {
             BarQuest
           </span>
         </Link>
-        <div className="flex items-center lg:hidden">
-          <Link href="/dashboard/" passHref>
-            <Button variant="ghost" className="my-1">
-              <LayoutDashboard className="mr-1 h-4 w-4" />
-              Dashboard
-            </Button>
-          </Link>
-          <Link href="/dashboard/newtest/" passHref>
-            <Button variant="ghost" className="my-1">
-              <BadgeCheck className="mr-1 h-4 w-4" />
-              New Test
-            </Button>
-          </Link>
-        </div>
         <div className="flex items-center space-x-2">
           {user ? (
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -81,11 +67,20 @@ function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
-                    href="/dashboard/general"
+                    href="/dashboard/newtest"
                     className="flex w-full items-center"
                   >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <BadgeCheck className="mr-2 h-4 w-4" />
+                    <span>Create Test</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                  <Link
+                    href="/dashboard/videos"
+                    className="flex w-full items-center"
+                  >
+                    <Video className="mr-2 h-4 w-4" />
+                    <span>User Guide</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="w-full cursor-pointer m-1">
@@ -95,6 +90,15 @@ function Header() {
                   >
                     <BookCheck className="mr-2 h-4 w-4" />
                     <span>My Subscription</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                  <Link
+                    href="/dashboard/general"
+                    className="flex w-full items-center"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <form action={handleSignOut} className="p-1">
