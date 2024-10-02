@@ -37,17 +37,6 @@ type Question = {
   comments: string; // Add comments field
 };
 
-// const subjects = [
-//   { id: 1, name: "Business Law" },
-//   { id: 2, name: "Criminal Law" },
-//   { id: 3, name: "Civil Litigation" },
-//   { id: 4, name: "Estate Planning" },
-//   { id: 5, name: "Family Law" },
-//   { id: 6, name: "Professional Responsibility" },
-//   { id: 7, name: "Public Law" },
-//   { id: 8, name: "Real Estate" },
-// ];
-
 export function CreateQuestionsComponent() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question>({

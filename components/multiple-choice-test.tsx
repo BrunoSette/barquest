@@ -17,20 +17,9 @@ import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import { Question } from "@/lib/db/schema";
 
 const COLORS = ["#4CAF50", "#F44336"];
-
-type Question = {
-  id: string;
-  subjectId: [number];
-  questionText: string;
-  answer1: string;
-  answer2: string;
-  answer3: string;
-  answer4: string;
-  correctAnswer: number;
-  comments: string;
-};
 
 export default function MultipleChoiceTest(userId: any) {
   const searchParams = useSearchParams();

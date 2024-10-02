@@ -11,27 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-};
-
-type Team = {
-  id: string;
-  name: string;
-  created_at: string;
-  updated_at: string;
-  stripe_customer_id: string;
-  stripe_subscription_id: string;
-  stripe_product_id: string;
-  plan_name: string;
-  subscription_status: string;
-};
+import { User } from "@/lib/db/schema";
 
 export default function UsersTableAndGraphs() {
   const [users, setUsers] = useState<User[]>([]);
@@ -158,12 +138,8 @@ export default function UsersTableAndGraphs() {
               <TableCell>{user.name || ""}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.role}</TableCell>
-              <TableCell>
-                {new Date(user.created_at).toLocaleString()}
-              </TableCell>
-              <TableCell>
-                {new Date(user.updated_at).toLocaleString()}
-              </TableCell>
+              <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+              <TableCell>{new Date(user.updatedAt).toLocaleString()}</TableCell>
             </TableRow>
           ))}
         </TableBody>

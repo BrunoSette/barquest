@@ -20,6 +20,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
+import { COLORS } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -30,8 +31,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState, useEffect } from "react";
-
-const COLORS = ["#F97316", "#3B82F6"]; // Orange and Blue
 
 export function BarExamDashboardComponent({ userId }: { userId: number }) {
   const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
@@ -204,8 +203,8 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                   />
                   <YAxis type="number" style={{ fontSize: "12px" }} />
                   <Tooltip contentStyle={{ fontSize: "12px" }} />
-                  <Bar dataKey="correct" fill="#F97316" name="Correct" />
-                  <Bar dataKey="incorrect" fill="#3B82F6" name="Incorrect" />
+                  <Bar dataKey="correct" fill={COLORS[0]} name="Correct" />
+                  <Bar dataKey="incorrect" fill={COLORS[1]} name="Incorrect" />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -268,7 +267,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                     <Line
                       type="monotone"
                       dataKey="score"
-                      stroke="#F97316"
+                      stroke={COLORS[0]}
                       name="Score"
                     />
                   </LineChart>
