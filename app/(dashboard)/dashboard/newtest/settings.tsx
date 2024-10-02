@@ -167,10 +167,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                       onChange={() => handleSubjectChange(subject.id)}
                       disabled={
                         !(
-                          (planName === "Barrister" &&
+                          (planName === "BarQuest - Barrister" &&
                             (subscriptionStatus === "active" ||
                               subscriptionStatus === "trialing")) ||
-                          (planName === "Solicitor + Barrister" &&
+                          (planName === "BarQuest - Full" &&
                             (subscriptionStatus === "active" ||
                               subscriptionStatus === "trialing"))
                         )
@@ -180,10 +180,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                   </div>
                 ))}
 
-                {((planName === "Barrister" &&
+                {((planName === "BarQuest - Barrister" &&
                   (subscriptionStatus === "active" ||
                     subscriptionStatus === "trialing")) ||
-                  (planName === "Solicitor + Barrister" &&
+                  (planName === "BarQuest - Full" &&
                     (subscriptionStatus === "active" ||
                       subscriptionStatus === "trialing"))) && (
                   <Button
@@ -214,10 +214,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                       onChange={() => handleSubjectChange(subject.id)}
                       disabled={
                         !(
-                          (planName === "Solicitor" &&
+                          (planName === "BarQuest - Solicitor" &&
                             (subscriptionStatus === "active" ||
                               subscriptionStatus === "trialing")) ||
-                          (planName === "Solicitor + Barrister" &&
+                          (planName === "BarQuest - Full" &&
                             (subscriptionStatus === "active" ||
                               subscriptionStatus === "trialing"))
                         )
@@ -226,10 +226,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                     <Label htmlFor={subject.name}>{subject.name}</Label>
                   </div>
                 ))}
-                {((planName === "Solicitor" &&
+                {((planName === "BarQuest - Solicitor" &&
                   (subscriptionStatus === "active" ||
                     subscriptionStatus === "trialing")) ||
-                  (planName === "Solicitor + Barrister" &&
+                  (planName === "BarQuest - Full" &&
                     (subscriptionStatus === "active" ||
                       subscriptionStatus === "trialing"))) && (
                   <Button
