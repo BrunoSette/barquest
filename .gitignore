@@ -38,3 +38,8 @@ next-env.d.ts
 
 # Docker
 postgres_data/
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

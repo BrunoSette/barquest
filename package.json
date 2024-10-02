@@ -65,6 +65,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.47.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
     "react-email": "3.0.1"
