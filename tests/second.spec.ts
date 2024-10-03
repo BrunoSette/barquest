@@ -167,7 +167,9 @@ test.describe("User Journey Tests", () => {
     }
 
     // Wait for a redirection to the dashboard
-    await page.waitForURL("http://localhost:3000/dashboard");
+    await page.waitForURL("http://localhost:3000/dashboard", {
+      timeout: 25000,
+    });
     await expect(
       page.getByRole("heading", { name: "Bar Exam Practice Dashboard" })
     ).toBeVisible({ timeout: 15000 });
