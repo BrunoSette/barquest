@@ -10,7 +10,7 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    environment: production
+    environment: preview
 
     env:
       POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
@@ -37,28 +37,22 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: |
-            ~/.bun
+            ~/.npm
             ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-
-
-      - name: Install Bun
-        run: curl -fsSL https://bun.sh/install | bash
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-
 
       - name: Install dependencies
-        run: bun install
+        run: yarn install
 
       - name: Build the application
-        run: bun run build
+        run: yarn build
 
       - name: Start the application
-        run: bun run start &
+        run: yarn start &
         env:
           PORT: 3000
-
-      - name: Debug ENV
-        run: echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }} FROM GITHUB ACTIONS"
 
       - name: Wait for the app to start
         run: npx wait-on http://localhost:3000
@@ -90,7 +84,7 @@ jobs:
           # SENTRY_ORG: "omnireno-inc"
           # SENTRY_PROJECT: "barquest"
         with:
-          environment: production
+          environment: preview
 
       - name: Finalize and notify Sentry of deployment
         run: |
