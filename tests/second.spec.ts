@@ -16,7 +16,7 @@ test.describe("User Journey Tests", () => {
       .click();
   });
 
-  test("check website links", async ({ page }) => {
+  test("login and check website links", async ({ page }) => {
     // Start tracing before test execution
 
     await page.goto("http://localhost:3000/sign-in");

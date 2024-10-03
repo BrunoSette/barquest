@@ -24,8 +24,7 @@ jobs:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
-      # SENTRY_ORG: "omnireno-inc"
-      # SENTRY_PROJECT: "barquest"
+
 
     steps:
       - uses: actions/checkout@v4
