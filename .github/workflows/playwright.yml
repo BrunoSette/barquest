@@ -10,7 +10,7 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    environment: preview
+    environment: production
 
     env:
       POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
@@ -22,8 +22,10 @@ jobs:
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: "omnireno-inc"
-      SENTRY_PROJECT: "barquest"
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+
+      # SENTRY_ORG: "omnireno-inc"
+      # SENTRY_PROJECT: "barquest"
 
     steps:
       - uses: actions/checkout@v4
@@ -79,8 +81,8 @@ jobs:
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: "omnireno-inc"
-          SENTRY_PROJECT: "barquest"
+          # SENTRY_ORG: "omnireno-inc"
+          # SENTRY_PROJECT: "barquest"
         with:
           environment: production
 
