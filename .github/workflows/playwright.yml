@@ -2,9 +2,9 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [main, master]
+    branches: ["*"]
   pull_request:
-    branches: [main, master]
+    branches: ["*"]
 
 jobs:
   test:
@@ -21,6 +21,9 @@ jobs:
       POSTGRES_NAME: "postgres"
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: "barquestinc"
+      SENTRY_PROJECT: "barquest"
 
     steps:
       - uses: actions/checkout@v4
@@ -67,3 +70,18 @@ jobs:
           name: playwright-results
           path: test-results/
           retention-days: 7
+
+      # Sentry integration: create a release and deploy
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: "barquestinc"
+          SENTRY_PROJECT: "barquest"
+        with:
+          environment: production
+
+      - name: Finalize and notify Sentry of deployment
+        run: |
+          sentry-cli releases finalize $GITHUB_SHA
+          sentry-cli releases deploys $GITHUB_SHA new -e production
