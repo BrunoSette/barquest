@@ -22,7 +22,7 @@ jobs:
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: "barquestinc"
+      SENTRY_ORG: "omnireno-inc"
       SENTRY_PROJECT: "barquest"
 
     steps:
@@ -58,6 +58,9 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
+      - name: Print environment variables
+        run: printenv
+
       - name: Run Playwright tests with tracing
         run: |
           mkdir -p test-results
@@ -76,7 +79,7 @@ jobs:
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: "barquestinc"
+          SENTRY_ORG: "omnireno-inc"
           SENTRY_PROJECT: "barquest"
         with:
           environment: production
