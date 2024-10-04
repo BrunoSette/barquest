@@ -1,37 +1,37 @@
-name: Create Sentry Release
+# name: Create Sentry Release
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    env:
-      SENTRY_AUTH_TOKEN: 9174e08adc7dd3c1cd053a6c15aeb868d27d4e1be80497d22fbe9fce47e50b08
-      SENTRY_ORG: omnireno-inc
-      SENTRY_PROJECT: barquest
-      SENTRY_LOG_LEVEL: debug
+# jobs:
+#   release:
+#     runs-on: ubuntu-latest
+#     env:
+#       SENTRY_AUTH_TOKEN: 069e508c55fb6025ba692b1734bf5b6ee5c6315d5d3cae27317a883e61a4e2d3
+#       SENTRY_ORG: omnireno-inc
+#       SENTRY_PROJECT: barquest
+#       SENTRY_LOG_LEVEL: debug
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
 
-      - name: Print environment variables
-        run: |
-          echo "SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN"
-          echo "SENTRY_ORG: $SENTRY_ORG"
-          echo "SENTRY_PROJECT: $SENTRY_PROJECT"
-          echo "SENTRY_LOG_LEVEL: $SENTRY_LOG_LEVEL"
+#       - name: Print environment variables
+#         run: |
+#           echo "SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN"
+#           echo "SENTRY_ORG: $SENTRY_ORG"
+#           echo "SENTRY_PROJECT: $SENTRY_PROJECT"
+#           echo "SENTRY_LOG_LEVEL: $SENTRY_LOG_LEVEL"
 
-      - name: Install Sentry CLI
-        run: npm install -g @sentry/cli
+#       - name: Install Sentry CLI
+#         run: npm install -g @sentry/cli
 
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        with:
-          environment: production
-          version: 1.0.0
+#       - name: Create Sentry release
+#         uses: getsentry/action-release@v1
+#         with:
+#           environment: production
+#           version: ${{ github.sha }}

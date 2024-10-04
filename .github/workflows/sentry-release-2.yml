@@ -1,0 +1,64 @@
+name: Create Sentry Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Sentry CLI
+        run: npm install -g @sentry/cli
+
+      - name: Read current version
+        id: read_version
+        run: |
+          if [ ! -f version.txt ]; then
+            echo "1.0.0" > version.txt
+          fi
+          VERSION=$(cat version.txt)
+          echo "Current version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_ENV
+
+      - name: Increment version
+        id: increment_version
+        run: |
+          VERSION=${{ env.version }}
+          IFS='.' read -r -a version_parts <<< "$VERSION"
+          PATCH=${version_parts[2]}
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="${version_parts[0]}.${version_parts[1]}.$PATCH"
+          echo "New version: $NEW_VERSION"
+          echo $NEW_VERSION > version.txt
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Create Sentry Release
+        run: |
+          export SENTRY_AUTH_TOKEN=069e508c55fb6025ba692b1734bf5b6ee5c6315d5d3cae27317a883e61a4e2d3
+          export SENTRY_ORG=barquestinc
+          VERSION=${{ env.new_version }}
+          sentry-cli releases new -p barquest $VERSION
+          sentry-cli releases set-commits --auto $VERSION
+          sentry-cli releases finalize $VERSION
+
+      - name: Commit version update
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.txt
+          git commit -m "Increment version to ${{ env.new_version }}"
+          git push
+
+      - name: Upload version file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-file
+          path: version.txt
