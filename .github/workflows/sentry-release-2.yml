@@ -39,6 +39,11 @@ jobs:
           sentry-cli releases set-commits --auto $VERSION
           sentry-cli releases finalize $VERSION
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Create Git tag
         run: |
           VERSION=${{ env.version }}
