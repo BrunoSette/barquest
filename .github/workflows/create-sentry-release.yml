@@ -8,44 +8,30 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      SENTRY_AUTH_TOKEN: 9174e08adc7dd3c1cd053a6c15aeb868d27d4e1be80497d22fbe9fce47e50b08
+      SENTRY_ORG: omnireno-inc
+      SENTRY_PROJECT: barquest
+      SENTRY_LOG_LEVEL: debug
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "lts/*"
+      - name: Print environment variables
+        run: |
+          echo "SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN"
+          echo "SENTRY_ORG: $SENTRY_ORG"
+          echo "SENTRY_PROJECT: $SENTRY_PROJECT"
+          echo "SENTRY_LOG_LEVEL: $SENTRY_LOG_LEVEL"
+
+      - name: Install Sentry CLI
+        run: npm install -g @sentry/cli
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: "barquestinc"
-          SENTRY_PROJECT: "barquest"
         with:
           environment: production
-
-      - name: Install Sentry CLI
-        run: npm ci
-
-      - name: Create Sentry release
-        run: |
-          # Create a new release on Sentry
-          npx sentry-cli releases new "$GITHUB_SHA"
-
-          # Associate commits with the release
-          npx sentry-cli releases set-commits --auto "$GITHUB_SHA"
-
-          # Finalize the release
-          npx sentry-cli releases finalize "$GITHUB_SHA"
-
-          # (Optional) Upload source maps, adjust path accordingly
-          npx sentry-cli releases files "$GITHUB_SHA" upload-sourcemaps ./dist
-
-      - name: Deploy Sentry release
-        run: |
-          # Notify Sentry about the deployment
-          npx sentry-cli releases deploys "$GITHUB_SHA" new -e production
+          version: 1.0.0
