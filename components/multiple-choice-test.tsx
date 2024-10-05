@@ -14,12 +14,11 @@ import {
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import { Question } from "@/lib/db/schema";
-
-const COLORS = ["#4CAF50", "#F44336"];
+import { COLORS } from "@/lib/utils";
 
 export default function MultipleChoiceTest(userId: any) {
   const searchParams = useSearchParams();
@@ -35,7 +34,7 @@ export default function MultipleChoiceTest(userId: any) {
     10
   );
   const secondsPerQuestion = parseInt(
-    searchParams.get("secondsPerQuestion") || "75",
+    searchParams.get("secondsPerQuestion") || "100",
     10
   );
 
@@ -105,11 +104,40 @@ export default function MultipleChoiceTest(userId: any) {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timer);
-            if (questions.length > 0 && currentQuestion < questions.length) {
-              handleAnswerSelection(5); // Automatically select an invalid answer
+
+            handleAnswerSubmission(); // Automatically submit answer if time runs out
+
+            if (isTutor) {
+              // In tutored mode, show the correct answer and wait for user to click "Next"
+              setIsAnswered(true); // Show the correct answer
+            } else {
+              // If not tutored, automatically move to the next question
+              if (currentQuestion === questions.length - 1) {
+                // Finish the test if it's the last question
+                setIsTestComplete(true);
+                localStorage.removeItem("timeLeft"); // Clear the timer
+                saveTestResult(
+                  userId.userId,
+                  score,
+                  questions.length,
+                  isTimed,
+                  isTutor,
+                  questionMode,
+                  numberOfQuestions
+                );
+              } else {
+                // Automatically move to the next question
+                setCurrentQuestion((prev) => prev + 1);
+                setSelectedAnswer(null); // Reset selected answer
+                setIsAnswered(false); // Reset the answered state
+                setTimeLeft(secondsPerQuestion); // Reset timer for next question
+                localStorage.setItem("timeLeft", secondsPerQuestion.toString());
+              }
             }
+
             return secondsPerQuestion; // Reset to time from URL
           }
+
           const newTime = prevTime - 1;
           localStorage.setItem("timeLeft", newTime.toString());
           return newTime;
@@ -120,16 +148,18 @@ export default function MultipleChoiceTest(userId: any) {
     }
   }, [currentQuestion, secondsPerQuestion, isTimed, questions.length]);
 
-  const handleAnswerSelection = async (value: number) => {
+  const handleAnswerSubmission = async () => {
     if (questions.length === 0 || currentQuestion >= questions.length) {
       return;
     }
 
-    setSelectedAnswer(value);
     setIsAnswered(true); // Mark the question as answered
 
     const currentQ = questions[currentQuestion];
-    const isCorrect = value === currentQ.correctAnswer;
+    const isCorrect = selectedAnswer === currentQ.correctAnswer;
+
+    // Handle the case where no answer was selected (time ran out)
+    const answerToSubmit = selectedAnswer !== null ? selectedAnswer : -1; // Set -1 or another invalid option
 
     if (!submittedAnswers.has(Number(currentQ.id))) {
       try {
@@ -139,10 +169,10 @@ export default function MultipleChoiceTest(userId: any) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            user_id: userId.userId, // This is passed as a prop
+            user_id: userId.userId,
             question_id: currentQ.id,
-            selected_answer: value,
-            is_correct: isCorrect,
+            selected_answer: answerToSubmit, // Submit -1 or invalid option if none was selected
+            is_correct: selectedAnswer !== null && isCorrect, // Mark as incorrect if unanswered
           }),
         });
 
@@ -153,27 +183,20 @@ export default function MultipleChoiceTest(userId: any) {
         const data = await response.json();
         console.log("Answer submitted:", data);
         setSubmittedAnswers((prev) => new Set(prev).add(Number(currentQ.id)));
+
+        // If the answer is correct, increase the score
+        if (isCorrect && selectedAnswer !== null) {
+          setScore(score + 1);
+        }
       } catch (error) {
         console.error("Error submitting answer:", error);
       }
     }
-
-    // Move to the next question after a short delay to show the correct answer
-    setTimeout(() => {
-      handleNextQuestion();
-    }, 1000); // Adjust the delay as needed
   };
 
   const handleNextQuestion = () => {
     if (questions.length === 0 || currentQuestion >= questions.length) {
       return;
-    }
-
-    const currentQ = questions[currentQuestion];
-    const correctAnswer = currentQ.correctAnswer;
-
-    if (selectedAnswer === correctAnswer) {
-      setScore(score + 1);
     }
 
     if (currentQuestion === questions.length - 1) {
@@ -197,18 +220,6 @@ export default function MultipleChoiceTest(userId: any) {
       setTimeLeft(secondsPerQuestion); // Reset timer for next question
       localStorage.setItem("timeLeft", secondsPerQuestion.toString());
     }
-  };
-
-  const handlePreviousQuestion = () => {
-    if (currentQuestion === 0) {
-      return;
-    }
-
-    setSelectedAnswer(null);
-    setCurrentQuestion(currentQuestion - 1);
-    setIsAnswered(false); // Reset the answered state for the previous question
-    setTimeLeft(secondsPerQuestion); // Reset timer for previous question
-    localStorage.setItem("timeLeft", secondsPerQuestion.toString());
   };
 
   const saveTestResult = async (
@@ -351,7 +362,7 @@ export default function MultipleChoiceTest(userId: any) {
           </p>
           <RadioGroup
             value={selectedAnswer?.toString() || ""}
-            onValueChange={(value) => handleAnswerSelection(parseInt(value))}
+            onValueChange={(value) => setSelectedAnswer(parseInt(value))} // Just store the value
           >
             {[
               questions[currentQuestion]?.answer1,
@@ -368,8 +379,8 @@ export default function MultipleChoiceTest(userId: any) {
                   ? isCorrect
                     ? "text-green-600"
                     : isSelected
-                      ? "text-red-600"
-                      : "text-gray-900"
+                    ? "text-red-600"
+                    : "text-gray-900"
                   : "text-gray-900";
 
               return (
@@ -404,20 +415,22 @@ export default function MultipleChoiceTest(userId: any) {
             </p>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-end">
           <Button
-            onClick={handlePreviousQuestion}
-            disabled={currentQuestion === 0}
-            variant="outline"
+            onClick={() => {
+              if (!isAnswered) {
+                handleAnswerSubmission(); // Submit the answer
+              } else if (!isTutor || (isTutor && isAnswered)) {
+                handleNextQuestion(); // Move to the next question
+              }
+            }}
+            disabled={selectedAnswer === null && !isAnswered} // Disable only if no answer is selected and not answered yet
           >
-            <ChevronLeft className="mr-2 h-4 w-4" /> Previous
-          </Button>
-          <Button
-            onClick={handleNextQuestion}
-            disabled={selectedAnswer === null}
-          >
-            {isLastQuestion ? "Finish" : "Next"}{" "}
-            <ChevronRight className="ml-2 h-4 w-4" />
+            {isAnswered
+              ? isLastQuestion
+                ? "Finish"
+                : "Next Question"
+              : "Submit Answer"}{" "}
           </Button>
         </CardFooter>
       </Card>

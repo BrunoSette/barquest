@@ -35,7 +35,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
   ); // All subjects selected by default
   const [questionMode, setQuestionMode] = useState("unused");
   const [numberOfQuestions, setNumberOfQuestions] = useState("1");
-  const [secondsPerQuestion, setSecondsPerQuestion] = useState("75");
+  const [secondsPerQuestion, setSecondsPerQuestion] = useState("100");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
