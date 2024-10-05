@@ -40,17 +40,18 @@ export default function MultipleChoiceTest(userId: any) {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(() => {
     const savedTime = localStorage.getItem("timeLeft");
     return savedTime ? parseInt(savedTime, 10) : secondsPerQuestion;
   });
   const [isTestComplete, setIsTestComplete] = useState(false);
-  const [isAnswered, setIsAnswered] = useState(false);
   const [submittedAnswers, setSubmittedAnswers] = useState<Set<number>>(
     new Set()
   );
+  const [answersMap, setAnswersMap] = useState<Record<number, number>>({});
+
+  const isAnswered = Object.keys(answersMap).some((questionId) => Number(questionId) === questions[currentQuestion].id);
 
   useEffect(() => {
     let didCancel = false;
@@ -102,6 +103,10 @@ export default function MultipleChoiceTest(userId: any) {
     if (isTimed) {
       const timer = setInterval(() => {
         setTimeLeft((prevTime) => {
+          if (isAnswered) {
+            clearInterval(timer);
+            return prevTime;
+          }
           if (prevTime <= 1) {
             clearInterval(timer);
 
@@ -134,7 +139,6 @@ export default function MultipleChoiceTest(userId: any) {
                 localStorage.setItem("timeLeft", secondsPerQuestion.toString());
               }
             }
-
             return secondsPerQuestion; // Reset to time from URL
           }
 
@@ -146,7 +150,7 @@ export default function MultipleChoiceTest(userId: any) {
 
       return () => clearInterval(timer);
     }
-  }, [currentQuestion, secondsPerQuestion, isTimed, questions.length]);
+  }, [currentQuestion, secondsPerQuestion, isTimed, questions.length, isAnswered]);
 
   const handleAnswerSubmission = async () => {
     if (questions.length === 0 || currentQuestion >= questions.length) {
@@ -215,10 +219,9 @@ export default function MultipleChoiceTest(userId: any) {
       );
     } else {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
-      setIsAnswered(false); // Reset the answered state for the next question
-      setTimeLeft(secondsPerQuestion); // Reset timer for next question
-      localStorage.setItem("timeLeft", secondsPerQuestion.toString());
+      const savedTime = localStorage.getItem("timeLeft");
+      setTimeLeft(savedTime ? parseInt(savedTime, 10) : secondsPerQuestion); // Reset timer for next question
+      // localStorage.setItem("timeLeft", secondsPerQuestion.toString());
     }
   };
 
@@ -371,7 +374,9 @@ export default function MultipleChoiceTest(userId: any) {
               questions[currentQuestion]?.answer4,
             ].map((choice, index) => {
               const answerId = index + 1;
-              const correctAnswer = questions[currentQuestion].correctAnswer;
+              const currentQ = questions[currentQuestion];
+              const selectedAnswer = answersMap[currentQ.id];
+              const correctAnswer = currentQ.correctAnswer;
               const isCorrect = answerId === correctAnswer;
               const isSelected = answerId === selectedAnswer;
               const textColorClass =
@@ -393,7 +398,7 @@ export default function MultipleChoiceTest(userId: any) {
                     id={`choice-${index}`}
                     className="mt-1"
                   />
-                  <Label htmlFor={`choice-${index}`} className="flex-1">
+                  <Label htmlFor={`choice-${index}`} className="flex-1 cursor-pointer">
                     {choice}
                   </Label>
                   {isTutor && isAnswered && (
