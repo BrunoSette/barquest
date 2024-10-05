@@ -121,7 +121,10 @@ export const userAnswers = pgTable("user_answers", {
     .references(() => users.id),
   questionId: integer("question_id").references(() => questions.id, {
     onDelete: "set null",
-  }), // Add "set null"
+  }),
+  testHistoryId: integer("test_history_id") // Foreign key to testHistory table
+    .notNull()
+    .references(() => testHistory.id), // This ensures answers are linked to specific tests
   selectedAnswer: integer("selected_answer").notNull(),
   isCorrect: pgBoolean("is_correct").notNull(),
   answeredAt: timestamp("answered_at").notNull().defaultNow(),
@@ -202,6 +205,14 @@ export const questionsRelations = relations(questions, ({ one, many }) => ({
   userAnswers: many(userAnswers),
 }));
 
+export const testHistoryRelations = relations(testHistory, ({ one, many }) => ({
+  user: one(users, {
+    fields: [testHistory.userId],
+    references: [users.id],
+  }),
+  userAnswers: many(userAnswers), // Add this relation if not already present
+}));
+
 export const userAnswersRelations = relations(userAnswers, ({ one }) => ({
   user: one(users, {
     fields: [userAnswers.userId],
@@ -211,12 +222,9 @@ export const userAnswersRelations = relations(userAnswers, ({ one }) => ({
     fields: [userAnswers.questionId],
     references: [questions.id],
   }),
-}));
-
-export const testHistoryRelations = relations(testHistory, ({ one }) => ({
-  user: one(users, {
-    fields: [testHistory.userId],
-    references: [users.id],
+  testHistory: one(testHistory, {
+    fields: [userAnswers.testHistoryId], // Link answers to specific test history
+    references: [testHistory.id],
   }),
 }));
 

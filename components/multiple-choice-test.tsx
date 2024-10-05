@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,12 +14,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
-import { Question } from "@/lib/db/schema";
 import { COLORS } from "@/lib/utils";
+import { Question } from "@/lib/db/schema";
+import { CheckCircle, XCircle } from "lucide-react";
+import Link from "next/link";
 
-export default function MultipleChoiceTest(userId: any) {
+export default function MultipleChoiceTest({ userId }: { userId: number }) {
   const searchParams = useSearchParams();
-  // Get parameters from URL
   const isTutor = searchParams.get("isTutor") === "true";
   const isTimed = searchParams.get("isTimed") === "true";
   const selectedSubjects = JSON.parse(
@@ -40,17 +39,16 @@ export default function MultipleChoiceTest(userId: any) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [testHistoryId, setTestHistoryId] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const savedTime = localStorage.getItem("timeLeft");
-    return savedTime ? parseInt(savedTime, 10) : secondsPerQuestion;
-  });
+  const [timeLeft, setTimeLeft] = useState(secondsPerQuestion);
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
   const [submittedAnswers, setSubmittedAnswers] = useState<Set<number>>(
     new Set()
   );
 
+  // Fetch questions on mount
   useEffect(() => {
     let didCancel = false;
 
@@ -58,34 +56,21 @@ export default function MultipleChoiceTest(userId: any) {
       try {
         const response = await fetch("/api/filteredquestions", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             subjectIds: selectedSubjects,
             maxQuestions: numberOfQuestions,
-            questionMode: questionMode,
-            userId: userId.userId,
+            questionMode,
+            userId,
           }),
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const data = await response.json();
-
-        if (!didCancel) {
-          if (Array.isArray(data)) {
-            setQuestions(data);
-          } else {
-            console.error("Unexpected response format:", data);
-          }
+        if (!didCancel && Array.isArray(data)) {
+          setQuestions(data);
         }
       } catch (error) {
-        if (!didCancel) {
-          console.error("Error fetching questions:", error);
-        }
+        console.error("Error fetching questions:", error);
       }
     };
 
@@ -93,10 +78,11 @@ export default function MultipleChoiceTest(userId: any) {
 
     return () => {
       didCancel = true;
-      localStorage.removeItem("timeLeft"); // Remove the item from localStorage on unmount
+      localStorage.removeItem("timeLeft");
     };
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
+  // Timer logic for timed tests
   useEffect(() => {
     if (isTimed) {
       const timer = setInterval(() => {
@@ -108,106 +94,73 @@ export default function MultipleChoiceTest(userId: any) {
           if (prevTime <= 1) {
             clearInterval(timer);
             handleAnswerSubmission(); // Automatically submit answer if time runs out
-
-            if (isTutor) {
-              // In tutored mode, show the correct answer and wait for user to click "Next"
-              setIsAnswered(true); // Show the correct answer
-            } else {
-              // If not tutored, automatically move to the next question
-              if (currentQuestion === questions.length - 1) {
-                // Finish the test if it's the last question
-                setIsTestComplete(true);
-                localStorage.removeItem("timeLeft"); // Clear the timer
-                saveTestResult(
-                  userId.userId,
-                  score,
-                  questions.length,
-                  isTimed,
-                  isTutor,
-                  questionMode,
-                  numberOfQuestions
-                );
-              } else {
-                // Automatically move to the next question
-                setCurrentQuestion((prev) => prev + 1);
-                setSelectedAnswer(null); // Reset selected answer
-                setIsAnswered(false); // Reset the answered state
-                // setTimeLeft(secondsPerQuestion); // Reset timer for next question
-                // localStorage.setItem("timeLeft", secondsPerQuestion.toString());
-              }
-            }
-
-            localStorage.setItem("timeLeft", secondsPerQuestion.toString());
-            return secondsPerQuestion; // Reset to time from URL
+            return secondsPerQuestion;
           }
-
-          const newTime = prevTime - 1;
-          localStorage.setItem("timeLeft", newTime.toString());
-          return newTime;
+          return prevTime - 1;
         });
       }, 1000);
 
       return () => clearInterval(timer);
     }
-  }, [currentQuestion, secondsPerQuestion, isTimed, questions.length, isAnswered]);
+  }, [currentQuestion, secondsPerQuestion, isTimed, isAnswered]);
 
+  // Handle answer submission
   const handleAnswerSubmission = async () => {
     const currentQ = questions[currentQuestion];
-    
-    if (questions.length === 0 || currentQuestion >= questions.length || submittedAnswers.has(Number(currentQ.id))) {
-      return;
-    }
-    
-    setIsAnswered(true); // Mark the question as answered
-    
-    const isCorrect = selectedAnswer === currentQ.correctAnswer;
 
-    // Handle the case where no answer was selected (time ran out)
-    const answerToSubmit = selectedAnswer !== null ? selectedAnswer : -1; // Set -1 or another invalid option
+    if (submittedAnswers.has(Number(currentQ.id))) return;
+
+    setIsAnswered(true); // Mark question as answered
+    const isCorrect = selectedAnswer === currentQ.correctAnswer;
+    const answerToSubmit = selectedAnswer !== null ? selectedAnswer : -1;
+
+    // Only create test history on first answer submission
+    if (!testHistoryId) {
+      console.log("Creating test history for the first answer");
+      const historyId = await saveTestResult(
+        userId,
+        score,
+        numberOfQuestions,
+        isTimed,
+        isTutor,
+        questionMode,
+        numberOfQuestions
+      );
+
+      setTestHistoryId(historyId);
+      console.log("Test history created ID:", historyId);
+    }
 
     try {
       const response = await fetch("/api/users-answers", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: userId.userId,
+          user_id: userId,
           question_id: currentQ.id,
-          selected_answer: answerToSubmit, // Submit -1 or invalid option if none was selected
-          is_correct: selectedAnswer !== null && isCorrect, // Mark as incorrect if unanswered
+          selected_answer: answerToSubmit,
+          is_correct: isCorrect,
+          test_history_id: testHistoryId, // Use history ID
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-      console.log("Answer submitted:", data);
       setSubmittedAnswers((prev) => new Set(prev).add(Number(currentQ.id)));
-
-      // If the answer is correct, increase the score
-      if (isCorrect && selectedAnswer !== null) {
-        setScore(score + 1);
-      }
+      if (isCorrect) setScore((prevScore) => prevScore + 1);
     } catch (error) {
       console.error("Error submitting answer:", error);
     }
   };
 
+  // Handle moving to the next question
   const handleNextQuestion = () => {
-    if (questions.length === 0 || currentQuestion >= questions.length) {
-      return;
-    }
-
     if (currentQuestion === questions.length - 1) {
       setIsTestComplete(true);
-      localStorage.removeItem("timeLeft"); // Clear the timer when the test is complete
+      localStorage.removeItem("timeLeft"); // Clear timer when the test is complete
 
-      // Save the test result to the database
+      // Save final test result
       saveTestResult(
-        userId.userId,
+        userId,
         score,
         questions.length,
         isTimed,
@@ -218,10 +171,7 @@ export default function MultipleChoiceTest(userId: any) {
     } else {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
-      setIsAnswered(false); // Reset the answered state for the next question
-      const savedTime = localStorage.getItem("timeLeft");
-      setTimeLeft(savedTime ? parseInt(savedTime, 10) : secondsPerQuestion); // Reset timer for next question
-      // localStorage.setItem("timeLeft", secondsPerQuestion.toString());
+      setIsAnswered(false);
     }
   };
 
@@ -233,13 +183,11 @@ export default function MultipleChoiceTest(userId: any) {
     tutor: boolean,
     questionMode: string,
     newQuestions: number
-  ) => {
+  ): Promise<number | null> => {
     try {
       const response = await fetch("/api/save-test-results", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId,
           score,
@@ -251,14 +199,11 @@ export default function MultipleChoiceTest(userId: any) {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-      console.log("Test result saved:", data);
+      return data.id || null;
     } catch (error) {
       console.error("Error saving test result:", error);
+      return null;
     }
   };
 
@@ -341,7 +286,6 @@ export default function MultipleChoiceTest(userId: any) {
       <h1 className="text-3xl font-bold mb-6 text-center">
         Canadian Bar Exam Practice Test
       </h1>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
@@ -365,79 +309,72 @@ export default function MultipleChoiceTest(userId: any) {
           </p>
           <RadioGroup
             value={selectedAnswer?.toString() || ""}
-            onValueChange={(value) => {
-              if (!isAnswered) {
-                setSelectedAnswer(parseInt(value)) // Just store the value
-              }
-            }}
+            onValueChange={(value) => setSelectedAnswer(parseInt(value))}
           >
-            {[
-              questions[currentQuestion]?.answer1,
-              questions[currentQuestion]?.answer2,
-              questions[currentQuestion]?.answer3,
-              questions[currentQuestion]?.answer4,
-            ].map((choice, index) => {
-              const answerId = index + 1;
-              const correctAnswer = questions[currentQuestion].correctAnswer;
-              const isCorrect = answerId === correctAnswer;
-              const isSelected = answerId === selectedAnswer;
-              const textColorClass =
-                isTutor && isAnswered
-                  ? isCorrect
-                    ? "text-green-600"
-                    : isSelected
-                    ? "text-red-600"
-                    : "text-gray-900"
-                  : "text-gray-900";
+            {["answer1", "answer2", "answer3", "answer4"].map(
+              (choice, index) => {
+                const answerId = index + 1;
+                const correctAnswer = questions[currentQuestion].correctAnswer;
+                const isCorrect = answerId === correctAnswer;
+                const isSelected = answerId === selectedAnswer;
+                const textColorClass =
+                  isTutor && isAnswered
+                    ? isCorrect
+                      ? "text-green-600"
+                      : isSelected
+                      ? "text-red-600"
+                      : "text-gray-900"
+                    : "text-gray-900";
 
-              return (
-                <div
-                  key={index}
-                  className={`flex items-center space-x-2 mb-4 ${textColorClass}`}
-                >
-                  <RadioGroupItem
-                    value={answerId.toString()}
-                    id={`choice-${index}`}
-                    className="mt-1"
-                  />
-                  <Label htmlFor={`choice-${index}`} className="flex-1 cursor-pointer">
-                    {choice}
-                  </Label>
-                  {isTutor && isAnswered && (
-                    <div className="ml-2">
-                      {isCorrect ? (
-                        <CheckCircle className="text-green-600 h-5 w-5" />
-                      ) : isSelected ? (
-                        <XCircle className="text-red-600 h-5 w-5" />
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    key={index}
+                    className={`flex items-center space-x-2 mb-4 ${textColorClass}`}
+                  >
+                    <RadioGroupItem
+                      value={answerId.toString()}
+                      id={`choice-${index}`}
+                      className="mt-1"
+                    />
+                    <Label
+                      htmlFor={`choice-${index}`}
+                      className="flex-1 cursor-pointer"
+                    >
+                      {(questions[currentQuestion] as any)[`answer${answerId}`]}
+                    </Label>
+                    {isTutor && isAnswered && (
+                      <div className="ml-2">
+                        {isCorrect ? (
+                          <CheckCircle className="text-green-600 h-5 w-5" />
+                        ) : (
+                          isSelected && (
+                            <XCircle className="text-red-600 h-5 w-5" />
+                          )
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+            )}
           </RadioGroup>
-          {isTutor && isAnswered && (
-            <p className="text-lg mb-6 text-gray-600">
-              {questions[currentQuestion]?.comments}
-            </p>
-          )}
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button
             onClick={() => {
               if (!isAnswered) {
-                handleAnswerSubmission(); // Submit the answer
-              } else if (!isTutor || (isTutor && isAnswered)) {
-                handleNextQuestion(); // Move to the next question
+                handleAnswerSubmission();
+              } else {
+                handleNextQuestion();
               }
             }}
-            disabled={selectedAnswer === null && !isAnswered} // Disable only if no answer is selected and not answered yet
+            disabled={selectedAnswer === null && !isAnswered}
           >
             {isAnswered
               ? isLastQuestion
                 ? "Finish"
                 : "Next Question"
-              : "Submit Answer"}{" "}
+              : "Submit Answer"}
           </Button>
         </CardFooter>
       </Card>

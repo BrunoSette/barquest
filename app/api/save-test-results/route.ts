@@ -9,14 +9,15 @@ export async function POST(req: NextRequest) {
   const { userId, score, questions, timed, tutor, questionMode, newQuestions } =
     await req.json();
 
+  // Validate that all required fields are provided
   if (
     !userId ||
     score === undefined ||
-    !questions ||
+    questions === undefined ||
     timed === undefined ||
     tutor === undefined ||
-    questionMode === undefined ||
-    !newQuestions
+    !questionMode ||
+    newQuestions === undefined
   ) {
     return NextResponse.json(
       { error: "Missing required fields" },
@@ -27,11 +28,15 @@ export async function POST(req: NextRequest) {
   let client;
   try {
     client = await pool.connect();
+
     const query = `
-      INSERT INTO test_history (user_id, score, questions, timed, tutor, questionMode, new_questions)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO test_history 
+        (user_id, score, questions, timed, tutor, questionmode, new_questions, date)
+      VALUES 
+        ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
       RETURNING *;
     `;
+
     const values = [
       userId,
       score,
@@ -43,9 +48,12 @@ export async function POST(req: NextRequest) {
     ];
 
     const result = await client.query(query, values);
-    return NextResponse.json(result.rows[0], { status: 200 });
+
+    // Respond with the inserted test history row
+    return NextResponse.json(result.rows[0], { status: 201 }); // 201 for resource creation
   } catch (error) {
-    console.error("Error saving test result:", error);
+    console.error("Error saving test result:", (error as Error).message);
+
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

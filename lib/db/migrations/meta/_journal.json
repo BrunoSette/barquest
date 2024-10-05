@@ -57,6 +57,20 @@
       "when": 1728139443410,
       "tag": "0007_sudden_deadpool",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1728154238342,
+      "tag": "0008_sparkling_ink",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1728155381642,
+      "tag": "0009_acoustic_james_howlett",
+      "breakpoints": true
     }
   ]
 }

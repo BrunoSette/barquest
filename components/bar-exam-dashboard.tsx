@@ -42,6 +42,8 @@ import {
 } from "./ui/dialog";
 
 interface TestDetail {
+  [x: string]: any;
+  subject: string;
   question: string;
   userAnswer: string;
   correctAnswer: string;
@@ -50,6 +52,9 @@ interface TestDetail {
 }
 
 interface TestHistory {
+  subject: number;
+  correct_answer: number;
+  question_text: string;
   id: number;
   score: number;
   questions: number;
@@ -68,7 +73,7 @@ export function TestDetailsDialog({ test }: { test: TestHistory }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/user-answers?test_history_id=${test.id}`
+        `/api/users-answers?test_history_id=${test.id}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch test details");
@@ -101,25 +106,49 @@ export function TestDetailsDialog({ test }: { test: TestHistory }) {
             testDetails.map((detail, index) => (
               <div key={index} className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2">
-                  Question {index + 1}: {detail.question}
+                  Question {index + 1}: {detail.question_text}
                 </h3>
                 <p className="mb-1">
                   Your Answer:{" "}
                   <span
                     className={
-                      detail.isCorrect ? "text-green-600" : "text-red-600"
+                      detail.is_correct ? "text-green-600" : "text-red-600"
                     }
                   >
-                    {detail.userAnswer}
+                    {detail[`answer${detail.selected_answer}`]}
                   </span>
                 </p>
-                {!detail.isCorrect && (
-                  <p className="mb-1 text-green-600">
-                    Correct Answer: {detail.correctAnswer}
+
+                <div className="mt-2">
+                  {/* Iterate through the answers */}
+                  {["answer1", "answer2", "answer3", "answer4"].map(
+                    (answerKey, idx) => {
+                      const answerNumber = idx + 1;
+                      const isCorrectAnswer =
+                        answerNumber === detail.correct_answer;
+                      const isSelectedAnswer =
+                        answerNumber === detail.selected_answer;
+                      const textColorClass = isCorrectAnswer
+                        ? "text-green-600"
+                        : isSelectedAnswer && !detail.is_correct
+                        ? "text-red-600"
+                        : "text-gray-800"; // Neutral for all other options
+
+                      return (
+                        <p key={idx} className={textColorClass}>
+                          {detail[answerKey]}
+                        </p>
+                      );
+                    }
+                  )}
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  Subject: {detail.subject}
+                </p>
+                {detail.comments && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Comments: {detail.comments}
                   </p>
-                )}
-                {detail.comment && (
-                  <p className="mt-2 text-sm text-gray-600">{detail.comment}</p>
                 )}
               </div>
             ))
@@ -425,8 +454,16 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                         {new Date(test.date).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-center">
-                        {/* Use the TestDetailsDialog component */}
                         <TestDetailsDialog test={test} />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {test.question_text}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {test.correct_answer}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {test.subject}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -449,6 +486,9 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                   <TableCell className="text-center font-bold">
                     {testHistory.reduce((acc, test) => acc + test.questions, 0)}
                   </TableCell>
+                  <TableCell className="text-center"></TableCell>
+                  <TableCell className="text-center"></TableCell>
+                  <TableCell className="text-center"></TableCell>
                   <TableCell className="text-center"></TableCell>
                   <TableCell className="text-center"></TableCell>
                   <TableCell className="text-center"></TableCell>
