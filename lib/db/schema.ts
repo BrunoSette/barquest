@@ -41,7 +41,7 @@ export const questions = pgTable("questions", {
   answer4: text("answer4").notNull(),
   comments: text("comments").notNull(),
   correctAnswer: integer("correct_answer").notNull(), // Stores the index of the correct answer (1-4)
-  isApproved: pgBoolean("isapproved").notNull().default(false), // Use pgBoolean for boolean type
+  is_approved: pgBoolean("is_approved").notNull().default(false), // Use pgBoolean for boolean type
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -119,11 +119,11 @@ export const userAnswers = pgTable("user_answers", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
-  questionId: integer("question_id")
-    .notNull()
-    .references(() => questions.id),
-  selectedAnswer: integer("selected_answer").notNull(), // Stores the index of the selected answer (1-4)
-  isCorrect: pgBoolean("is_correct").notNull(), // Indicates if the selected answer is correct
+  questionId: integer("question_id").references(() => questions.id, {
+    onDelete: "set null",
+  }), // Add "set null"
+  selectedAnswer: integer("selected_answer").notNull(),
+  isCorrect: pgBoolean("is_correct").notNull(),
   answeredAt: timestamp("answered_at").notNull().defaultNow(),
 });
 

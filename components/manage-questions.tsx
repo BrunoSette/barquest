@@ -44,7 +44,7 @@ type Question = {
   questionText: string;
   choices: string[];
   correctAnswer: string;
-  isApproved: boolean; // Updated field name
+  is_approved: boolean; // Updated field name
   comments: string;
 };
 
@@ -97,7 +97,7 @@ export function ManageQuestionsComponent() {
             questionText: item.questionText,
             choices: [item.answer1, item.answer2, item.answer3, item.answer4],
             correctAnswer: item[`answer${item.correctAnswer}`],
-            isApproved: item.isApproved, // Map isApproved field
+            is_approved: item.is_approved, // Map is_approved field
             comments: item.comments,
           }));
 
@@ -186,7 +186,7 @@ export function ManageQuestionsComponent() {
             correctAnswer:
               editingQuestion.choices.indexOf(editingQuestion.correctAnswer) +
               1,
-            isApproved: editingQuestion.isApproved, // Include isApproved in the request
+            is_approved: editingQuestion.is_approved ?? false, // Ensure is_approved is not undefined
             comments: editingQuestion.comments,
           }),
         });
@@ -258,7 +258,7 @@ export function ManageQuestionsComponent() {
                 </p>
                 <p className="mt-2">
                   <strong>Approved:</strong>{" "}
-                  {question.isApproved ? "Yes" : "No"}
+                  {question.is_approved ? "Yes" : "No"}
                 </p>
               </CardContent>
               <CardFooter className="flex justify-end space-x-2">
@@ -419,11 +419,11 @@ export function ManageQuestionsComponent() {
                   </Label>
                   <Switch
                     id="edit-approved"
-                    checked={editingQuestion.isApproved}
+                    checked={editingQuestion.is_approved}
                     onCheckedChange={(checked) =>
                       setEditingQuestion({
                         ...editingQuestion,
-                        isApproved: checked,
+                        is_approved: checked,
                       })
                     }
                     className="ml-2 h-6 w-11 rounded-full border-gray-300 bg-gray-200 focus:ring-indigo-500"
