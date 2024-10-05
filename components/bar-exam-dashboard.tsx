@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +31,106 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState, useEffect } from "react";
+import { ScrollArea } from "./ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+
+interface TestDetail {
+  question: string;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  comment?: string;
+}
+
+interface TestHistory {
+  id: number;
+  score: number;
+  questions: number;
+  timed: boolean;
+  tutor: boolean;
+  questionmode: string;
+  new_questions: number;
+  date: string;
+}
+
+export function TestDetailsDialog({ test }: { test: TestHistory }) {
+  const [testDetails, setTestDetails] = useState<TestDetail[] | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchTestDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/user-answers?test_history_id=${test.id}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch test details");
+      }
+      const data = await response.json();
+      setTestDetails(data);
+    } catch (error) {
+      console.error("Error fetching test details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog onOpenChange={(isOpen) => isOpen && fetchTestDetails()}>
+      <DialogTrigger asChild>
+        <Button variant="outline">View Details</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-[800px] w-[90vw]">
+        <DialogHeader>
+          <DialogTitle>Test Details</DialogTitle>
+          <DialogDescription>
+            Test taken on {new Date(test.date).toLocaleString()}
+          </DialogDescription>
+        </DialogHeader>
+        <ScrollArea className="h-[60vh] mt-4">
+          {loading ? (
+            <Skeleton className="h-full w-full" />
+          ) : testDetails ? (
+            testDetails.map((detail, index) => (
+              <div key={index} className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-2">
+                  Question {index + 1}: {detail.question}
+                </h3>
+                <p className="mb-1">
+                  Your Answer:{" "}
+                  <span
+                    className={
+                      detail.isCorrect ? "text-green-600" : "text-red-600"
+                    }
+                  >
+                    {detail.userAnswer}
+                  </span>
+                </p>
+                {!detail.isCorrect && (
+                  <p className="mb-1 text-green-600">
+                    Correct Answer: {detail.correctAnswer}
+                  </p>
+                )}
+                {detail.comment && (
+                  <p className="mt-2 text-sm text-gray-600">{detail.comment}</p>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No details available</p>
+          )}
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function BarExamDashboardComponent({ userId }: { userId: number }) {
   const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
@@ -40,18 +140,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
   const [answersPerSubject, setAnswersPerSubject] = useState<
     { subject: string; total_answers: number; correct_answers: number }[]
   >([]);
-  const [testHistory, setTestHistory] = useState<
-    {
-      id: number;
-      score: number;
-      questions: number;
-      timed: boolean;
-      tutor: boolean;
-      questionmode: string;
-      new_questions: number;
-      date: string;
-    }[]
-  >([]);
+  const [testHistory, setTestHistory] = useState<TestHistory[]>([]);
 
   useEffect(() => {
     const fetchTotalAnswers = async () => {
@@ -145,7 +234,9 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               {totalAnswers !== null &&
               correctAnswers !== null &&
               totalAnswers > 0 ? (
-                `${((correctAnswers / totalAnswers) * 100).toFixed(0)}% correct rate`
+                `${((correctAnswers / totalAnswers) * 100).toFixed(
+                  0
+                )}% correct rate`
               ) : (
                 <div></div>
               )}
@@ -171,7 +262,10 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
               {totalAnswers !== null &&
               correctAnswers !== null &&
               totalAnswers > 0 ? (
-                `${(((totalAnswers - correctAnswers) / totalAnswers) * 100).toFixed(0)}% error rate`
+                `${(
+                  ((totalAnswers - correctAnswers) / totalAnswers) *
+                  100
+                ).toFixed(0)}% error rate`
               ) : (
                 <div></div>
               )}
@@ -297,6 +391,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                   <TableHead className="text-center">Tutor</TableHead>
                   <TableHead className="text-center">Test Mode</TableHead>
                   <TableHead className="text-center">Date</TableHead>
+                  <TableHead className="text-center">Details</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -328,6 +423,10 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                       </TableCell>
                       <TableCell className="text-center">
                         {new Date(test.date).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {/* Use the TestDetailsDialog component */}
+                        <TestDetailsDialog test={test} />
                       </TableCell>
                     </TableRow>
                   ))}
