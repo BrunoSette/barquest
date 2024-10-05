@@ -17,7 +17,7 @@ export default async function NewTestPage() {
 
   return (
     <div>
-      <Settings teamData={teamData} />;
+      <Settings teamData={teamData} />
     </div>
   );
 }

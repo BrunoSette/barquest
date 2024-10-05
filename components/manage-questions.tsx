@@ -36,6 +36,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "./ui/textarea";
 
 type Question = {
   id: string;
@@ -278,14 +279,21 @@ export function ManageQuestionsComponent() {
         )}
 
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Edit Question</DialogTitle>
+          <DialogContent className="max-w-3xl h-[90vh] overflow-y-auto max-h-[80vh] p-6 bg-white rounded-lg shadow-lg">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-xl font-semibold">
+                Edit Question
+              </DialogTitle>
             </DialogHeader>
             {editingQuestion && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <Label htmlFor="edit-subject">Subject</Label>
+                  <Label
+                    htmlFor="edit-subject"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Subject
+                  </Label>
                   <Select
                     value={editingQuestion.subject}
                     onValueChange={(value) =>
@@ -308,9 +316,15 @@ export function ManageQuestionsComponent() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="edit-question">Question</Label>
-                  <Input
+                  <Label
+                    htmlFor="edit-question"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Question
+                  </Label>
+                  <Textarea
                     id="edit-question"
+                    rows={4}
                     value={editingQuestion.questionText}
                     onChange={(e) =>
                       setEditingQuestion({
@@ -318,17 +332,21 @@ export function ManageQuestionsComponent() {
                         questionText: e.target.value,
                       })
                     }
-                    className="w-full"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
                 {editingQuestion.choices.map((choice, index) => (
                   <div key={index}>
-                    <Label htmlFor={`edit-choice-${index}`}>
+                    <Label
+                      htmlFor={`edit-choice-${index}`}
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Choice {index + 1}
                     </Label>
-                    <Input
+                    <Textarea
                       id={`edit-choice-${index}`}
                       value={choice}
+                      rows={4}
                       onChange={(e) => {
                         const newChoices = [...editingQuestion.choices];
                         newChoices[index] = e.target.value;
@@ -337,11 +355,14 @@ export function ManageQuestionsComponent() {
                           choices: newChoices,
                         });
                       }}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                   </div>
                 ))}
                 <div>
-                  <Label>Correct Answer</Label>
+                  <Label className="block text-sm font-medium text-gray-700">
+                    Correct Answer
+                  </Label>
                   <RadioGroup
                     value={editingQuestion.correctAnswer}
                     onValueChange={(value) =>
@@ -350,14 +371,19 @@ export function ManageQuestionsComponent() {
                         correctAnswer: value,
                       })
                     }
+                    className="mt-2 space-y-2"
                   >
                     {editingQuestion.choices.map((choice, index) => (
                       <div className="flex items-center space-x-2" key={index}>
                         <RadioGroupItem
                           value={choice}
                           id={`edit-correct-${index}`}
+                          className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                         />
-                        <Label htmlFor={`edit-correct-${index}`}>
+                        <Label
+                          htmlFor={`edit-correct-${index}`}
+                          className="text-sm font-medium text-gray-700"
+                        >
                           {choice}
                         </Label>
                       </div>
@@ -365,21 +391,32 @@ export function ManageQuestionsComponent() {
                   </RadioGroup>
                 </div>
                 <div>
-                  <Label htmlFor="edit-comments">Comments</Label>
-                  <Input
+                  <Label
+                    htmlFor="edit-comments"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Comments
+                  </Label>
+                  <Textarea
                     id="edit-comments"
                     value={editingQuestion.comments}
+                    rows={5}
                     onChange={(e) =>
                       setEditingQuestion({
                         ...editingQuestion,
                         comments: e.target.value,
                       })
                     }
-                    className="w-full"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="edit-approved">Approved</Label>
+                  <Label
+                    htmlFor="edit-approved"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Approved
+                  </Label>
                   <Switch
                     id="edit-approved"
                     checked={editingQuestion.isApproved}
@@ -389,12 +426,18 @@ export function ManageQuestionsComponent() {
                         isApproved: checked,
                       })
                     }
+                    className="ml-2 h-6 w-11 rounded-full border-gray-300 bg-gray-200 focus:ring-indigo-500"
                   />
                 </div>
               </div>
             )}
-            <DialogFooter>
-              <Button onClick={handleSaveEdit}>Save Changes</Button>
+            <DialogFooter className="mt-6 flex justify-end space-x-2">
+              <Button
+                onClick={handleSaveEdit}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Save Changes
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

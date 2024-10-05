@@ -5,9 +5,12 @@ import Image from "next/image";
 import pic from "../public/imagem2.png";
 import Link from "next/link";
 
+;
+
+
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen overflow-hidden">
       <main className="flex-grow">
         <section className="py-20 bg-gradient-to-r from-orange-50 to-orange-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
