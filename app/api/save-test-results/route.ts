@@ -64,3 +64,66 @@ export async function POST(req: NextRequest) {
     }
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const { userId, score, questions, timed, tutor, questionMode, newQuestions, testHistoryId } =
+    await req.json();
+
+  // Validate that all required fields are provided
+  if (
+    !userId ||
+    !testHistoryId ||
+    score === undefined ||
+    questions === undefined ||
+    timed === undefined ||
+    tutor === undefined ||
+    !questionMode ||
+    newQuestions === undefined
+  ) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  let client;
+
+  try {
+    client = await pool.connect();
+    const query = `
+      UPDATE test_history
+      SET 
+        score = $1, 
+        questions = $2, 
+        timed = $3, 
+        tutor = $4, 
+        questionmode = $5, 
+        new_questions = $6, 
+        date = CURRENT_TIMESTAMP
+      WHERE 
+        id = $7
+      RETURNING *;
+    `;
+
+    const values = [
+      score,
+      questions,
+      timed,
+      tutor,
+      questionMode,
+      newQuestions,
+      testHistoryId,
+    ];
+
+    const result = await client.query(query, values);
+
+    // Respond with the inserted test history row
+    return NextResponse.json({ status: 204 });
+  } catch (error) {
+
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+}

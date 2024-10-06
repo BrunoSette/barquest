@@ -158,16 +158,19 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
       setIsTestComplete(true);
       localStorage.removeItem("timeLeft"); // Clear timer when the test is complete
 
-      // Save final test result
-      saveTestResult(
-        userId,
-        score,
-        questions.length,
-        isTimed,
-        isTutor,
-        questionMode,
-        numberOfQuestions
-      );
+      if (testHistoryId) {
+        updateTestResult(
+          userId,
+          score,
+          questions.length,
+          isTimed,
+          isTutor,
+          questionMode,
+          numberOfQuestions,
+          testHistoryId,
+        );
+      }
+
     } else {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -182,7 +185,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     timed: boolean,
     tutor: boolean,
     questionMode: string,
-    newQuestions: number
+    newQuestions: number,
   ): Promise<number | null> => {
     try {
       const response = await fetch("/api/save-test-results", {
@@ -204,6 +207,38 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     } catch (error) {
       console.error("Error saving test result:", error);
       return null;
+    }
+  };
+
+  const updateTestResult = async (
+    userId: number,
+    score: number,
+    questions: number,
+    timed: boolean,
+    tutor: boolean,
+    questionMode: string,
+    newQuestions: number,
+    testHistoryId: number,
+  ): Promise<void> => {
+    try {
+      const response = await fetch("/api/save-test-results", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          score,
+          questions,
+          timed,
+          tutor,
+          questionMode,
+          newQuestions,
+          testHistoryId,
+        }),
+      });
+
+      await response.json();
+    } catch (error) {
+      console.error("Error saving test result:", error);
     }
   };
 
