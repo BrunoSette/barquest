@@ -29,22 +29,18 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     searchParams.get("numberOfQuestions") || "1",
     10
   );
-  const secondsPerQuestion = parseInt(
-    searchParams.get("secondsPerQuestion") || "100",
-    10
-  );
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [testHistoryId, setTestHistoryId] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(secondsPerQuestion);
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
   const [submittedAnswers, setSubmittedAnswers] = useState<Set<number>>(
     new Set()
   );
+  const [timeLeft, setTimeLeft] = useState<number>(numberOfQuestions * 100); // Total time for the test
 
   // Fetch questions on mount
   useEffect(() => {
@@ -85,14 +81,10 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     if (isTimed) {
       const timer = setInterval(() => {
         setTimeLeft((prevTime) => {
-          if (isAnswered) {
-            clearInterval(timer);
-            return prevTime;
-          }
           if (prevTime <= 1) {
             clearInterval(timer);
-            handleAnswerSubmission(); // Automatically submit answer if time runs out
-            return secondsPerQuestion;
+            // handleTestCompletion(); // Handle test completion when time runs out
+            // return 0;
           }
           return prevTime - 1;
         });
@@ -100,7 +92,25 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
 
       return () => clearInterval(timer);
     }
-  }, [currentQuestion, secondsPerQuestion, isTimed, isAnswered]);
+  }, [isTimed]);
+
+  // Handle test completion
+  const handleTestCompletion = async () => {
+    setIsTestComplete(true); // Mark the test as complete
+
+    if (testHistoryId) {
+      await updateTestResult(
+        userId,
+        score,
+        questions.length,
+        isTimed,
+        isTutor,
+        questionMode,
+        numberOfQuestions,
+        testHistoryId
+      );
+    }
+  };
 
   // Handle answer submission
   const handleAnswerSubmission = async () => {
@@ -174,21 +184,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
   // Handle moving to the next question
   const handleNextQuestion = () => {
     if (currentQuestion === questions.length - 1) {
-      setIsTestComplete(true);
-      localStorage.removeItem("timeLeft"); // Clear timer when the test is complete
-
-      if (testHistoryId) {
-        updateTestResult(
-          userId,
-          score,
-          questions.length,
-          isTimed,
-          isTutor,
-          questionMode,
-          numberOfQuestions,
-          testHistoryId
-        );
-      }
+      handleTestCompletion();
     } else {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -312,7 +308,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
         <CardContent>
           {isTimed && (
             <Progress
-              value={(timeLeft / secondsPerQuestion) * 100}
+              value={(timeLeft / (numberOfQuestions * 100)) * 100}
               className="mb-4"
             />
           )}
