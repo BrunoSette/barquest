@@ -12,6 +12,8 @@ import {
   CheckCircle,
   XCircle,
   Trash2,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import {
   BarChart,
@@ -112,42 +114,58 @@ export function TestDetailsDialog({
 
   return (
     <Dialog onOpenChange={(isOpen) => isOpen && fetchTestDetails()}>
+      {" "}
       <DialogTrigger asChild>
-        <Button className="bg-white text-blue hover:bg-blue-50 text-md px-8 py-5 rounded">
-          View Details
+        <Button
+          variant="outline"
+          className="bg-white text-primary hover:bg-primary-foreground text-md px-8 py-5 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
+        >
+          View Test Details
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[800px] w-[90vw]">
+      <DialogContent className="max-w-4xl w-[90vw]">
         <DialogHeader>
-          <DialogTitle>Test Details</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-primary">
+            Test Details
+          </DialogTitle>
           {testDate && (
-            <DialogDescription>
+            <DialogDescription className="text-muted-foreground">
               Test taken on {new Date(testDate).toLocaleString()}
             </DialogDescription>
           )}
         </DialogHeader>
-        <ScrollArea className="h-[60vh] mt-4">
+        <ScrollArea className="h-[70vh] mt-6 pr-4">
           {loading ? (
-            <Skeleton className="h-full w-full" />
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-lg" />
+              ))}
+            </div>
           ) : testDetails ? (
             testDetails.map((detail, index) => (
-              <div key={index} className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-semibold mb-2">
+              <div
+                key={index}
+                className="mb-8 p-6 bg-card rounded-lg shadow-md border border-border"
+              >
+                <h3 className="text-lg font-semibold mb-4 text-card-foreground">
                   Question {index + 1}: {detail.question_text}
                 </h3>
-                <p className="mb-1">
-                  Your Answer:{" "}
-                  <span
-                    className={
-                      detail.is_correct ? "text-green-600" : "text-red-600"
-                    }
-                  >
-                    {detail[`answer${detail.selected_answer}`]}
-                  </span>
-                </p>
+                <div className="mb-4 p-3 bg-muted rounded-md">
+                  <p className="font-medium text-muted-foreground">
+                    Your Answer:{" "}
+                    <span
+                      className={
+                        detail.is_correct
+                          ? "text-green-600 font-bold"
+                          : "text-red-600 font-bold"
+                      }
+                    >
+                      {detail[`answer${detail.selected_answer}`]}
+                    </span>
+                  </p>
+                </div>
 
-                <div className="mt-2">
-                  {/* Iterate through the answers */}
+                <div className="space-y-2">
                   {["answer1", "answer2", "answer3", "answer4"].map(
                     (answerKey, idx) => {
                       const answerNumber = idx + 1;
@@ -155,32 +173,65 @@ export function TestDetailsDialog({
                         answerNumber === detail.correct_answer;
                       const isSelectedAnswer =
                         answerNumber === detail.selected_answer;
-                      const textColorClass = isCorrectAnswer
-                        ? "text-green-600"
-                        : isSelectedAnswer && !detail.is_correct
-                        ? "text-red-600"
-                        : "text-gray-800"; // Neutral for all other options
+                      let Icon = null;
+                      let bgColorClass = "";
+
+                      if (isCorrectAnswer) {
+                        Icon = CheckCircle2;
+                        bgColorClass = "bg-green-100";
+                      } else if (isSelectedAnswer && !detail.is_correct) {
+                        Icon = XCircle;
+                        bgColorClass = "bg-red-100";
+                      }
 
                       return (
-                        <p key={idx} className={textColorClass}>
-                          {detail[answerKey]}
-                        </p>
+                        <div
+                          key={idx}
+                          className={`flex items-center p-2 rounded-md ${bgColorClass}`}
+                        >
+                          {Icon && (
+                            <Icon
+                              className={`w-5 h-5 mr-2 ${
+                                isCorrectAnswer
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            />
+                          )}
+                          <p
+                            className={`flex-grow ${
+                              isCorrectAnswer
+                                ? "text-green-700"
+                                : isSelectedAnswer && !detail.is_correct
+                                ? "text-red-700"
+                                : "text-card-foreground"
+                            }`}
+                          >
+                            {detail[answerKey]}
+                          </p>
+                        </div>
                       );
                     }
                   )}
                 </div>
-                <p className="mt-2 text-sm text-gray-600">
-                  Subject: {detail.subject}
-                </p>
+                <div className="mt-4 flex items-center text-sm text-muted-foreground">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <p>Subject: {detail.subject}</p>
+                </div>
                 {detail.comments && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Comments: {detail.comments}
-                  </p>
+                  <div className="mt-2 p-3 bg-muted rounded-md">
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium">Comments:</span>{" "}
+                      {detail.comments}
+                    </p>
+                  </div>
                 )}
               </div>
             ))
           ) : (
-            <p>No details available</p>
+            <p className="text-center text-muted-foreground">
+              No details available
+            </p>
           )}
         </ScrollArea>
       </DialogContent>

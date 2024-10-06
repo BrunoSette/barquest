@@ -115,7 +115,6 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     const isCorrect = selectedAnswer === currentQ.correctAnswer;
     const answerToSubmit = selectedAnswer !== null ? selectedAnswer : -1;
 
-    // Only create test history on first answer submission
     if (!testHistoryId) {
       console.log("Creating test history for the first answer");
       const historyId = await saveTestResult(
@@ -130,26 +129,48 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
 
       setTestHistoryId(historyId);
       console.log("Test history created ID:", historyId);
-    }
 
-    try {
-      const response = await fetch("/api/users-answers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userId,
-          question_id: currentQ.id,
-          selected_answer: answerToSubmit,
-          is_correct: isCorrect,
-          test_history_id: testHistoryId, // Use history ID
-        }),
-      });
+      // Fetch user answers after creating test history
+      try {
+        const response = await fetch("/api/users-answers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            question_id: currentQ.id,
+            selected_answer: answerToSubmit,
+            is_correct: isCorrect,
+            test_history_id: historyId, // Use newly created history ID
+          }),
+        });
 
-      const data = await response.json();
-      setSubmittedAnswers((prev) => new Set(prev).add(Number(currentQ.id)));
-      if (isCorrect) setScore((prevScore) => prevScore + 1);
-    } catch (error) {
-      console.error("Error submitting answer:", error);
+        const data = await response.json();
+        setSubmittedAnswers((prev) => new Set(prev).add(Number(currentQ.id)));
+        if (isCorrect) setScore((prevScore) => prevScore + 1);
+      } catch (error) {
+        console.error("Error submitting answer:", error);
+      }
+    } else {
+      // Fetch user answers if test history already exists
+      try {
+        const response = await fetch("/api/users-answers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            question_id: currentQ.id,
+            selected_answer: answerToSubmit,
+            is_correct: isCorrect,
+            test_history_id: testHistoryId, // Use existing history ID
+          }),
+        });
+
+        const data = await response.json();
+        setSubmittedAnswers((prev) => new Set(prev).add(Number(currentQ.id)));
+        if (isCorrect) setScore((prevScore) => prevScore + 1);
+      } catch (error) {
+        console.error("Error submitting answer:", error);
+      }
     }
   };
 
