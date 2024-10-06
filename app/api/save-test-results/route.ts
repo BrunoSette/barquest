@@ -66,8 +66,16 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const { userId, score, questions, timed, tutor, questionMode, newQuestions, testHistoryId } =
-    await req.json();
+  const {
+    userId,
+    score,
+    questions,
+    timed,
+    tutor,
+    questionMode,
+    newQuestions,
+    testHistoryId,
+  } = await req.json();
 
   // Validate that all required fields are provided
   if (
@@ -119,7 +127,6 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ status: 204 });
   } catch (error) {
-
   } finally {
     if (client) {
       client.release();
@@ -142,19 +149,34 @@ export async function DELETE(req: NextRequest) {
 
   try {
     client = await pool.connect();
-    const query = `
+    await client.query("BEGIN"); // Start transaction
+
+    // Delete user answers associated with the testHistoryId
+    const deleteUserAnswersQuery = `
+      DELETE FROM user_answers
+      WHERE test_history_id = $1;
+    `;
+    await client.query(deleteUserAnswersQuery, [testHistoryId]);
+
+    // Delete the test history record
+    const deleteTestHistoryQuery = `
       DELETE FROM test_history
       WHERE id = $1
       RETURNING *;
     `;
+    const result = await client.query(deleteTestHistoryQuery, [testHistoryId]);
 
-    const values = [testHistoryId];
-
-    const result = await client.query(query, values);
+    await client.query("COMMIT"); // Commit transaction
 
     return NextResponse.json({ status: 204 });
   } catch (error) {
-
+    if (client) {
+      await client.query("ROLLBACK"); // Rollback transaction on error
+    }
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   } finally {
     if (client) {
       client.release();
