@@ -5,9 +5,6 @@ import Image from "next/image";
 import pic from "../public/imagem2.png";
 import Link from "next/link";
 
-;
-
-
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -27,9 +24,9 @@ export default function HomePage() {
                   designed to boost your confidence and exam success.
                 </p>
                 <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                  <Link href="/sign-up">
+                  <Link href="#pricing">
                     <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full text-lg px-8 py-4 inline-flex items-center justify-center">
-                      Create my first test now
+                      Start My 7 Days Free Trial
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
@@ -93,7 +90,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="testimonials" className="py-16 bg-orange-50">
+        {/* <section id="testimonials" className="py-16 bg-orange-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
               What Our Users Say
@@ -127,7 +124,7 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section id="faq" className="py-16 bg-orange-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -178,7 +175,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-        <section>
+        <section id="pricing">
           <PricingPage />
         </section>
 
@@ -196,7 +193,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-                <Link href="/sign-up">
+                <Link href="#pricing">
                   <Button className="bg-white hover:bg-gray-100 text-orange-500 rounded-full text-xl px-12 py-6 inline-flex items-center justify-center">
                     Start Your Free Account Today
                     <ArrowRight className="ml-3 h-6 w-6" />
@@ -210,7 +207,7 @@ export default function HomePage() {
 
       <footer className="bg-gray-800 text-white">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-sm font-semibold uppercase tracking-wider">
                 Company
@@ -312,14 +309,14 @@ export default function HomePage() {
                 </li>
               </ul>
             </div>
-          </div>
-          <div className="mt-8 border-t border-gray-700 pt-8 flex justify-between items-center">
-            <p className="text-base text-gray-400">
-              &copy; 2024 BarPrep. All rights reserved.
-            </p>
-            {/* <p className="text-base text-gray-400">Designed for success</p> */}
-          </div>
+          </div> */}
+          {/* <div className="mt-8 border-t border-gray-700 pt-8 flex justify-between items-center"> */}
+          <p className="text-base text-gray-400">
+            &copy; 2024 BarPrep. All rights reserved.
+          </p>
+          {/* <p className="text-base text-gray-400">Designed for success</p> */}
         </div>
+        {/* </div> */}
       </footer>
     </div>
   );
