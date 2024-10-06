@@ -310,7 +310,7 @@ export function DashboardComponent({ userId }: { userId: number }) {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Bar Exam Practice Dashboard</h1>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
         <Link href="/dashboard/newtest">
           <Button className="bg-orange-500 hover:bg-orange-600">
             <PlusCircle className="mr-2 h-4 w-4" /> Create a New Test
