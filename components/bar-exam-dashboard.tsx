@@ -6,7 +6,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
-import { PlusCircle, BookOpen, CheckCircle, XCircle } from "lucide-react";
+import {
+  PlusCircle,
+  BookOpen,
+  CheckCircle,
+  XCircle,
+  Trash2,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -22,6 +28,17 @@ import {
   Line,
 } from "recharts";
 import { COLORS } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -65,7 +82,13 @@ interface TestHistory {
   date: string;
 }
 
-export function TestDetailsDialog({ testId, testDate }: { testId: number, testDate?: string }) {
+export function TestDetailsDialog({
+  testId,
+  testDate,
+}: {
+  testId: number;
+  testDate?: string;
+}) {
   const [testDetails, setTestDetails] = useState<TestDetail[] | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -98,7 +121,7 @@ export function TestDetailsDialog({ testId, testDate }: { testId: number, testDa
           {testDate && (
             <DialogDescription>
               Test taken on {new Date(testDate).toLocaleString()}
-           </DialogDescription>
+            </DialogDescription>
           )}
         </DialogHeader>
         <ScrollArea className="h-[60vh] mt-4">
@@ -211,7 +234,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setTestHistory((prev) => ([...prev.filter((h) => h.id != testHistoryId)]));
+      setTestHistory((prev) => [...prev.filter((h) => h.id != testHistoryId)]);
     } catch (error) {
       console.error("Error deleting test history:", error);
     } finally {
@@ -443,7 +466,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                   <TableHead className="text-center">Test Mode</TableHead>
                   <TableHead className="text-center">Date</TableHead>
                   <TableHead className="text-center">Details</TableHead>
-                  <TableHead className="text-center">Actions</TableHead>
+                  <TableHead className="text-center">Delete</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -477,25 +500,48 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                         {new Date(test.date).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-center">
-                        <TestDetailsDialog testId={test.id} testDate={test.date} />
+                        <TestDetailsDialog
+                          testId={test.id}
+                          testDate={test.date}
+                        />
                       </TableCell>
-                      <TableCell className="text-center">
-                        <button
-                          className="font-semibold text-red-600 px-2 py-1 cursor-pointer bg-red-100 rounded"
-                          onClick={() => handleDeleteSingleTestHistory(test.id)}
-                          disabled={deleting}
-                        >
-                          X
-                        </button>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {test.question_text}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {test.correct_answer}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {test.subject}
+                      <TableCell className="p-0">
+                        <div className="flex items-center justify-center h-full">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will
+                                  permanently delete your test history record
+                                  and remove the data from our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    handleDeleteSingleTestHistory(test.id)
+                                  }
+                                  disabled={deleting}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -518,7 +564,6 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                   <TableCell className="text-center font-bold">
                     {testHistory.reduce((acc, test) => acc + test.questions, 0)}
                   </TableCell>
-                  <TableCell className="text-center"></TableCell>
                   <TableCell className="text-center"></TableCell>
                   <TableCell className="text-center"></TableCell>
                   <TableCell className="text-center"></TableCell>
