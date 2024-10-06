@@ -27,7 +27,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
   const selectedSubjects = JSON.parse(
     searchParams.get("selectedSubjects") || "[]"
   ).map((id: string) => parseInt(id, 10));
-  const questionMode = searchParams.get("questionMode") || "unused";
+  const questionMode = searchParams.get("questionMode") || "all";
   const numberOfQuestions = parseInt(
     searchParams.get("numberOfQuestions") || "1",
     10
@@ -168,10 +168,9 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
           isTutor,
           questionMode,
           numberOfQuestions,
-          testHistoryId,
+          testHistoryId
         );
       }
-
     } else {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -186,7 +185,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     timed: boolean,
     tutor: boolean,
     questionMode: string,
-    newQuestions: number,
+    newQuestions: number
   ): Promise<number | null> => {
     try {
       const response = await fetch("/api/save-test-results", {
@@ -219,7 +218,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     tutor: boolean,
     questionMode: string,
     newQuestions: number,
-    testHistoryId: number,
+    testHistoryId: number
   ): Promise<void> => {
     try {
       const response = await fetch("/api/save-test-results", {
@@ -296,9 +295,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
               </ResponsiveContainer>
             </div>
             <div className="flex space-x-4 items-center">
-              {testHistoryId && (
-                <TestDetailsDialog testId={testHistoryId} />
-              )}
+              {testHistoryId && <TestDetailsDialog testId={testHistoryId} />}
 
               <Link href="/dashboard">
                 <div className="bg-blue-500 text-white px-4 py-2 rounded">
@@ -398,6 +395,11 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
               }
             )}
           </RadioGroup>
+          {isTutor && isAnswered && (
+            <p className="text-lg mb-6 text-gray-600">
+              {questions[currentQuestion]?.comments}
+            </p>
+          )}
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button

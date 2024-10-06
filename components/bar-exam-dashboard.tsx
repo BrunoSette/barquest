@@ -113,7 +113,9 @@ export function TestDetailsDialog({
   return (
     <Dialog onOpenChange={(isOpen) => isOpen && fetchTestDetails()}>
       <DialogTrigger asChild>
-        <Button variant="outline">View Details</Button>
+        <Button className="bg-white text-blue hover:bg-blue-50 text-md px-8 py-5 rounded">
+          View Details
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[800px] w-[90vw]">
         <DialogHeader>
