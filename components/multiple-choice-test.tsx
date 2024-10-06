@@ -30,21 +30,42 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     10
   );
 
+  // Load the initial state from localStorage (or fallback to defaults)
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(() => {
+    return parseInt(localStorage.getItem("currentQuestion") || "0", 10);
+  });
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [testHistoryId, setTestHistoryId] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState(() => {
+    return parseInt(localStorage.getItem("score") || "0", 10);
+  });
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
   const [submittedAnswers, setSubmittedAnswers] = useState<Set<number>>(
-    new Set()
+    new Set(JSON.parse(localStorage.getItem("submittedAnswers") || "[]"))
   );
-  const [timeLeft, setTimeLeft] = useState<number>(numberOfQuestions * 100); // Total time for the test
+  const [timeLeft, setTimeLeft] = useState(() => {
+    return parseInt(
+      localStorage.getItem("timeLeft") || (numberOfQuestions * 100).toString(),
+      10
+    );
+  });
 
-  // Fetch questions on mount
+  // Save the current state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("currentQuestion", currentQuestion.toString());
+    localStorage.setItem("score", score.toString());
+    localStorage.setItem("timeLeft", timeLeft.toString());
+    localStorage.setItem(
+      "submittedAnswers",
+      JSON.stringify(Array.from(submittedAnswers))
+    );
+  }, [currentQuestion, score, timeLeft, submittedAnswers]);
+
   useEffect(() => {
     let didCancel = false;
+    const savedQuestions = localStorage.getItem("questions");
 
     const fetchQuestions = async () => {
       try {
@@ -62,17 +83,21 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
         const data = await response.json();
         if (!didCancel && Array.isArray(data)) {
           setQuestions(data);
+          localStorage.setItem("questions", JSON.stringify(data)); // Save questions to localStorage
         }
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
     };
 
-    fetchQuestions();
+    if (savedQuestions) {
+      setQuestions(JSON.parse(savedQuestions)); // Restore saved questions
+    } else {
+      fetchQuestions(); // Fetch new questions if none are saved
+    }
 
     return () => {
       didCancel = true;
-      localStorage.removeItem("timeLeft");
     };
   }, []);
 
@@ -84,7 +109,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
           if (prevTime <= 1) {
             clearInterval(timer);
             // handleTestCompletion(); // Handle test completion when time runs out
-            // return 0;
+            return 0;
           }
           return prevTime - 1;
         });
@@ -97,6 +122,8 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
   // Handle test completion
   const handleTestCompletion = async () => {
     setIsTestComplete(true); // Mark the test as complete
+    localStorage.removeItem("currentQuestion");
+    localStorage.removeItem("timeLeft");
 
     if (testHistoryId) {
       await updateTestResult(
@@ -123,7 +150,6 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     const answerToSubmit = selectedAnswer !== null ? selectedAnswer : -1;
 
     if (!testHistoryId) {
-      console.log("Creating test history for the first answer");
       const historyId = await saveTestResult(
         userId,
         score,
@@ -135,9 +161,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
       );
 
       setTestHistoryId(historyId);
-      console.log("Test history created ID:", historyId);
 
-      // Fetch user answers after creating test history
       try {
         const response = await fetch("/api/users-answers", {
           method: "POST",
@@ -147,7 +171,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
             question_id: currentQ.id,
             selected_answer: answerToSubmit,
             is_correct: isCorrect,
-            test_history_id: historyId, // Use newly created history ID
+            test_history_id: historyId,
           }),
         });
 
@@ -158,7 +182,6 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
         console.error("Error submitting answer:", error);
       }
     } else {
-      // Fetch user answers if test history already exists
       try {
         const response = await fetch("/api/users-answers", {
           method: "POST",
@@ -168,7 +191,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
             question_id: currentQ.id,
             selected_answer: answerToSubmit,
             is_correct: isCorrect,
-            test_history_id: testHistoryId, // Use existing history ID
+            test_history_id: testHistoryId,
           }),
         });
 

@@ -73,6 +73,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
     event.preventDefault();
     setIsPending(true);
     setError("");
+    localStorage.clear();
 
     try {
       // Simulate form action
