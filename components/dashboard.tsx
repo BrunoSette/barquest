@@ -243,41 +243,36 @@ export function DashboardComponent({ userId }: { userId: number }) {
   const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-
   const [answersPerSubject, setAnswersPerSubject] = useState<
     { subject: string; total_answers: number; correct_answers: number }[]
   >([]);
   const [testHistory, setTestHistory] = useState<TestHistory[]>([]);
 
-  useEffect(() => {
-    const fetchTotalAnswers = async () => {
-      try {
-        const response = await fetch(`/api/total_answers?user_id=${userId}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-
-        setTotalAnswers(data.total_answers);
-        setCorrectAnswers(data.correct_answers);
-        setAnswersPerSubject(data.answers_per_subject);
-        setTestHistory(data.test_history);
-        console.log("Data test history", data.test_history);
-      } catch (error) {
-        console.error("Error fetching total answers:", error);
-      } finally {
-        setLoading(false);
+  const fetchTotalAnswers = async () => {
+    try {
+      const response = await fetch(`/api/total_answers?user_id=${userId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+      const data = await response.json();
 
-    if (userId) {
-      fetchTotalAnswers();
+      setTotalAnswers(data.total_answers);
+      setCorrectAnswers(data.correct_answers);
+      setAnswersPerSubject(data.answers_per_subject);
+      setTestHistory(data.test_history);
+      console.log("Data test history", data.test_history);
+    } catch (error) {
+      console.error("Error fetching total answers:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [userId]); // Ensure this runs only when userId changes
+  };
 
-  async function handleDeleteSingleTestHistory(testHistoryId: number) {
-    setDeleting(true);
+  useEffect(() => {
+    fetchTotalAnswers();
+  }, [userId]);
+
+  const deleteTestHistory = async (testHistoryId: number) => {
     try {
       const response = await fetch("/api/save-test-results", {
         method: "DELETE",
@@ -287,13 +282,12 @@ export function DashboardComponent({ userId }: { userId: number }) {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setTestHistory((prev) => [...prev.filter((h) => h.id != testHistoryId)]);
+      // Refresh the data after deletion
+      await fetchTotalAnswers();
     } catch (error) {
       console.error("Error deleting test history:", error);
-    } finally {
-      setDeleting(false);
     }
-  }
+  };
 
   const overallPerformance = [
     { name: "Correct", value: correctAnswers },
@@ -584,10 +578,7 @@ export function DashboardComponent({ userId }: { userId: number }) {
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() =>
-                                    handleDeleteSingleTestHistory(test.id)
-                                  }
-                                  disabled={deleting}
+                                  onClick={() => deleteTestHistory(test.id)}
                                 >
                                   Delete
                                 </AlertDialogAction>
