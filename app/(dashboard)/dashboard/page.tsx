@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/db/queries";
-import { BarExamDashboardComponent } from "@/components/bar-exam-dashboard";
+import { DashboardComponent } from "@/components/dashboard";
 import Head from "next/head";
 
 export const metadata = {
@@ -21,7 +21,7 @@ export default async function SubscriptionPage() {
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
       </Head>
-      <BarExamDashboardComponent userId={user.id} />
+      <DashboardComponent userId={user.id} />
     </div>
   );
 }

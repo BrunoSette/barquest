@@ -18,7 +18,7 @@ import { COLORS } from "@/lib/utils";
 import { Question } from "@/lib/db/schema";
 import { CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
-import { TestDetailsDialog } from "./bar-exam-dashboard";
+import { TestDetailsDialog } from "./dashboard";
 
 export default function MultipleChoiceTest({ userId }: { userId: number }) {
   const searchParams = useSearchParams();

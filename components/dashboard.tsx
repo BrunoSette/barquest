@@ -188,7 +188,7 @@ export function TestDetailsDialog({
   );
 }
 
-export function BarExamDashboardComponent({ userId }: { userId: number }) {
+export function DashboardComponent({ userId }: { userId: number }) {
   const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
