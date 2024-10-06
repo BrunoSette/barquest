@@ -18,6 +18,7 @@ import { COLORS } from "@/lib/utils";
 import { Question } from "@/lib/db/schema";
 import { CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
+import { TestDetailsDialog } from "./bar-exam-dashboard";
 
 export default function MultipleChoiceTest({ userId }: { userId: number }) {
   const searchParams = useSearchParams();
@@ -294,7 +295,11 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 items-center">
+              {testHistoryId && (
+                <TestDetailsDialog testId={testHistoryId} />
+              )}
+
               <Link href="/dashboard">
                 <div className="bg-blue-500 text-white px-4 py-2 rounded">
                   Go to Dashboard
