@@ -1,0 +1,1 @@
+ALTER TABLE "user_answers" ALTER COLUMN "test_history_id" SET DEFAULT 0;

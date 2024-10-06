@@ -124,6 +124,7 @@ export const userAnswers = pgTable("user_answers", {
   }),
   testHistoryId: integer("test_history_id") // Foreign key to testHistory table
     .notNull()
+    .default(0)
     .references(() => testHistory.id), // This ensures answers are linked to specific tests
   selectedAnswer: integer("selected_answer").notNull(),
   isCorrect: pgBoolean("is_correct").notNull(),
