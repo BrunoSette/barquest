@@ -35,10 +35,8 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
   ); // All subjects selected by default
   const [questionMode, setQuestionMode] = useState("all");
   const [numberOfQuestions, setNumberOfQuestions] = useState("1");
-  const [secondsPerQuestion, setSecondsPerQuestion] = useState("100");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const subscriptionStatus = teamData.subscriptionStatus || "free";
   const planName = teamData.planName || "none";
 
@@ -75,12 +73,9 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
     event.preventDefault();
     setIsPending(true);
     setError("");
-    setSuccess("");
 
     try {
       // Simulate form action
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSuccess("Test created successfully");
 
       // Construct query parameters
       const queryParams = new URLSearchParams({
@@ -89,7 +84,6 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
         selectedSubjects: JSON.stringify(selectedSubjects),
         questionMode,
         numberOfQuestions,
-        secondsPerQuestion,
       });
 
       // Navigate to the /create page with the state as query parameters
@@ -137,20 +131,6 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                     onCheckedChange={(checked) => setIsTimed(checked)}
                     className="w-12 h-6"
                   />
-                  {isTimed && (
-                    <div className="flex items-center space-x-2">
-                      <Label htmlFor="secondsPerQuestion">Seconds</Label>
-                      <input
-                        type="number"
-                        id="secondsPerQuestion"
-                        max={600}
-                        min={30}
-                        value={secondsPerQuestion}
-                        onChange={(e) => setSecondsPerQuestion(e.target.value)}
-                        className="border border-gray-300 rounded p-2 w-13"
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
             </CardContent>
