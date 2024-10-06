@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ExamResults } from "./exam-results";
 import {
   Card,
   CardContent,
@@ -278,60 +279,17 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
 
   if (isTestComplete) {
     return (
-      <div className="container mx-auto p-4 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          Canadian Bar Exam Practice Test Results
-        </h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <div className="text-center">
-                Your Score: {score} / {questions.length} (
-                {Math.round((score / questions.length) * 100)}%)
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center">
-            <div className="w-64 h-64 mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={resultData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {resultData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex space-x-4 items-center">
-              {testHistoryId && <TestDetailsDialog testId={testHistoryId} />}
-
-              <Link href="/dashboard">
-                <div className="bg-blue-500 text-white text-md px-8 p-3 transition-all duration-300 ease-in-out transform hover:scale-105">
-                  Go to Dashboard
-                </div>
-              </Link>
-              <Link href="/dashboard/newtest">
-                <div className="bg-orange-500 text-white text-md px-8 p-3 transition-all duration-300 ease-in-out transform hover:scale-105">
-                  Start New Test
-                </div>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <ExamResults
+        score={score}
+        isTestComplete={true}
+        questions={questions.map((q) => ({
+          id: q.id,
+          question: q.questionText,
+          answer: q.correctAnswer.toString(),
+        }))}
+        resultData={resultData}
+        testHistoryId={testHistoryId as number}
+      />
     );
   }
 
