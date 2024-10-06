@@ -5,7 +5,7 @@ import Link from "next/link";
 import HeroImage from "../public/imagem2.png";
 import AnalyticsImage from "../public/229shots_so.png";
 import QuestionsImage from "../public/questions.png";
-import IphoneMockup from "../public/iphone-mockup.png";
+import IphoneMockup from "../public/iphone.png";
 import PricingPage from "@/app/(dashboard)/pricing/page";
 
 export default function HomePage() {
@@ -41,7 +41,7 @@ export default function HomePage() {
                   alt="Student preparing for Ontario Bar Exam"
                   width={800}
                   height={600}
-                  className="rounded-lg shadow-xl"
+                  className="rounded-lg object-contain h-80 w-full"
                 />
               </div>
             </div>
@@ -112,9 +112,9 @@ export default function HomePage() {
                   progress in real-time with detailed analytics.
                 </p>
               </div>
-              <div className="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
+              <div className="mt-10 -mx-4 relative lg:mt-0 " aria-hidden="true">
                 <Image
-                  className="relative mx-auto rounded-lg shadow-lg"
+                  className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={QuestionsImage}
                   alt="Study materials screenshot"
                   width={600}
@@ -129,9 +129,12 @@ export default function HomePage() {
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-              <div className="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
+              <div
+                className="mt-10 -mx-4 relative lg:mt-0 lg:h-80"
+                aria-hidden="true"
+              >
                 <Image
-                  className="relative mx-auto rounded-lg shadow-lg"
+                  className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={AnalyticsImage}
                   alt="Performance analytics dashboard"
                   width={600}
@@ -176,9 +179,12 @@ export default function HomePage() {
                   features across all devices.
                 </p>
               </div>
-              <div className="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
+              <div
+                className="mt-10 -mx-4 relative lg:mt-0 lg:h-80"
+                aria-hidden="true"
+              >
                 <Image
-                  className="relative mx-auto rounded-lg shadow-lg"
+                  className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={IphoneMockup}
                   alt="BarQuest on mobile devices"
                   width={600}
