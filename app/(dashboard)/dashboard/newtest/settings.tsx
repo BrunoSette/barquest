@@ -33,7 +33,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>(
     subjects.map((subject) => subject.id)
   ); // All subjects selected by default
-  const [questionMode, setQuestionMode] = useState("unused");
+  const [questionMode, setQuestionMode] = useState("all");
   const [numberOfQuestions, setNumberOfQuestions] = useState("1");
   const [secondsPerQuestion, setSecondsPerQuestion] = useState("100");
   const [isPending, setIsPending] = useState(false);
