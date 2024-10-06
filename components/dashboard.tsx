@@ -475,7 +475,12 @@ export function DashboardComponent({ userId }: { userId: number }) {
                     <XAxis
                       dataKey="date"
                       style={{ fontSize: "12px" }}
-                      tickFormatter={(date) => format(new Date(date), "dd/MM")}
+                      tickFormatter={(date) => {
+                        const parsedDate = new Date(date);
+                        return isNaN(parsedDate.getTime())
+                          ? "Invalid Date"
+                          : format(parsedDate, "dd/MM");
+                      }}
                     />
                     <YAxis type="number" style={{ fontSize: "12px" }} />
                     <Tooltip contentStyle={{ fontSize: "12px" }} />
