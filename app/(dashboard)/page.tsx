@@ -189,8 +189,83 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section id="faq" className="py-16 bg-orange-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+              Frequently Asked Questions
+            </h2>
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 bg-orange-50">
+              {[
+                {
+                  question: "How up-to-date is your question bank?",
+                  answer:
+                    "Our question bank is regularly updated to reflect the latest changes in Ontario Bar Exam content and format.",
+                },
+                {
+                  question: "Can I access BarPrep on mobile devices?",
+                  answer:
+                    "Yes, our platform is fully responsive and can be accessed on smartphones and tablets.",
+                },
+                {
+                  question: "How does the real-time analytics feature work?",
+                  answer:
+                    "Our system tracks your performance across different topics and question types, providing detailed insights to help you improve.",
+                },
+                {
+                  question: "What is included in the 7-day free trial?",
+                  answer:
+                    "During your 7-day free trial, you'll have full access to all the features of your selected plan, including our extensive question banks, real-time progress tracking, instant feedback, and mobile-friendly access. This allows you to experience the full value of BarQuest before committing to a subscription.",
+                },
+                {
+                  question:
+                    "How do I cancel my subscription if I'm not satisfied?",
+                  answer:
+                    "Canceling your subscription is easy! If you decide that BarQuest isn't the right fit for you, simply log into your account settings and follow the cancellation instructions. For assistance, our support team is always here to help.",
+                },
+                {
+                  question: "When will I be charged after the free trial?",
+                  answer:
+                    "You won't be charged during the 7-day free trial. Your subscription will automatically begin at the end of the trial period unless you cancel beforehand.",
+                },
+              ].map((item, index) => (
+                <div key={index} className="bg-white p-6 rounded-lg">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {item.question}
+                  </h3>
+                  <p className="text-gray-600">{item.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="pricing">
           <PricingPage />
+        </section>
+
+        <section className="py-16 bg-orange-500">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
+              <div>
+                <h2 className="text-3xl font-bold text-white sm:text-4xl">
+                  Ready to Ace the Ontario Bar Exam?
+                </h2>
+                <p className="mt-3 max-w-3xl text-lg text-orange-100">
+                  Our platform gives you everything you need to fully prepare
+                  and pass with confidence. Stop stressing over outdated
+                  materials—focus on mastering the content that matters most.
+                </p>
+              </div>
+              <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
+                <Link href="#pricing">
+                  <Button className="bg-white hover:bg-gray-100 text-orange-500 rounded-full text-xl px-12 py-6 inline-flex items-center justify-center">
+                    Start Your Free Account Today
+                    <ArrowRight className="ml-3 h-6 w-6" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 
