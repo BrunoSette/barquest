@@ -118,7 +118,7 @@ export function TestDetailsDialog({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="bg-white text-primary hover:bg-primary-foreground text-md px-8 py-5 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
+          className="bg-white text-primary hover:bg-primary-foreground text-md px-8 py-5 transition-all duration-300 ease-in-out transform hover:scale-105"
         >
           View Test Details
         </Button>

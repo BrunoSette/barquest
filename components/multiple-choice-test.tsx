@@ -319,12 +319,12 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
               {testHistoryId && <TestDetailsDialog testId={testHistoryId} />}
 
               <Link href="/dashboard">
-                <div className="bg-blue-500 text-white px-4 py-2 rounded">
+                <div className="bg-blue-500 text-white text-md px-8 p-3 transition-all duration-300 ease-in-out transform hover:scale-105">
                   Go to Dashboard
                 </div>
               </Link>
               <Link href="/dashboard/newtest">
-                <div className="bg-orange-500 text-white px-4 py-2 rounded">
+                <div className="bg-orange-500 text-white text-md px-8 p-3 transition-all duration-300 ease-in-out transform hover:scale-105">
                   Start New Test
                 </div>
               </Link>
