@@ -65,7 +65,7 @@ interface TestHistory {
   date: string;
 }
 
-export function TestDetailsDialog({ test }: { test: TestHistory }) {
+export function TestDetailsDialog({ testId, testDate }: { testId: number, testDate?: string }) {
   const [testDetails, setTestDetails] = useState<TestDetail[] | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -73,7 +73,7 @@ export function TestDetailsDialog({ test }: { test: TestHistory }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/users-answers?test_history_id=${test.id}`
+        `/api/users-answers?test_history_id=${testId}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch test details");
@@ -95,9 +95,11 @@ export function TestDetailsDialog({ test }: { test: TestHistory }) {
       <DialogContent className="max-w-[800px] w-[90vw]">
         <DialogHeader>
           <DialogTitle>Test Details</DialogTitle>
-          <DialogDescription>
-            Test taken on {new Date(test.date).toLocaleString()}
-          </DialogDescription>
+          {testDate && (
+            <DialogDescription>
+              Test taken on {new Date(testDate).toLocaleString()}
+           </DialogDescription>
+          )}
         </DialogHeader>
         <ScrollArea className="h-[60vh] mt-4">
           {loading ? (
@@ -165,6 +167,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
   const [totalAnswers, setTotalAnswers] = useState<number | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   const [answersPerSubject, setAnswersPerSubject] = useState<
     { subject: string; total_answers: number; correct_answers: number }[]
@@ -196,6 +199,25 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
       fetchTotalAnswers();
     }
   }, [userId]); // Ensure this runs only when userId changes
+
+  async function handleDeleteSingleTestHistory(testHistoryId: number) {
+    setDeleting(true);
+    try {
+      const response = await fetch("/api/save-test-results", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ testHistoryId }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setTestHistory((prev) => ([...prev.filter((h) => h.id != testHistoryId)]));
+    } catch (error) {
+      console.error("Error deleting test history:", error);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   const overallPerformance = [
     { name: "Correct", value: correctAnswers },
@@ -421,6 +443,7 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                   <TableHead className="text-center">Test Mode</TableHead>
                   <TableHead className="text-center">Date</TableHead>
                   <TableHead className="text-center">Details</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -454,7 +477,16 @@ export function BarExamDashboardComponent({ userId }: { userId: number }) {
                         {new Date(test.date).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-center">
-                        <TestDetailsDialog test={test} />
+                        <TestDetailsDialog testId={test.id} testDate={test.date} />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <button
+                          className="font-semibold text-red-600 px-2 py-1 cursor-pointer bg-red-100 rounded"
+                          onClick={() => handleDeleteSingleTestHistory(test.id)}
+                          disabled={deleting}
+                        >
+                          X
+                        </button>
                       </TableCell>
                       <TableCell className="text-center">
                         {test.question_text}

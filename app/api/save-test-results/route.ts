@@ -117,7 +117,41 @@ export async function PATCH(req: NextRequest) {
 
     const result = await client.query(query, values);
 
-    // Respond with the inserted test history row
+    return NextResponse.json({ status: 204 });
+  } catch (error) {
+
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const { testHistoryId } = await req.json();
+
+  // Validate that all required fields are provided
+  if (!testHistoryId) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  let client;
+
+  try {
+    client = await pool.connect();
+    const query = `
+      DELETE FROM test_history
+      WHERE id = $1
+      RETURNING *;
+    `;
+
+    const values = [testHistoryId];
+
+    const result = await client.query(query, values);
+
     return NextResponse.json({ status: 204 });
   } catch (error) {
 
