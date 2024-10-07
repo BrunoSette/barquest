@@ -26,19 +26,21 @@ const metadata = {
   description: "Your Ultimate Prep Tool for the Ontario Bar Exam",
 };
 
-export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
+export function Settings({ teamData }: { teamData: TeamDataWithMembers | null }) {
   const router = useRouter();
   const [isTutor, setIsTutor] = useState(true);
   const [isTimed, setIsTimed] = useState(true);
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>(
     subjects.map((subject) => subject.id)
-  ); // All subjects selected by default
+  );
   const [questionMode, setQuestionMode] = useState("all");
   const [numberOfQuestions, setNumberOfQuestions] = useState("1");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
-  const subscriptionStatus = teamData.subscriptionStatus || "free";
-  const planName = teamData.planName || "none";
+  
+  // Use default values if teamData is null
+  const subscriptionStatus = teamData?.subscriptionStatus || "free";
+  const planName = teamData?.planName || "none";
 
   console.log("teamData", teamData);
   console.log("subscriptionStatus", subscriptionStatus);

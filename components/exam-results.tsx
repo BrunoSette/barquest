@@ -9,26 +9,18 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+// import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import Link from "next/link";
 import { ArrowRight, BarChart2, Home } from "lucide-react";
-import { TestDetailsDialog } from "./dashboard";
-
-const COLORS = ["#10B981", "#EF4444"];
-
-interface ExamResultsProps {
-  isTestComplete: boolean;
-  score: number;
-  testHistoryId: number;
-  questions: { id: number; question: string; answer: string }[];
-  resultData: { name: string; value: number }[];
-}
+import { TestDetailsDialog } from "./dashboard/TestDetailsDialog";
+import { ExamResultsProps } from "@/app/types";
+// import { COLORS } from "@/lib/utils";
 
 export function ExamResults({
   isTestComplete,
   score,
   questions,
-  resultData,
+  // resultData,
   testHistoryId,
 }: ExamResultsProps) {
   if (!isTestComplete) {
@@ -40,7 +32,7 @@ export function ExamResults({
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 text-center">
-        Canadian Bar Exam Practice Test Results
+        Practice Quiz Results
       </h1>
       <Card className="mb-8">
         <CardHeader>
@@ -56,8 +48,8 @@ export function ExamResults({
             <Progress value={percentage} className="h-4" />
             <p className="text-center mt-2 text-2xl font-bold">{percentage}%</p>
           </div>
-          <div className="w-64 h-64 mb-8">
-            <ResponsiveContainer width="100%" height="100%">
+          {/* <div className="w-64 h-64 mb-8"> */}
+          {/* <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={resultData}
@@ -77,8 +69,8 @@ export function ExamResults({
                 </Pie>
                 <Legend />
               </PieChart>
-            </ResponsiveContainer>
-          </div>
+            </ResponsiveContainer> */}
+          {/* </div> */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-md">
             <Link href="/dashboard" passHref>
               <Button className="w-full bg-blue-500 hover:bg-blue-700 text-white p-5">

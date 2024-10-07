@@ -106,7 +106,7 @@ export default function SettingsPage() {
               )}
               <Button
                 type="submit"
-                className="bg-orange-500 hover:bg-orange-600 text-white"
+                className="bg-orange-500 hover:bg-orange-600 text-white flex items-center"
                 disabled={isAccountPending}
               >
                 {isAccountPending ? (
@@ -181,14 +181,14 @@ export default function SettingsPage() {
                 disabled={isPasswordPending}
               >
                 {isPasswordPending ? (
-                  <div>
+                  <div className="flex items-center">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
+                    <span>Updating...</span>
                   </div>
                 ) : (
-                  <div>
+                  <div className="flex items-center">
                     <Lock className="mr-2 h-4 w-4" />
-                    Update Password
+                    <span>Update Password</span>
                   </div>
                 )}
               </Button>
@@ -226,14 +226,14 @@ export default function SettingsPage() {
                 disabled={isDeletePending}
               >
                 {isDeletePending ? (
-                  <div>
+                  <div className="flex items-center">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Deleting...
+                    <span>Deleting...</span>
                   </div>
                 ) : (
-                  <div>
+                  <div className="flex items-center">
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Account
+                    <span>Delete Account</span>
                   </div>
                 )}
               </Button>

@@ -314,9 +314,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        Canadian Bar Exam Practice Test
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Practice Quiz</h1>
       <Card>
         <CardHeader>
           <CardTitle className="flex justify-between items-center">

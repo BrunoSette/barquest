@@ -120,7 +120,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     .limit(1);
 
   if (existingUser.length > 0) {
-    return { error: "Failed to create user. Please try again." };
+    return { error: "You are already registered. Please sign-in" };
   }
 
   const passwordHash = await hashPassword(password);
@@ -217,7 +217,7 @@ export async function signOut() {
   const user = (await getUser()) as User;
   const userWithTeam = await getUserWithTeam(user.id);
   await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
-  (await cookies()).delete('session');
+  (await cookies()).delete("session");
 }
 
 const updatePasswordSchema = z
@@ -308,8 +308,8 @@ export const deleteAccount = validatedActionWithUser(
         );
     }
 
-    (await cookies()).delete('session');
-    redirect('/sign-in');
+    (await cookies()).delete("session");
+    redirect("/sign-in");
   }
 );
 
