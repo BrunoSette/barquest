@@ -8,7 +8,7 @@ import { StatCard } from "./dashboard/StatCard";
 
 // Dynamic imports
 const PerformanceBySubjectCard = dynamic(() =>
-  import("./ui/performance-by-subject-card").then(
+  import("./dashboard/PerformanceBySubjectCard").then(
     (mod) => mod.PerformanceBySubjectCard
   )
 );
@@ -26,7 +26,7 @@ const PerformanceHistoryChart = dynamic(() =>
 );
 
 const TestHistoryCard = dynamic(() =>
-  import("./test-history-card").then((mod) => mod.TestHistoryCard)
+  import("./dashboard/TestHistoryCard").then((mod) => mod.TestHistoryCard)
 );
 
 interface DashboardProps {

@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TestDetailsDialog } from "@/components/test-details-dialog";
+import { TestDetailsDialog } from "@/components/dashboard/TestDetailsDialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import {

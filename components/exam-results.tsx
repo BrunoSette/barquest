@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import Link from "next/link";
 import { ArrowRight, BarChart2, Home } from "lucide-react";
-import { TestDetailsDialog } from "./test-details-dialog";
+import { TestDetailsDialog } from "./dashboard/TestDetailsDialog";
 import { ExamResultsProps } from "@/app/types";
 import { COLORS } from "@/lib/utils";
 
