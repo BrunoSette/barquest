@@ -22,6 +22,20 @@ export interface TestHistory {
   date: string;
 }
 
+export interface TestHistoryItem {
+  subject: number;
+  correct_answer: number;
+  question_text: string;
+  id: number;
+  score: number;
+  questions: number;
+  timed: boolean;
+  tutor: boolean;
+  questionmode: string;
+  new_questions: number;
+  date: string;
+}
+
 export interface ExamResultsProps {
   isTestComplete: boolean;
   score: number;

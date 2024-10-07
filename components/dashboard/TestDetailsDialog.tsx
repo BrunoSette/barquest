@@ -14,17 +14,28 @@ import { TestDetail } from "@/app/types";
 import { AlertCircle, CheckCircle2, XCircle } from "lucide-react";
 
 async function fetchTestDetails(testId: number): Promise<TestDetail[]> {
-  const response = await fetch(`/api/users-answers?test_history_id=${testId}`, {
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    throw new Error("Failed to fetch test details");
+  try {
+    const response = await fetch(
+      `/api/users-answers?test_history_id=${testId}`,
+      {
+        cache: "force-cache",
+      }
+    );
+    if (!response.ok) {
+      if (response.status === 404) {
+        return []; // Return an empty array if no data is found
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching test details:", error);
+    throw new Error("Failed to fetch test details. Please try again later.");
   }
-  return response.json();
 }
 
 function TestDetails({ testDetails }: { testDetails: TestDetail[] }) {
-  if (!Array.isArray(testDetails)) {
+  if (!Array.isArray(testDetails) || testDetails.length === 0) {
     return <div>No test details available</div>;
   }
 
@@ -124,11 +135,15 @@ export function TestDetailsDialog({
   testDate?: string;
 }) {
   const [testDetails, setTestDetails] = useState<TestDetail[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTestDetails(testId)
       .then(setTestDetails)
-      .catch((error) => console.error("Failed to fetch test details:", error));
+      .catch((error) => {
+        console.error("Failed to fetch test details:", error);
+        setError(error.message);
+      });
   }, [testId]);
 
   return (
@@ -162,7 +177,11 @@ export function TestDetailsDialog({
               </div>
             }
           >
-            <TestDetails testDetails={testDetails} />
+            {error ? (
+              <div className="text-red-500 font-semibold">{error}</div>
+            ) : (
+              <TestDetails testDetails={testDetails} />
+            )}
           </Suspense>
         </ScrollArea>
       </DialogContent>
