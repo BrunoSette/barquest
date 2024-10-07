@@ -13,16 +13,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import Link from "next/link";
 import { ArrowRight, BarChart2, Home } from "lucide-react";
 import { TestDetailsDialog } from "./dashboard";
-
+import { ExamResultsProps } from "@/app/types";
 const COLORS = ["#10B981", "#EF4444"];
-
-interface ExamResultsProps {
-  isTestComplete: boolean;
-  score: number;
-  testHistoryId: number;
-  questions: { id: number; question: string; answer: string }[];
-  resultData: { name: string; value: number }[];
-}
 
 export function ExamResults({
   isTestComplete,

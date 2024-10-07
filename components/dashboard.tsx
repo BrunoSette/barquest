@@ -59,30 +59,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-
-interface TestDetail {
-  [x: string]: any;
-  subject: string;
-  question: string;
-  userAnswer: string;
-  correctAnswer: string;
-  isCorrect: boolean;
-  comment?: string;
-}
-
-interface TestHistory {
-  subject: number;
-  correct_answer: number;
-  question_text: string;
-  id: number;
-  score: number;
-  questions: number;
-  timed: boolean;
-  tutor: boolean;
-  questionmode: string;
-  new_questions: number;
-  date: string;
-}
+import { TestDetail, TestHistory } from "@/app/types";
 
 export function TestDetailsDialog({
   testId,
