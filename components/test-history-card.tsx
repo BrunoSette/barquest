@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TestDetailsDialog } from "@/components/dashboard";
+import { TestDetailsDialog } from "@/components/test-details-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import {
@@ -144,12 +144,27 @@ export const TestHistoryCard: React.FC<TestHistoryCardProps> = ({
                       {test.questionmode}
                     </TableCell>
                     <TableCell className="text-center">
-                      {test.date ? new Date(test.date).toLocaleString() : "N/A"}
+                      {test.date
+                        ? new Date(test.date).toLocaleString("en-US", {
+                            timeZone: "UTC",
+                            year: "numeric",
+                            month: "numeric",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "numeric",
+                            second: "numeric",
+                            hour12: true,
+                          })
+                        : "N/A"}
                     </TableCell>
                     <TableCell className="text-center">
                       <TestDetailsDialog
                         testId={test.id}
-                        testDate={test.date ? test.date.toString() : undefined}
+                        testDate={
+                          test.date
+                            ? new Date(test.date).toUTCString()
+                            : undefined
+                        }
                       />
                     </TableCell>
                     <TableCell className="p-0">

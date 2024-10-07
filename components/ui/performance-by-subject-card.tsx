@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { PerformanceCardProps } from "@/app/types";
-const COLORS = ["#10B981", "#EF4444"];
+import { COLORS } from "@/lib/utils";
 
 export const PerformanceBySubjectCard: React.FC<PerformanceCardProps> = ({
   performanceData,
