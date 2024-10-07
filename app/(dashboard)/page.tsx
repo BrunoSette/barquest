@@ -6,7 +6,11 @@ import HeroImage from "../public/imagem2.png";
 import AnalyticsImage from "../public/229shots_so.png";
 import QuestionsImage from "../public/questions.png";
 import IphoneMockup from "../public/iphone.png";
-import PricingPage from "@/app/(dashboard)/pricing/page";
+import dynamic from "next/dynamic";
+const PricingComponent = dynamic(
+  () => import("@/app/(dashboard)/pricing/page"),
+  { ssr: true }
+);
 
 export default function HomePage() {
   return (
@@ -246,7 +250,7 @@ export default function HomePage() {
         </section>
 
         <section id="pricing">
-          <PricingPage />
+          <PricingComponent />
         </section>
 
         <section className="py-16 bg-orange-500">

@@ -1,35 +1,60 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   PlusCircle,
   BookOpen,
   CheckCircle,
   XCircle,
-  Trash2,
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
-
-import { ScrollArea } from "./ui/scroll-area";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { TestDetail } from "@/app/types";
-import { PerformanceBySubjectCard } from "./ui/performance-by-subject-card";
-import { TestHistoryCard } from "./test-history-card";
 import { useDashboardData } from "./hooks/useDashboardData";
 import { StatCard } from "./dashboard/StatCard";
-import { OverallPerformanceChart } from "./dashboard/OverallPerformanceChart";
-import { PerformanceHistoryChart } from "./dashboard/PerformanceHistoryChart";
+import { ScrollArea } from "./ui/scroll-area";
+import { TestDetail } from "@/app/types";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "./ui/dialog";
+import { DialogHeader } from "./ui/dialog";
+import { Skeleton } from "./ui/skeleton";
+
+// Dynamic imports
+const PerformanceBySubjectCard = dynamic(
+  () =>
+    import("./ui/performance-by-subject-card").then(
+      (mod) => mod.PerformanceBySubjectCard
+    ),
+  { ssr: false }
+);
+
+const OverallPerformanceChart = dynamic(
+  () =>
+    import("./dashboard/OverallPerformanceChart").then(
+      (mod) => mod.OverallPerformanceChart
+    ),
+  { ssr: false }
+);
+
+const PerformanceHistoryChart = dynamic(
+  () =>
+    import("./dashboard/PerformanceHistoryChart").then(
+      (mod) => mod.PerformanceHistoryChart
+    ),
+  { ssr: false }
+);
+
+const TestHistoryCard = dynamic(
+  () => import("./test-history-card").then((mod) => mod.TestHistoryCard),
+  { ssr: false }
+);
 
 export function TestDetailsDialog({
   testId,
@@ -187,7 +212,14 @@ export function TestDetailsDialog({
 }
 
 export function DashboardComponent({ userId }: { userId: number }) {
-  const { totalAnswers, correctAnswers, answersPerSubject, testHistory, loading, deleteTestHistory } = useDashboardData(userId);
+  const {
+    totalAnswers,
+    correctAnswers,
+    answersPerSubject,
+    testHistory,
+    loading,
+    deleteTestHistory,
+  } = useDashboardData(userId);
 
   const performanceData = answersPerSubject.map((subjectData) => ({
     subject: subjectData.subject,
@@ -216,17 +248,30 @@ export function DashboardComponent({ userId }: { userId: number }) {
           title="Correct Answers"
           value={correctAnswers}
           icon={CheckCircle}
-          subtitle={totalAnswers !== null && correctAnswers !== null && totalAnswers > 0
-            ? `${((correctAnswers / totalAnswers) * 100).toFixed(0)}% correct rate`
-            : undefined}
+          subtitle={
+            totalAnswers !== null && correctAnswers !== null && totalAnswers > 0
+              ? `${((correctAnswers / totalAnswers) * 100).toFixed(
+                  0
+                )}% correct rate`
+              : undefined
+          }
         />
         <StatCard
           title="Incorrect Answers"
-          value={totalAnswers !== null && correctAnswers !== null ? totalAnswers - correctAnswers : null}
+          value={
+            totalAnswers !== null && correctAnswers !== null
+              ? totalAnswers - correctAnswers
+              : null
+          }
           icon={XCircle}
-          subtitle={totalAnswers !== null && correctAnswers !== null && totalAnswers > 0
-            ? `${(((totalAnswers - correctAnswers) / totalAnswers) * 100).toFixed(0)}% error rate`
-            : undefined}
+          subtitle={
+            totalAnswers !== null && correctAnswers !== null && totalAnswers > 0
+              ? `${(
+                  ((totalAnswers - correctAnswers) / totalAnswers) *
+                  100
+                ).toFixed(0)}% error rate`
+              : undefined
+          }
         />
       </div>
 
