@@ -12,7 +12,7 @@ export function SubmitButton() {
     <Button
       onClick={() =>
         sendGAEvent("event", "buttonClicked", {
-          value: "Start My 7 Days Free Trial",
+          value: "Get Started",
         })
       }
       type="submit"
@@ -26,7 +26,7 @@ export function SubmitButton() {
         </div>
       ) : (
         <div className="flex items-center">
-          Start My 7 Days Free Trial
+          Get Started
           <ArrowRight className="ml-2 h-4 w-4" />
         </div>
       )}
