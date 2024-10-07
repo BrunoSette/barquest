@@ -29,3 +29,14 @@ export interface ExamResultsProps {
   questions: { id: number; question: string; answer: string }[];
   resultData: { name: string; value: number }[];
 }
+
+export interface PerformanceCardProps {
+  performanceData: { subject: string; correct: number; incorrect: number }[];
+  loading: boolean;
+}
+
+export interface TestHistoryCardProps {
+  testHistory: any[];
+  loading: boolean;
+  deleteTestHistory: (testHistoryId: number) => Promise<void>;
+}

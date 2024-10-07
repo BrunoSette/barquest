@@ -30,26 +30,6 @@ import {
   Line,
 } from "recharts";
 import { COLORS } from "@/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ScrollArea } from "./ui/scroll-area";
 import {
   Dialog,
@@ -60,6 +40,8 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { TestDetail, TestHistory } from "@/app/types";
+import { PerformanceBySubjectCard } from "./ui/performance-by-subject-card";
+import { TestHistoryCard } from "./test-history-card";
 
 export function TestDetailsDialog({
   testId,
@@ -225,7 +207,24 @@ export function DashboardComponent({ userId }: { userId: number }) {
   >([]);
   const [testHistory, setTestHistory] = useState<TestHistory[]>([]);
 
-  const fetchTotalAnswers = async () => {
+  const deleteTestHistory = async (testHistoryId: number) => {
+    try {
+      const response = await fetch("/api/save-test-results", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ testHistoryId }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      // Refresh the data after deletion
+      await fetchTotalAnswers();
+    } catch (error) {
+      console.error("Error deleting test history:", error);
+    }
+  };
+
+  async function fetchTotalAnswers() {
     try {
       const response = await fetch(`/api/total_answers?user_id=${userId}`);
       if (!response.ok) {
@@ -243,28 +242,11 @@ export function DashboardComponent({ userId }: { userId: number }) {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     fetchTotalAnswers();
   }, [userId]);
-
-  const deleteTestHistory = async (testHistoryId: number) => {
-    try {
-      const response = await fetch("/api/save-test-results", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ testHistoryId }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      // Refresh the data after deletion
-      await fetchTotalAnswers();
-    } catch (error) {
-      console.error("Error deleting test history:", error);
-    }
-  };
 
   const overallPerformance = [
     { name: "Correct", value: correctAnswers },
@@ -372,37 +354,14 @@ export function DashboardComponent({ userId }: { userId: number }) {
         </Card>
       </div>
 
+      {/* Performance by Subject */}
       <div className="w-full mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance by Subject</CardTitle>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            {loading ? (
-              <Skeleton className="h-full w-full" />
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={performanceData}
-                  layout="horizontal"
-                  margin={{ top: 5, right: 2, left: 2, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="subject"
-                    type="category"
-                    style={{ fontSize: "12px" }}
-                  />
-                  <YAxis type="number" style={{ fontSize: "12px" }} />
-                  <Tooltip contentStyle={{ fontSize: "12px" }} />
-                  <Bar dataKey="correct" fill={COLORS[0]} name="Correct" />
-                  <Bar dataKey="incorrect" fill={COLORS[1]} name="Incorrect" />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
+        <PerformanceBySubjectCard
+          performanceData={performanceData}
+          loading={loading}
+        />
         <div className="grid gap-4 md:grid-cols-2 mt-6">
+          {/* Overall Performance */}
           <Card>
             <CardHeader>
               <CardTitle>Overall Performance</CardTitle>
@@ -438,6 +397,7 @@ export function DashboardComponent({ userId }: { userId: number }) {
               )}
             </CardContent>
           </Card>
+          {/* Performance History */}
           <Card>
             <CardHeader>
               <CardTitle>Performance History</CardTitle>
@@ -475,133 +435,11 @@ export function DashboardComponent({ userId }: { userId: number }) {
         </div>
       </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Test History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <Skeleton className="h-full w-full" />
-          ) : (
-            <Table>
-              <TableCaption>A list of your recent test attempts.</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px] text-center">Ord.</TableHead>
-                  <TableHead className="text-center">Score</TableHead>
-                  <TableHead className="text-center">Questions</TableHead>
-                  <TableHead className="text-center">Timed</TableHead>
-                  <TableHead className="text-center">Tutor</TableHead>
-                  <TableHead className="text-center">Test Mode</TableHead>
-                  <TableHead className="text-center">Date</TableHead>
-                  <TableHead className="text-center">Details</TableHead>
-                  <TableHead className="text-center">Delete</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {testHistory
-                  .slice()
-                  .sort((a, b) => +new Date(b.date) - +new Date(a.date))
-                  .map((test, index, array) => (
-                    <TableRow key={`${test.id}-${index}`}>
-                      <TableCell className="text-center">
-                        {array.length - index}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {totalAnswers !== null && totalAnswers > 0
-                          ? ((test.score / test.questions) * 100).toFixed(0)
-                          : "0"}
-                        %
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {test.questions}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {test.timed ? "Yes" : "No"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {test.tutor ? "Yes" : "No"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {test.questionmode}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {new Date(test.date).toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <TestDetailsDialog
-                          testId={test.id}
-                          testDate={test.date}
-                        />
-                      </TableCell>
-                      <TableCell className="p-0">
-                        <div className="flex items-center justify-center h-full">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 p-0"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you absolutely sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete your test history record
-                                  and remove the data from our servers.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => deleteTestHistory(test.id)}
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                {/* New row for questions sum and score average */}
-                <TableRow>
-                  <TableCell className="text-center font-bold">Total</TableCell>
-                  <TableCell className="text-center font-bold">
-                    {testHistory.length > 0
-                      ? (
-                          testHistory.reduce((acc, test) => {
-                            if (test.questions > 0) {
-                              return acc + (test.score / test.questions) * 100;
-                            }
-                            return acc;
-                          }, 0) / testHistory.length
-                        ).toFixed(0)
-                      : "0"}
-                    %
-                  </TableCell>
-                  <TableCell className="text-center font-bold">
-                    {testHistory.reduce((acc, test) => acc + test.questions, 0)}
-                  </TableCell>
-                  <TableCell className="text-center"></TableCell>
-                  <TableCell className="text-center"></TableCell>
-                  <TableCell className="text-center"></TableCell>
-                  <TableCell className="text-center"></TableCell>
-                  <TableCell className="text-center"></TableCell>
-                  <TableCell className="text-center"></TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <TestHistoryCard
+        testHistory={testHistory}
+        loading={loading}
+        deleteTestHistory={deleteTestHistory}
+      />
     </div>
   );
 }
