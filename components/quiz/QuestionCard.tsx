@@ -106,31 +106,32 @@ export default function QuestionCard({
           <p className="text-lg mb-6 text-gray-600">{question.comments}</p>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between space-x-2">
+      <CardFooter className="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2">
         {!isFirstQuestion && (
-          <Button onClick={handlePreviousQuestion} variant="outline">
+          <Button onClick={handlePreviousQuestion} variant="outline" className="w-full sm:w-auto">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Previous Question
           </Button>
         )}
         <div className="flex-grow" />
-        <div className="space-x-2">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
           {!isAnswered && (
             <Button
               onClick={handleSubmitAnswer}
               disabled={selectedAnswer === null}
+              className="w-full sm:w-auto"
             >
               Submit Answer
             </Button>
           )}
           {!isLastQuestion && (
-            <Button onClick={handleNextQuestion} variant="outline">
+            <Button onClick={handleNextQuestion} variant="outline" className="w-full sm:w-auto">
               Next Question
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           )}
           {isLastQuestion && (
-            <Button onClick={handleNextQuestion}>
+            <Button onClick={handleNextQuestion} className="w-full sm:w-auto">
               Finish
             </Button>
           )}

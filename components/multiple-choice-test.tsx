@@ -88,7 +88,9 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
 
   if (questions.length === 0) {
     console.log("No questions available");
-    return <div>No questions available.</div>;
+    return (
+      <div>No questions available. Did you made a too restrictive filter?</div>
+    );
   }
 
   const handleAnswer = async () => {
