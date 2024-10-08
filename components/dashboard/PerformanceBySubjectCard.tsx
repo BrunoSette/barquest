@@ -37,16 +37,25 @@ export const PerformanceBySubjectCard: React.FC<PerformanceCardProps> = ({
             <BarChart
               data={processedData}
               layout="horizontal"
-              margin={{ top: 2, right: 5, left: 5, bottom: 2 }}
+              margin={{ top: 10, right: 2, left: 2, bottom: 2 }}
             >
-              <XAxis dataKey="subject" type="category" />
-              <YAxis type="number" domain={[0, 100]} />
+              <XAxis
+                dataKey="subject"
+                type="category"
+                style={{ fontSize: "8px" }}
+              />
+
+              <YAxis
+                type="number"
+                domain={[0, 100]}
+                style={{ fontSize: "10px" }}
+              />
               <Tooltip
                 formatter={(value: number) => [
-                  `${value.toFixed(2)}%`,
+                  `${value.toFixed(0)}%`,
                   "Correct",
                 ]}
-                contentStyle={{ fontSize: "12px" }}
+                contentStyle={{ fontSize: "14px" }}
               />
               <Bar dataKey="percentage" fill={COLORS[1]} name="Correct">
                 <LabelList
