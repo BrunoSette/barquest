@@ -29,7 +29,7 @@ export function Settings({
     subjects.map((subject) => subject.id)
   );
   const [questionMode, setQuestionMode] = useState("all");
-  const [numberOfQuestions, setNumberOfQuestions] = useState("1");
+  const [numberOfQuestions, setNumberOfQuestions] = useState("20");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
   const [showPricingDialog, setShowPricingDialog] = useState(false);
