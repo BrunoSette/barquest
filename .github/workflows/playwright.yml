@@ -8,6 +8,7 @@ on:
 
 jobs:
   PlayWriteTests:
+  PlayWriteTests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: preview
@@ -43,9 +44,23 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
+
+      - name: Get Preview URL
+        run: echo "PREVIEW_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
@@ -58,15 +73,19 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
-      - name: Wait for Vercel deployment
-        run: |
-          echo "Waiting 30 seconds for deployment to be ready..."
-          sleep 30
-          echo "Deployment is ready!"
+      # - name: Wait for Vercel deployment
+      #   run: |
+      #     echo "Waiting 30 seconds for deployment to be ready..."
+      #     sleep 30
+      #     echo "Deployment is ready!"
 
       - name: Run Playwright tests with tracing
         run: |
           mkdir -p test-results
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" \
+            npx playwright test --trace on --output=test-results --timeout 90000 --retries 2
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ env.PREVIEW_URL }}
           xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" \
             npx playwright test --trace on --output=test-results --timeout 90000 --retries 2
         env:
