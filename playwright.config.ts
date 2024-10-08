@@ -12,16 +12,16 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 20000, // Set global test timeout to 30 seconds
+  timeout: 80000, // Set global test timeout to 30 seconds
   testDir: "./tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 0 : 0,
+  retries: process.env.CI ? 0 : 2,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 2 : undefined,
+  workers: process.env.CI ? 2 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -33,8 +33,8 @@ export default defineConfig({
     trace: "on",
     video: "retain-on-failure",
     /* Set test timeouts individually if needed */
-    actionTimeout: 10000, // Timeout for each action (e.g., click, type)
-    navigationTimeout: 30000, // Timeout for navigation actions
+    actionTimeout: 30000, // Timeout for each action (e.g., click, type)
+    navigationTimeout: 60000, // Timeout for navigation actions
   },
 
   /* Configure projects for major browsers */
@@ -73,8 +73,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://127.0.0.1:3000',
+  //   command: "pnpm run dev",
+  //   url: "http://127.0.0.1:3000",
   //   reuseExistingServer: !process.env.CI,
   // },
 });

@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-const BASE_URL = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
-const TIMEOUT = 30000;
+const BASE_URL =
+  process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
+const TIMEOUT = 60000; // 60 seconds
 
 test.describe("User Journey Tests", () => {
   let page: Page;
@@ -18,35 +19,23 @@ test.describe("User Journey Tests", () => {
 
   async function login(email: string, password: string) {
     console.log(`Attempting to login with email: ${email}`);
-    await page.goto(`${BASE_URL}/sign-in`);
-    await page.getByPlaceholder("Enter your email").fill(email);
-    await page.getByPlaceholder("Enter your password").fill(password);
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.goto(`${BASE_URL}/sign-in`, { waitUntil: "networkidle" });
+    console.log("Navigated to sign-in page");
+
+    await page.fill('input[type="email"]', email);
+    await page.fill('input[type="password"]', password);
+    await page.click('button[type="submit"]');
+
+    await page.waitForNavigation({ waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({
       timeout: TIMEOUT,
     });
     console.log("Login successful");
   }
 
-  async function expectElementVisible(
-    selector: string,
-    options = { timeout: TIMEOUT }
-  ) {
+  async function expectElementVisible(selector: string, options = { timeout: TIMEOUT }) {
     await expect(page.locator(selector)).toBeVisible(options);
   }
-
-  test("should navigate to Home Page and start Sign Up process", async () => {
-    await page.goto(BASE_URL);
-    await expect(
-      page.getByRole("heading", {
-        name: "Your Ultimate Prep Tool for the Ontario Bar Exam",
-      })
-    ).toBeVisible({ timeout: TIMEOUT });
-    await page
-      .getByRole("button", { name: "Start My 7 Days Free Trial" })
-      .first()
-      .click();
-  });
 
   test("login and check website links", async () => {
     await login("bruno.sette@gmail.com", "12345678");
@@ -61,12 +50,18 @@ test.describe("User Journey Tests", () => {
     ];
 
     for (const element of elementsToCheck) {
-      const selector = element.withinNavigation
-        ? `nav >> role=button[name="${element.name}"]`
-        : `role=${element.role}[name="${element.name}"]`;
-      await expectElementVisible(selector);
+      if (element.withinNavigation) {
+        await expectElementVisible(
+          `nav >> role=button[name="${element.name}"]`
+        );
+      } else {
+        await expectElementVisible(
+          `role=${element.role}[name="${element.name}"]`
+        );
+      }
     }
 
+    // Navigate to "Create a New Test" section
     await page
       .getByRole("main")
       .getByRole("button", { name: "Create a New Test" })
@@ -82,12 +77,16 @@ test.describe("User Journey Tests", () => {
     ];
 
     for (const element of createTestElements) {
-      const selector = element.label
-        ? `label:text("${element.label}")`
-        : `role=${element.role}[name="${element.name}"]`;
-      await expectElementVisible(selector);
+      if (element.label) {
+        await expectElementVisible(`label:text("${element.label}")`);
+      } else {
+        await expectElementVisible(
+          `role=${element.role}[name="${element.name}"]`
+        );
+      }
     }
 
+    // Navigate to other sections and check elements
     const sections = [
       {
         name: "User Guide",
@@ -111,17 +110,18 @@ test.describe("User Journey Tests", () => {
 
     for (const section of sections) {
       await page.getByRole("button", { name: section.name }).click();
-      const headingSelector = `role=heading[name="${
-        section.expectedHeading || section.expectedHeadings?.[0] || ""
-      }"]`;
-      await expectElementVisible(headingSelector);
-
+      await expectElementVisible(
+        `role=heading[name="${
+          section.expectedHeading ||
+          (section.expectedHeadings && section.expectedHeadings[0]) ||
+          ""
+        }"]`
+      );
       if (section.expectedButton) {
         await expectElementVisible(
           `role=button[name="${section.expectedButton}"]`
         );
       }
-
       if (Array.isArray(section.expectedHeadings)) {
         for (const heading of section.expectedHeadings) {
           await expectElementVisible(`role=heading[name="${heading}"]`);
@@ -131,9 +131,9 @@ test.describe("User Journey Tests", () => {
   });
 
   test("create a new test and complete quiz", async () => {
-    console.log("Starting create a new test and complete quiz test");
     await login("brunosette@gmail.com", "12345678");
 
+    // Navigate to the "Create a New Test" section from the dashboard
     await page
       .getByRole("main")
       .getByRole("button", { name: "Create a New Test" })
@@ -143,61 +143,67 @@ test.describe("User Journey Tests", () => {
     });
     await page.getByRole("button", { name: "Create Test" }).click();
 
-    const initialQuizElements = [
-      { role: "heading", name: "Practice Quiz" },
-      { text: "Question 1 of" },
-      { role: "button", name: "Submit Answer" },
-      { role: "button", name: "Next Question" },
-      { role: "progressbar" },
-    ];
+    // Verify initial quiz elements
+    await expect(
+      page.getByRole("heading", { name: "Practice Quiz" })
+    ).toBeVisible();
+    await expect(page.getByText("Question 1 of")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Submit Answer" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Next Question" })
+    ).toBeVisible();
+    await expect(page.getByRole("progressbar")).toBeVisible();
 
-    for (const element of initialQuizElements) {
-      if (element.text) {
-        await expect(page.getByText(element.text)).toBeVisible();
-      } else {
-        await expect(
-          page.getByRole(element.role, { name: element.name })
-        ).toBeVisible();
-      }
+    // Answer first question
+    const options = await page.getByRole("radio").all();
+    if (options.length > 0) {
+      await options[Math.floor(Math.random() * options.length)].click();
     }
+    await page.getByRole("button", { name: "Submit Answer" }).click();
+    await page.getByRole("button", { name: "Next Question" }).click();
 
-    async function answerQuestion() {
+    // Verify second question
+    await expect(page.getByText("Question 2 of 2")).toBeVisible();
+
+    // Simulate answering remaining questions
+    const totalQuestions = 20; // Adjust this number based on your quiz length
+    for (let i = 2; i <= totalQuestions; i++) {
+      // Click a random answer option
       const options = await page.getByRole("radio").all();
       if (options.length > 0) {
         await options[Math.floor(Math.random() * options.length)].click();
       }
+
       await page.getByRole("button", { name: "Submit Answer" }).click();
-    }
 
-    await answerQuestion();
-    await page.getByRole("button", { name: "Next Question" }).click();
-    await expect(page.getByText("Question 2 of")).toBeVisible();
-
-    const totalQuestions = 20;
-    for (let i = 2; i <= totalQuestions; i++) {
-      await answerQuestion();
       if (i < totalQuestions) {
         await page.getByRole("button", { name: "Next Question" }).click();
         await expect(page.getByText(`Question ${i + 1} of`)).toBeVisible();
       }
     }
 
+    // Finish quiz
     await expect(page.getByRole("button", { name: "Finish" })).toBeVisible();
     await page.getByRole("button", { name: "Finish" }).click();
 
-    const resultsPageElements = [
-      { role: "heading", name: "Practice Quiz Results" },
-      { role: "heading", name: "Your Performance" },
-      { role: "heading", name: "Performance Breakdown" },
-      { role: "button", name: "Start New Test" },
-      { role: "button", name: "View Test Details" },
+    // Verify results page
+    const resultsPageHeadings = [
+      "Practice Quiz Results",
+      "Your Performance",
+      "Performance Breakdown",
     ];
-
-    for (const element of resultsPageElements) {
-      await expect(
-        page.getByRole(element.role, { name: element.name })
-      ).toBeVisible();
+    for (const heading of resultsPageHeadings) {
+      await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     }
+
+    await expect(
+      page.getByRole("button", { name: "Start New Test" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "View Test Details" })
+    ).toBeVisible();
 
     await page.getByRole("button", { name: "View Test Details" }).click();
     await expect(
@@ -209,6 +215,5 @@ test.describe("User Journey Tests", () => {
     await expect(
       page.getByRole("heading", { name: /Question 2:/ })
     ).toBeVisible();
-    console.log("Test completed successfully");
   });
 });

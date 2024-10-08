@@ -7,7 +7,7 @@ on:
     branches: ["*"]
 
 jobs:
-  test:
+  PlayWriteTests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: preview
@@ -23,6 +23,9 @@ jobs:
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -34,27 +37,40 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build the application
-        run: pnpm build
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Start the application
-        run: pnpm start &
-        env:
-          PORT: 3000
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
 
-      - name: Wait for the app to start
-        run: npx wait-on http://localhost:3000
+      - name: Get Preview URL
+        run: echo "PREVIEW_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
-      - name: Run Playwright tests
+      - name: Wait for Vercel deployment
+        run: |
+          echo "Waiting 30 seconds for deployment to be ready..."
+          sleep 30
+          echo "Deployment is ready!"
+
+      - name: Run Playwright tests with tracing
         run: |
           mkdir -p test-results
-          PLAYWRIGHT_TEST_BASE_URL=http://localhost:3000 npx playwright test --trace on --output=test-results
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" \
+            npx playwright test --trace on --output=test-results --timeout 90000 --retries 2
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ env.PREVIEW_URL }}
 
       - name: Upload Playwright report and trace
         if: always()
@@ -63,11 +79,3 @@ jobs:
           name: playwright-results
           path: test-results/
           retention-days: 7
-
-      # Sentry steps (if needed)
-      # - name: Create Sentry release
-      #   uses: getsentry/action-release@v1
-      #   env:
-      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      #   with:
-      #     environment: preview
