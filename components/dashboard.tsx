@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, BookOpen, CheckCircle, XCircle } from "lucide-react";
+import { PlusCircle, BookOpen, CheckCircle, TrendingUp } from "lucide-react";
 import { StatCard } from "./dashboard/StatCard";
 
 // Dynamic imports
@@ -73,33 +73,63 @@ export function DashboardComponent({
           title="Total Questions Attempted"
           value={totalAnswers}
           icon={BookOpen}
+          subtitle={
+            testHistory.length > 0 &&
+            correctAnswers !== null &&
+            totalAnswers > 0
+              ? (() => {
+                  const lastWeekQuestions = testHistory
+                    .filter(
+                      (test) =>
+                        new Date(test.date) >=
+                        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                    )
+                    .reduce((sum, test) => sum + test.questions, 0);
+                  const difference = totalAnswers - lastWeekQuestions;
+                  return `${difference} from last week`;
+                })()
+              : undefined
+          }
         />
         <StatCard
           title="Correct Answers"
           value={correctAnswers}
           icon={CheckCircle}
           subtitle={
-            totalAnswers !== null && correctAnswers !== null && totalAnswers > 0
-              ? `${((correctAnswers / totalAnswers) * 100).toFixed(
-                  0
-                )}% correct rate`
+            correctAnswers !== null && totalAnswers > 0
+              ? `And ${totalAnswers - correctAnswers} incorrect in ${
+                  testHistory.length
+                } tests taken`
               : undefined
           }
         />
+
         <StatCard
-          title="Incorrect Answers"
+          title="Total Score"
           value={
-            totalAnswers !== null && correctAnswers !== null
-              ? totalAnswers - correctAnswers
-              : null
-          }
-          icon={XCircle}
-          subtitle={
             totalAnswers !== null && correctAnswers !== null && totalAnswers > 0
-              ? `${(
-                  ((totalAnswers - correctAnswers) / totalAnswers) *
-                  100
-                ).toFixed(0)}% error rate`
+              ? `${((correctAnswers / totalAnswers) * 100).toFixed(0)}%`
+              : 0
+          }
+          icon={TrendingUp}
+          subtitle={
+            testHistory.length !== null &&
+            correctAnswers !== null &&
+            totalAnswers > 0
+              ? (() => {
+                  const lastWeekScore = testHistory
+                    .filter(
+                      (test) =>
+                        new Date(test.date) >=
+                        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                    )
+                    .reduce((sum, test) => sum + test.score, 0);
+                  const currentScore = (correctAnswers / totalAnswers) * 100;
+                  const difference = currentScore - lastWeekScore;
+                  return `${difference > 0 ? "+" : ""}${difference.toFixed(
+                    1
+                  )}% from last week`;
+                })()
               : undefined
           }
         />

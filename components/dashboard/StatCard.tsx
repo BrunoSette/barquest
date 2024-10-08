@@ -1,15 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   title: string;
-  value: number | null;
+  value: string | number | null;
   icon: LucideIcon;
   subtitle?: string;
 }
 
-export function StatCard({ title, value, icon: Icon, subtitle }: StatCardProps) {
+export function StatCard({
+  title,
+  value,
+  icon: Icon,
+  subtitle,
+}: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -20,7 +25,9 @@ export function StatCard({ title, value, icon: Icon, subtitle }: StatCardProps) 
         <div className="text-2xl font-bold">
           {value !== null ? value : <Skeleton className="w-[100%] h-[16px]" />}
         </div>
-        {subtitle && <div className="text-xs text-muted-foreground">{subtitle}</div>}
+        {subtitle && (
+          <div className="text-xs text-muted-foreground">{subtitle}</div>
+        )}
       </CardContent>
     </Card>
   );
