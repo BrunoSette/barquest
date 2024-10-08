@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -11,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, XCircle } from "lucide-react";
 import { Question } from "@/lib/db/schema";
 
 type QuestionCardProps = {
@@ -22,7 +21,8 @@ type QuestionCardProps = {
   isTutor: boolean;
   selectedAnswer: number | null;
   setSelectedAnswer: (answer: number | null) => void;
-  handleAnswer: () => Promise<void>;
+  handleSubmitAnswer: () => Promise<void>;
+  handleNextQuestion: () => void;
   handlePreviousQuestion: () => void;
   isLastQuestion: boolean;
   isFirstQuestion: boolean;
@@ -37,7 +37,8 @@ export default function QuestionCard({
   isTutor,
   selectedAnswer,
   setSelectedAnswer,
-  handleAnswer,
+  handleSubmitAnswer,
+  handleNextQuestion,
   handlePreviousQuestion,
   isLastQuestion,
   isFirstQuestion,
@@ -50,11 +51,7 @@ export default function QuestionCard({
           <span>
             Question {currentQuestionNumber} of {totalQuestions}
           </span>
-          {children && (
-            <div className="w-full mt-2">
-              {children}
-            </div>
-          )}
+          {children && <div className="w-full mt-2">{children}</div>}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -109,23 +106,33 @@ export default function QuestionCard({
           <p className="text-lg mb-6 text-gray-600">{question.comments}</p>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-between space-x-2">
         {!isFirstQuestion && (
           <Button onClick={handlePreviousQuestion} variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Previous Question
           </Button>
         )}
+        {!isLastQuestion && (
+          <Button onClick={handleNextQuestion} variant="outline">
+            Next Question <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
         <div className="flex-grow" />
-        <Button
-          onClick={handleAnswer}
-          disabled={selectedAnswer === null && !isAnswered}
-        >
-          {isAnswered
-            ? isLastQuestion
-              ? "Finish"
-              : "Next Question"
-            : "Submit Answer"}
-        </Button>
+        <div className="space-x-2">
+          {!isAnswered && (
+            <Button
+              onClick={handleSubmitAnswer}
+              disabled={selectedAnswer === null}
+            >
+              Submit Answer
+            </Button>
+          )}
+
+          {isLastQuestion && isAnswered && (
+            <Button onClick={handleNextQuestion}>Finish</Button>
+          )}
+        </div>
       </CardFooter>
     </Card>
   );

@@ -5,17 +5,18 @@ import { ExamResults } from "./exam-results";
 import QuestionCard from "./quiz/QuestionCard";
 import TimerDisplay from "./quiz/TimerDisplay";
 import { useEffect } from "react";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 
-export default function MultipleChoiceTest({
-  userId,
-}: {
-  userId: number;
-}) {
+export default function MultipleChoiceTest({ userId }: { userId: number }) {
   const searchParams = useSearchParams();
-  const searchParamsObject = searchParams ? Object.fromEntries(searchParams) : {};
+  const searchParamsObject = searchParams
+    ? Object.fromEntries(searchParams)
+    : {};
 
-  console.log("SearchParams in MultipleChoiceTest:", JSON.stringify(searchParamsObject, null, 2));
+  console.log(
+    "SearchParams in MultipleChoiceTest:",
+    JSON.stringify(searchParamsObject, null, 2)
+  );
 
   const {
     questions,
@@ -35,6 +36,7 @@ export default function MultipleChoiceTest({
     isLoading,
     handlePreviousQuestion,
     numberOfQuestions,
+    answeredQuestions,
   } = useTestLogic(userId, searchParamsObject);
 
   useEffect(() => {
@@ -48,7 +50,16 @@ export default function MultipleChoiceTest({
       selectedAnswer,
       numberOfQuestions,
     });
-  }, [currentQuestion, score, isTestComplete, isAnswered, timeLeft, testHistoryId, selectedAnswer, numberOfQuestions]);
+  }, [
+    currentQuestion,
+    score,
+    isTestComplete,
+    isAnswered,
+    timeLeft,
+    testHistoryId,
+    selectedAnswer,
+    numberOfQuestions,
+  ]);
 
   if (isLoading) {
     console.log("Test is loading");
@@ -84,14 +95,9 @@ export default function MultipleChoiceTest({
     console.log("handleAnswer called, isAnswered:", isAnswered);
     if (!isAnswered) {
       await handleSubmitAnswer();
-    } else {
-      if (currentQuestion === questions.length - 1) {
-        console.log("Last question, completing test");
-        await handleCompleteTest();
-      } else {
-        console.log("Moving to next question");
-        await handleNextQuestion();
-      }
+    } else if (currentQuestion === questions.length - 1) {
+      console.log("Last question, completing test");
+      await handleCompleteTest();
     }
   };
 
@@ -99,16 +105,16 @@ export default function MultipleChoiceTest({
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 text-center">Practice Quiz</h1>
-      <p className="text-center mb-4">Total Questions: {numberOfQuestions}</p>
       <QuestionCard
         question={questions[currentQuestion]}
         currentQuestionNumber={currentQuestion + 1}
         totalQuestions={questions.length}
         isAnswered={isAnswered}
         isTutor={isTutor}
-        selectedAnswer={selectedAnswer}
+        selectedAnswer={answeredQuestions[currentQuestion] || selectedAnswer}
         setSelectedAnswer={setSelectedAnswer}
-        handleAnswer={handleAnswer}
+        handleSubmitAnswer={handleSubmitAnswer}
+        handleNextQuestion={handleNextQuestion}
         handlePreviousQuestion={handlePreviousQuestion}
         isLastQuestion={currentQuestion === questions.length - 1}
         isFirstQuestion={currentQuestion === 0}

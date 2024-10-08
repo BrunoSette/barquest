@@ -5,7 +5,7 @@ import {
   getTestState,
   submitAnswer,
   completeTest,
-  resetTestState, // Add this new function
+  resetTestState,
 } from "@/app/actions/testActions";
 
 type TestState = {
@@ -34,6 +34,10 @@ export function useTestLogic(
   const [isLoading, setIsLoading] = useState(true);
   const hasInitialized = useRef(false);
 
+  const [answeredQuestions, setAnsweredQuestions] = useState<{
+    [key: number]: number;
+  }>({});
+
   const isTutor = searchParams?.isTutor === "true";
   const isTimed = searchParams?.isTimed === "true";
   const selectedSubjects = JSON.parse(
@@ -54,11 +58,28 @@ export function useTestLogic(
   console.log("questionMode:", questionMode);
   console.log("Parsed numberOfQuestions:", numberOfQuestions);
 
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const storedTimeLeft = localStorage.getItem(`timeLeft_${userId}`);
-    return storedTimeLeft ? parseInt(storedTimeLeft, 10) : 0;
-  });
+  const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // This effect will run only on the client-side
+    const storedTimeLeft = localStorage.getItem(`timeLeft_${userId}`);
+    setTimeLeft(
+      storedTimeLeft ? parseInt(storedTimeLeft, 10) : numberOfQuestions * 100
+    );
+
+    // Retrieve answered questions from localStorage
+    const storedAnsweredQuestions = localStorage.getItem(`answeredQuestions_${userId}`);
+    if (storedAnsweredQuestions) {
+      setAnsweredQuestions(JSON.parse(storedAnsweredQuestions));
+    }
+
+    // Retrieve questions from localStorage
+    const storedQuestions = localStorage.getItem(`questions_${userId}`);
+    if (storedQuestions) {
+      setQuestions(JSON.parse(storedQuestions));
+    }
+  }, [userId, numberOfQuestions]);
 
   useEffect(() => {
     const fetchQuestionsAndState = async () => {
@@ -69,12 +90,23 @@ export function useTestLogic(
       try {
         console.log("Fetching questions and test state...");
         console.log("Number of questions requested:", numberOfQuestions);
-        const fetchedQuestions = await getQuestions(
-          userId,
-          selectedSubjects,
-          numberOfQuestions,
-          questionMode
-        );
+        
+        // Check if questions are already in localStorage
+        const storedQuestions = localStorage.getItem(`questions_${userId}`);
+        let fetchedQuestions;
+        if (storedQuestions) {
+          fetchedQuestions = JSON.parse(storedQuestions);
+        } else {
+          fetchedQuestions = await getQuestions(
+            userId,
+            selectedSubjects,
+            numberOfQuestions,
+            questionMode
+          );
+          // Save questions to localStorage
+          localStorage.setItem(`questions_${userId}`, JSON.stringify(fetchedQuestions));
+        }
+        
         console.log("Fetched questions:", fetchedQuestions);
         setQuestions(fetchedQuestions);
 
@@ -83,6 +115,18 @@ export function useTestLogic(
         const fetchedTestState = await getTestState(userId);
         console.log("Fetched test state:", fetchedTestState);
         setTestState(fetchedTestState);
+
+        // Restore answered questions state
+        const storedAnsweredQuestions = localStorage.getItem(`answeredQuestions_${userId}`);
+        if (storedAnsweredQuestions) {
+          const parsedAnsweredQuestions = JSON.parse(storedAnsweredQuestions);
+          setAnsweredQuestions(parsedAnsweredQuestions);
+          setTestState(prevState => ({
+            ...prevState,
+            currentQuestion: Object.keys(parsedAnsweredQuestions).length,
+            isAnswered: Object.keys(parsedAnsweredQuestions).length > 0,
+          }));
+        }
       } catch (error) {
         console.error("Error fetching questions and test state:", error);
       } finally {
@@ -95,15 +139,12 @@ export function useTestLogic(
 
   useEffect(() => {
     if (isTimed && !isLoading && !testState.isTestComplete) {
-      const totalTime = numberOfQuestions * 100; // 100 seconds per question
-      const storedTimeLeft = localStorage.getItem(`timeLeft_${userId}`);
-      const initialTimeLeft = storedTimeLeft ? parseInt(storedTimeLeft, 10) : totalTime;
-      setTimeLeft(initialTimeLeft);
-
       timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
           const newTime = prevTime <= 1 ? 0 : prevTime - 1;
-          localStorage.setItem(`timeLeft_${userId}`, newTime.toString());
+          if (typeof window !== "undefined") {
+            localStorage.setItem(`timeLeft_${userId}`, newTime.toString());
+          }
           if (newTime === 0) {
             clearInterval(timerRef.current!);
             handleCompleteTest();
@@ -131,6 +172,15 @@ export function useTestLogic(
       testState.testHistoryId
     );
 
+    const updatedAnsweredQuestions = {
+      ...answeredQuestions,
+      [testState.currentQuestion]: selectedAnswer,
+    };
+    setAnsweredQuestions(updatedAnsweredQuestions);
+
+    // Save answered questions to localStorage
+    localStorage.setItem(`answeredQuestions_${userId}`, JSON.stringify(updatedAnsweredQuestions));
+
     setTestState((prevState) => {
       const newState = {
         ...prevState,
@@ -144,56 +194,67 @@ export function useTestLogic(
       console.log("Updated test state after submitting answer:", newState);
       return newState;
     });
-  }, [userId, questions, testState, selectedAnswer]);
+  }, [userId, questions, testState, selectedAnswer, answeredQuestions]);
 
-  const handleNextQuestion = useCallback(async () => {
+  const handleNextQuestion = useCallback(() => {
     console.log("Moving to next question");
     if (testState.currentQuestion < questions.length - 1) {
       setTestState((prevState) => {
+        const nextQuestion = prevState.currentQuestion + 1;
         const newState = {
           ...prevState,
-          currentQuestion: prevState.currentQuestion + 1,
-          isAnswered: false,
+          currentQuestion: nextQuestion,
+          isAnswered: !!answeredQuestions[nextQuestion],
         };
         console.log("Updated test state for next question:", newState);
         return newState;
       });
-      setSelectedAnswer(null);
+      setSelectedAnswer(answeredQuestions[testState.currentQuestion + 1] || null);
     } else {
       console.log("Reached last question");
     }
-  }, [questions.length, testState]);
+  }, [questions.length, testState, answeredQuestions]);
+
+  const handlePreviousQuestion = useCallback(() => {
+    console.log("Moving to previous question");
+    if (testState.currentQuestion > 0) {
+      setTestState((prevState) => {
+        const previousQuestion = prevState.currentQuestion - 1;
+        const newState = {
+          ...prevState,
+          currentQuestion: previousQuestion,
+          isAnswered: !!answeredQuestions[previousQuestion],
+        };
+        console.log("Updated test state for previous question:", newState);
+        return newState;
+      });
+      setSelectedAnswer(answeredQuestions[testState.currentQuestion - 1] || null);
+    } else {
+      console.log("Already at the first question");
+    }
+  }, [testState, answeredQuestions]);
 
   const handleCompleteTest = useCallback(async () => {
     console.log("Completing test");
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    localStorage.removeItem(`timeLeft_${userId}`);
+    // If there's a selected answer for the last question and it hasn't been submitted yet, submit it
+    if (selectedAnswer !== null && !testState.isAnswered) {
+      await handleSubmitAnswer();
+    }
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(`timeLeft_${userId}`);
+      localStorage.removeItem(`answeredQuestions_${userId}`);
+      localStorage.removeItem(`questions_${userId}`);
+    }
     await completeTest(userId, testState.testHistoryId);
     setTestState((prevState) => {
       const newState = { ...prevState, isTestComplete: true };
       console.log("Test completed, final state:", newState);
       return newState;
     });
-  }, [userId, testState.testHistoryId]);
-
-  const handlePreviousQuestion = useCallback(() => {
-    console.log("Moving to previous question");
-    if (testState.currentQuestion > 0) {
-      setTestState((prevState) => {
-        const newState = {
-          ...prevState,
-          currentQuestion: prevState.currentQuestion - 1,
-          isAnswered: true, // Assuming the previous question was answered
-        };
-        console.log("Updated test state for previous question:", newState);
-        return newState;
-      });
-    } else {
-      console.log("Already at the first question");
-    }
-  }, [testState]);
+  }, [userId, testState, selectedAnswer, handleSubmitAnswer]);
 
   return {
     questions,
@@ -212,7 +273,8 @@ export function useTestLogic(
     isTutor,
     isTimed,
     isLoading,
-    numberOfQuestions, // Add this to the returned object
+    numberOfQuestions,
     timeLeft,
+    answeredQuestions,
   };
 }
