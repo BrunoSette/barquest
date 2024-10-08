@@ -93,12 +93,10 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
 
   const handleAnswer = async () => {
     console.log("handleAnswer called, isAnswered:", isAnswered);
-    if (!isAnswered) {
+    if (!isAnswered && selectedAnswer !== null) {
       await handleSubmitAnswer();
-    } else if (currentQuestion === questions.length - 1) {
-      console.log("Last question, completing test");
-      await handleCompleteTest();
     }
+    handleNextQuestion();
   };
 
   console.log("Rendering QuestionCard");
@@ -114,7 +112,7 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
         selectedAnswer={answeredQuestions[currentQuestion] || selectedAnswer}
         setSelectedAnswer={setSelectedAnswer}
         handleSubmitAnswer={handleSubmitAnswer}
-        handleNextQuestion={handleNextQuestion}
+        handleNextQuestion={handleAnswer} // Use handleAnswer for both submit and next/finish
         handlePreviousQuestion={handlePreviousQuestion}
         isLastQuestion={currentQuestion === questions.length - 1}
         isFirstQuestion={currentQuestion === 0}

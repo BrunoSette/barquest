@@ -206,48 +206,6 @@ export function useTestLogic(
     });
   }, [userId, questions, testState, selectedAnswer, answeredQuestions]);
 
-  const handleNextQuestion = useCallback(() => {
-    console.log("Moving to next question");
-    if (testState.currentQuestion < questions.length - 1) {
-      setTestState((prevState) => {
-        const nextQuestion = prevState.currentQuestion + 1;
-        const newState = {
-          ...prevState,
-          currentQuestion: nextQuestion,
-          isAnswered: !!answeredQuestions[nextQuestion],
-        };
-        console.log("Updated test state for next question:", newState);
-        return newState;
-      });
-      setSelectedAnswer(
-        answeredQuestions[testState.currentQuestion + 1] || null
-      );
-    } else {
-      console.log("Reached last question");
-    }
-  }, [questions.length, testState, answeredQuestions]);
-
-  const handlePreviousQuestion = useCallback(() => {
-    console.log("Moving to previous question");
-    if (testState.currentQuestion > 0) {
-      setTestState((prevState) => {
-        const previousQuestion = prevState.currentQuestion - 1;
-        const newState = {
-          ...prevState,
-          currentQuestion: previousQuestion,
-          isAnswered: !!answeredQuestions[previousQuestion],
-        };
-        console.log("Updated test state for previous question:", newState);
-        return newState;
-      });
-      setSelectedAnswer(
-        answeredQuestions[testState.currentQuestion - 1] || null
-      );
-    } else {
-      console.log("Already at the first question");
-    }
-  }, [testState, answeredQuestions]);
-
   const handleCompleteTest = useCallback(async () => {
     console.log("Completing test");
     if (timerRef.current) {
@@ -269,6 +227,49 @@ export function useTestLogic(
       return newState;
     });
   }, [userId, testState, selectedAnswer, handleSubmitAnswer]);
+
+  const handleNextQuestion = useCallback(() => {
+    console.log("Moving to next question or finishing");
+    if (testState.currentQuestion < questions.length - 1) {
+      setTestState((prevState) => {
+        const nextQuestion = prevState.currentQuestion + 1;
+        const newState = {
+          ...prevState,
+          currentQuestion: nextQuestion,
+          isAnswered: !!answeredQuestions[nextQuestion],
+        };
+        console.log("Updated test state for next question:", newState);
+        return newState;
+      });
+      setSelectedAnswer(
+        answeredQuestions[testState.currentQuestion + 1] || null
+      );
+    } else {
+      console.log("Reached last question, completing test");
+      handleCompleteTest();
+    }
+  }, [questions.length, testState, answeredQuestions, handleCompleteTest]);
+
+  const handlePreviousQuestion = useCallback(() => {
+    console.log("Moving to previous question");
+    if (testState.currentQuestion > 0) {
+      setTestState((prevState) => {
+        const previousQuestion = prevState.currentQuestion - 1;
+        const newState = {
+          ...prevState,
+          currentQuestion: previousQuestion,
+          isAnswered: !!answeredQuestions[previousQuestion],
+        };
+        console.log("Updated test state for previous question:", newState);
+        return newState;
+      });
+      setSelectedAnswer(
+        answeredQuestions[testState.currentQuestion - 1] || null
+      );
+    } else {
+      console.log("Already at the first question");
+    }
+  }, [testState, answeredQuestions]);
 
   return {
     questions,

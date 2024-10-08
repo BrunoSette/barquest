@@ -113,11 +113,6 @@ export default function QuestionCard({
             Previous Question
           </Button>
         )}
-        {!isLastQuestion && (
-          <Button onClick={handleNextQuestion} variant="outline">
-            Next Question <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        )}
         <div className="flex-grow" />
         <div className="space-x-2">
           {!isAnswered && (
@@ -128,9 +123,16 @@ export default function QuestionCard({
               Submit Answer
             </Button>
           )}
-
-          {isLastQuestion && isAnswered && (
-            <Button onClick={handleNextQuestion}>Finish</Button>
+          {!isLastQuestion && (
+            <Button onClick={handleNextQuestion} variant="outline">
+              Next Question
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+          {isLastQuestion && (
+            <Button onClick={handleNextQuestion}>
+              Finish
+            </Button>
           )}
         </div>
       </CardFooter>
