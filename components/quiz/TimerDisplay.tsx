@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Progress } from "@/components/ui/progress";
 
@@ -7,7 +7,10 @@ type TimerDisplayProps = {
   totalTime: number;
 };
 
-export default function TimerDisplay({ timeLeft, totalTime }: TimerDisplayProps) {
+export default function TimerDisplay({
+  timeLeft,
+  totalTime,
+}: TimerDisplayProps) {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -16,8 +19,7 @@ export default function TimerDisplay({ timeLeft, totalTime }: TimerDisplayProps)
 
   return (
     <div className="w-full">
-      <div className="flex justify-between mb-2">
-        <span className="text-sm font-medium">Time Remaining:</span>
+      <div className="flex justify-end mb-2">
         <span className="text-sm font-bold">{formatTime(timeLeft)}</span>
       </div>
       <Progress value={(timeLeft / totalTime) * 100} className="w-full" />
