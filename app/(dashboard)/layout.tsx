@@ -34,6 +34,10 @@ function Header() {
     router.push("/");
   }
 
+  const handleMenuItemClick = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 flex justify-between items-center">
@@ -59,50 +63,81 @@ function Header() {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="p-0">
-                <DropdownMenuItem className="w-full cursor-pointer m-1">
-                  <Link href="/dashboard" className="flex w-full items-center">
+                <DropdownMenuItem
+                  className="w-full cursor-pointer m-1"
+                  onSelect={handleMenuItemClick}
+                >
+                  <Link
+                    href="/dashboard"
+                    className="flex w-full items-center"
+                    onClick={handleMenuItemClick}
+                  >
                     <DashboardIcon className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                <DropdownMenuItem
+                  className="w-full cursor-pointer m-1"
+                  onSelect={handleMenuItemClick}
+                >
                   <Link
                     href="/dashboard/newtest"
                     className="flex w-full items-center"
+                    onClick={handleMenuItemClick}
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     <span>Create Test</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                <DropdownMenuItem
+                  className="w-full cursor-pointer m-1"
+                  onSelect={handleMenuItemClick}
+                >
                   <Link
                     href="/dashboard/videos"
                     className="flex w-full items-center"
+                    onClick={handleMenuItemClick}
                   >
                     <Video className="mr-2 h-4 w-4" />
                     <span>User Guide</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                <DropdownMenuItem
+                  className="w-full cursor-pointer m-1"
+                  onSelect={handleMenuItemClick}
+                >
                   <Link
                     href="/dashboard/subscription"
                     className="flex w-full items-center"
+                    onClick={handleMenuItemClick}
                   >
                     <BookCheck className="mr-2 h-4 w-4" />
                     <span>My Subscription</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                <DropdownMenuItem
+                  className="w-full cursor-pointer m-1"
+                  onSelect={handleMenuItemClick}
+                >
                   <Link
                     href="/dashboard/general"
                     className="flex w-full items-center"
+                    onClick={handleMenuItemClick}
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <form action={handleSignOut} className="p-1">
-                  <button type="submit" className="flex w-full">
+                  <button
+                    type="submit"
+                    className="flex w-full"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleMenuItemClick();
+                      handleSignOut();
+                    }}
+                  >
                     <DropdownMenuItem className="w-full cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>
