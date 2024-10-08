@@ -11,12 +11,18 @@ export async function getQuestions(
   numberOfQuestions: number,
   questionMode: string
 ): Promise<Question[]> {
-  console.log(`Requesting ${numberOfQuestions} questions for subjects: ${selectedSubjects.join(', ')}, mode: ${questionMode}`);
+  console.log(
+    `Requesting ${numberOfQuestions} questions for subjects: ${selectedSubjects.join(
+      ", "
+    )}, mode: ${questionMode}`
+  );
 
   let query = db.select().from(questions);
 
   if (selectedSubjects.length > 0) {
-    query = query.where(inArray(questions.subjectId, selectedSubjects));
+    query = query.where(
+      inArray(questions.subjectId, selectedSubjects)
+    ) as typeof query;
   }
 
   if (questionMode === "unanswered") {
@@ -32,19 +38,25 @@ export async function getQuestions(
     console.log(`User has answered ${answeredQuestionIds.length} questions`);
 
     if (answeredQuestionIds.length > 0) {
-      query = query.where(not(inArray(questions.id, answeredQuestionIds)));
+      query = query.where(
+        not(inArray(questions.id, answeredQuestionIds))
+      ) as typeof query;
     }
   }
 
   // Add randomization to the query
-  query = query.orderBy(sql`RANDOM()`);
+  query = query.orderBy(sql`RANDOM()`) as typeof query;
 
-  const totalQuestions = await db.select({ count: sql<number>`count(*)` }).from(questions);
+  const totalQuestions = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(questions);
   console.log(`Total questions in database: ${totalQuestions[0].count}`);
 
   const fetchedQuestions = await query;
-  
-  console.log(`Fetched ${fetchedQuestions.length} questions out of ${numberOfQuestions} requested`);
+
+  console.log(
+    `Fetched ${fetchedQuestions.length} questions out of ${numberOfQuestions} requested`
+  );
 
   // Slice the array to return only the requested number of questions (or all if fewer are available)
   return fetchedQuestions.slice(0, numberOfQuestions);
@@ -152,30 +164,25 @@ export async function completeTest(
 
 export async function resetTestState(userId: number) {
   // First, delete related user_answers
-  await db
-    .delete(userAnswers)
-    .where(
-      and(
-        eq(userAnswers.userId, userId),
-        inArray(
-          userAnswers.testHistoryId,
-          db
-            .select({ id: testHistory.id })
-            .from(testHistory)
-            .where(and(eq(testHistory.userId, userId), eq(testHistory.timed, false)))
-        )
+  await db.delete(userAnswers).where(
+    and(
+      eq(userAnswers.userId, userId),
+      inArray(
+        userAnswers.testHistoryId,
+        db
+          .select({ id: testHistory.id })
+          .from(testHistory)
+          .where(
+            and(eq(testHistory.userId, userId), eq(testHistory.timed, false))
+          )
       )
-    );
+    )
+  );
 
   // Then, delete incomplete test history
   await db
     .delete(testHistory)
-    .where(
-      and(
-        eq(testHistory.userId, userId),
-        eq(testHistory.timed, false)
-      )
-    );
+    .where(and(eq(testHistory.userId, userId), eq(testHistory.timed, false)));
 
   // Create a new test history entry
   const newTest = await db

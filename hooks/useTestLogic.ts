@@ -69,7 +69,9 @@ export function useTestLogic(
     );
 
     // Retrieve answered questions from localStorage
-    const storedAnsweredQuestions = localStorage.getItem(`answeredQuestions_${userId}`);
+    const storedAnsweredQuestions = localStorage.getItem(
+      `answeredQuestions_${userId}`
+    );
     if (storedAnsweredQuestions) {
       setAnsweredQuestions(JSON.parse(storedAnsweredQuestions));
     }
@@ -90,7 +92,7 @@ export function useTestLogic(
       try {
         console.log("Fetching questions and test state...");
         console.log("Number of questions requested:", numberOfQuestions);
-        
+
         // Check if questions are already in localStorage
         const storedQuestions = localStorage.getItem(`questions_${userId}`);
         let fetchedQuestions;
@@ -104,9 +106,12 @@ export function useTestLogic(
             questionMode
           );
           // Save questions to localStorage
-          localStorage.setItem(`questions_${userId}`, JSON.stringify(fetchedQuestions));
+          localStorage.setItem(
+            `questions_${userId}`,
+            JSON.stringify(fetchedQuestions)
+          );
         }
-        
+
         console.log("Fetched questions:", fetchedQuestions);
         setQuestions(fetchedQuestions);
 
@@ -117,11 +122,13 @@ export function useTestLogic(
         setTestState(fetchedTestState);
 
         // Restore answered questions state
-        const storedAnsweredQuestions = localStorage.getItem(`answeredQuestions_${userId}`);
+        const storedAnsweredQuestions = localStorage.getItem(
+          `answeredQuestions_${userId}`
+        );
         if (storedAnsweredQuestions) {
           const parsedAnsweredQuestions = JSON.parse(storedAnsweredQuestions);
           setAnsweredQuestions(parsedAnsweredQuestions);
-          setTestState(prevState => ({
+          setTestState((prevState) => ({
             ...prevState,
             currentQuestion: Object.keys(parsedAnsweredQuestions).length,
             isAnswered: Object.keys(parsedAnsweredQuestions).length > 0,
@@ -179,7 +186,10 @@ export function useTestLogic(
     setAnsweredQuestions(updatedAnsweredQuestions);
 
     // Save answered questions to localStorage
-    localStorage.setItem(`answeredQuestions_${userId}`, JSON.stringify(updatedAnsweredQuestions));
+    localStorage.setItem(
+      `answeredQuestions_${userId}`,
+      JSON.stringify(updatedAnsweredQuestions)
+    );
 
     setTestState((prevState) => {
       const newState = {
@@ -209,7 +219,9 @@ export function useTestLogic(
         console.log("Updated test state for next question:", newState);
         return newState;
       });
-      setSelectedAnswer(answeredQuestions[testState.currentQuestion + 1] || null);
+      setSelectedAnswer(
+        answeredQuestions[testState.currentQuestion + 1] || null
+      );
     } else {
       console.log("Reached last question");
     }
@@ -228,7 +240,9 @@ export function useTestLogic(
         console.log("Updated test state for previous question:", newState);
         return newState;
       });
-      setSelectedAnswer(answeredQuestions[testState.currentQuestion - 1] || null);
+      setSelectedAnswer(
+        answeredQuestions[testState.currentQuestion - 1] || null
+      );
     } else {
       console.log("Already at the first question");
     }
@@ -262,7 +276,6 @@ export function useTestLogic(
     score: testState.score,
     isTestComplete: testState.isTestComplete,
     isAnswered: testState.isAnswered,
-    timeLeft: testState.timeLeft,
     testHistoryId: testState.testHistoryId,
     selectedAnswer,
     setSelectedAnswer,
