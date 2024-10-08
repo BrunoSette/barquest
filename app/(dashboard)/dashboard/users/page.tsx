@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/db/queries";
-import UsersTableAndGraphs from "@/components/users-table-and-graphs";
+import UsersAdmin from "@/components/users-admin";
 import Head from "next/head";
 
 export const metadata = {
@@ -21,7 +21,7 @@ export default async function TestePage() {
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
       </Head>
-      <UsersTableAndGraphs />
+      <UsersAdmin />
     </div>
   );
 }

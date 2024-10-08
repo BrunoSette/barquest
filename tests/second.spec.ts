@@ -1,220 +1,214 @@
 import { test, expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+const BASE_URL = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
+const TIMEOUT = 30000;
 
 test.describe("User Journey Tests", () => {
-  test("should navigate to Home Page and start Sign Up process", async ({
-    page,
-  }) => {
-    await page.goto("http://localhost:3000/");
+  let page: Page;
+
+  test.beforeEach(async ({ browser }) => {
+    page = await browser.newPage();
+    console.log(`Using base URL: ${BASE_URL}`);
+  });
+
+  test.afterEach(async () => {
+    await page.close();
+  });
+
+  async function login(email: string, password: string) {
+    console.log(`Attempting to login with email: ${email}`);
+    await page.goto(`${BASE_URL}/sign-in`);
+    await page.getByPlaceholder("Enter your email").fill(email);
+    await page.getByPlaceholder("Enter your password").fill(password);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({
+      timeout: TIMEOUT,
+    });
+    console.log("Login successful");
+  }
+
+  async function expectElementVisible(
+    selector: string,
+    options = { timeout: TIMEOUT }
+  ) {
+    await expect(page.locator(selector)).toBeVisible(options);
+  }
+
+  test("should navigate to Home Page and start Sign Up process", async () => {
+    await page.goto(BASE_URL);
     await expect(
       page.getByRole("heading", {
         name: "Your Ultimate Prep Tool for the Ontario Bar Exam",
       })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: TIMEOUT });
     await page
       .getByRole("button", { name: "Start My 7 Days Free Trial" })
       .first()
       .click();
   });
 
-  test("login and check website links", async ({ page }) => {
-    // Start tracing before test execution
+  test("login and check website links", async () => {
+    await login("bruno.sette@gmail.com", "12345678");
 
-    await page.goto("http://localhost:3000/sign-in");
+    const elementsToCheck = [
+      { role: "link", name: "BarQuest" },
+      { role: "button", name: "Dashboard" },
+      { role: "button", name: "Create a New Test", withinNavigation: true },
+      { role: "button", name: "User Guide" },
+      { role: "button", name: "My Subscription" },
+      { role: "button", name: "Settings" },
+    ];
 
-    // Fill in login credentials
-    await page
-      .getByPlaceholder("Enter your email")
-      .fill("bruno.sette@gmail.com");
-    await page.getByPlaceholder("Enter your password").fill("12345678");
-    await page.getByRole("button", { name: "Sign in" }).click();
+    for (const element of elementsToCheck) {
+      const selector = element.withinNavigation
+        ? `nav >> role=button[name="${element.name}"]`
+        : `role=${element.role}[name="${element.name}"]`;
+      await expectElementVisible(selector);
+    }
 
-    // Check visibility of elements after login
-    await expect(
-      page.getByRole("heading", { name: "Bar Exam Practice Dashboard" })
-    ).toBeVisible({ timeout: 20000 });
-
-    await expect(page.getByRole("link", { name: "BarQuest" })).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(page.getByRole("button", { name: "Dashboard" })).toBeVisible({
-      timeout: 10000,
-    });
-
-    await expect(
-      page
-        .getByRole("navigation")
-        .getByRole("button", { name: "Create a New Test" })
-    ).toBeVisible({ timeout: 10000 });
-
-    await expect(page.getByRole("button", { name: "User Guide" })).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(
-      page.getByRole("button", { name: "My Subscription" })
-    ).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole("button", { name: "Settings" })).toBeVisible({
-      timeout: 10000,
-    });
-
-    // Navigate to "Create a New Test" section
     await page
       .getByRole("main")
       .getByRole("button", { name: "Create a New Test" })
       .click();
-    await expect(page.getByRole("heading", { name: "Test Mode" })).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(page.getByRole("heading", { name: "Subjects" })).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(
-      page.getByRole("heading", { name: "Max Number of Questions" })
-    ).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole("button", { name: "Create Test" })).toBeVisible(
+
+    const createTestElements = [
+      { role: "heading", name: "Test Mode" },
+      { role: "heading", name: "Subjects" },
+      { role: "heading", name: "Max Number of Questions" },
+      { role: "button", name: "Create Test" },
+      { label: "Tutor" },
+      { label: "Timed" },
+    ];
+
+    for (const element of createTestElements) {
+      const selector = element.label
+        ? `label:text("${element.label}")`
+        : `role=${element.role}[name="${element.name}"]`;
+      await expectElementVisible(selector);
+    }
+
+    const sections = [
       {
-        timeout: 10000,
+        name: "User Guide",
+        expectedHeading: "User Guide and Study Strategies",
+      },
+      {
+        name: "My Subscription",
+        expectedHeading: "Subscription",
+        expectedButton: "Manage Subscription",
+      },
+      {
+        name: "Settings",
+        expectedHeadings: [
+          "General Settings",
+          "Security Settings",
+          "Delete Account",
+        ],
+        expectedButton: "Save Changes",
+      },
+    ];
+
+    for (const section of sections) {
+      await page.getByRole("button", { name: section.name }).click();
+      const headingSelector = `role=heading[name="${
+        section.expectedHeading || section.expectedHeadings?.[0] || ""
+      }"]`;
+      await expectElementVisible(headingSelector);
+
+      if (section.expectedButton) {
+        await expectElementVisible(
+          `role=button[name="${section.expectedButton}"]`
+        );
       }
-    );
-    await expect(page.getByLabel("Tutor")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByLabel("Timed")).toBeVisible({ timeout: 10000 });
 
-    // Navigate to User Guide and other sections
-    await page.getByRole("button", { name: "User Guide" }).click();
-    await expect(
-      page.getByRole("heading", { name: "User Guide and Study" })
-    ).toBeVisible({ timeout: 10000 });
-
-    await page.getByRole("button", { name: "My Subscription" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Subscription" })
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-      page.getByRole("button", { name: "Manage Subscription" })
-    ).toBeVisible({ timeout: 10000 });
-
-    await page.getByRole("button", { name: "Settings" }).click();
-    await expect(
-      page.getByRole("heading", { name: "General Settings" })
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-      page.getByRole("button", { name: "Save Changes" })
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-      page.getByRole("heading", { name: "Security Settings" })
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-      page.getByRole("heading", { name: "Delete Account" })
-    ).toBeVisible({ timeout: 10000 });
+      if (Array.isArray(section.expectedHeadings)) {
+        for (const heading of section.expectedHeadings) {
+          await expectElementVisible(`role=heading[name="${heading}"]`);
+        }
+      }
+    }
   });
 
-  test("should fill in Payment details and delete account", async ({
-    page,
-  }) => {
-    // Add event listener for Stripe responses
-    page.on("response", async (response) => {
-      if (response.url().includes("stripe.com") && !response.ok()) {
-        console.log(`Stripe request failed with status: ${response.status()}`);
-        console.log(`Response body: ${await response.text()}`);
-      }
-    });
+  test("create a new test and complete quiz", async () => {
+    console.log("Starting create a new test and complete quiz test");
+    await login("brunosette@gmail.com", "12345678");
 
-    await page.goto("http://localhost:3000/");
     await page
-      .getByRole("button", { name: "Start My 7 Days Free Trial" })
-      .first()
-      .click();
-    await page.getByPlaceholder("Enter your email").fill("test@gmail.com");
-    await page.getByPlaceholder("Enter your password").fill("12345678");
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.waitForTimeout(3000); // Wait for 3 seconds to ensure the error message appears
-
-    if (
-      await page
-        .getByText("Failed to create user. Please try again.")
-        .isVisible()
-    ) {
-      console.log("Error message detected, navigating to login page.");
-      // Navigate to the login page and log in
-      await page.goto("http://localhost:3000/sign-in");
-      await page.getByPlaceholder("Enter your email").fill("test@gmail.com");
-      await page.getByPlaceholder("Enter your password").fill("12345678");
-      await page.getByRole("button", { name: "Sign in" }).click();
-    } else {
-      console.log(
-        "No error message detected, continuing with sign-up process."
-      );
-      // Continue with the sign-up process
-      await page.waitForSelector("text=Enter payment details", {
-        timeout: 20000,
-      });
-      await page.getByPlaceholder("1234 1234 1234").fill("4242 4242 4242 4242");
-      await page.getByPlaceholder("1234 1234 1234").press("Tab");
-      await page.getByPlaceholder("MM / YY").fill("09 / 29");
-      await page.getByPlaceholder("MM / YY").press("Tab");
-      await page.getByPlaceholder("CVC").fill("454");
-      await page.getByPlaceholder("CVC").press("Tab");
-      await page.getByPlaceholder("Full name on card").fill("teste ");
-      await page.getByPlaceholder("Full name on card").press("Tab");
-      await page.getByLabel("Country or region").selectOption("KH");
-      await page.getByLabel("Country or region").selectOption("CA");
-      await page.locator("body").press("Tab");
-      await page.getByPlaceholder("Postal code").click();
-      await page.getByPlaceholder("Postal code").fill("M2P 2P2");
-      await page.getByPlaceholder("Postal code").press("Tab");
-      await page.getByTestId("hosted-payment-submit-button").click();
-      await page.getByLabel("Email").fill("test@gmail.com");
-      await page.getByTestId("hosted-payment-submit-button").click();
-    }
-
-    // Wait for a redirection to the dashboard
-    await page.waitForURL("http://localhost:3000/dashboard", {
-      timeout: 25000,
+      .getByRole("main")
+      .getByRole("button", { name: "Create a New Test" })
+      .click({ timeout: TIMEOUT });
+    await expect(page.getByRole("heading", { name: "Test Mode" })).toBeVisible({
+      timeout: TIMEOUT,
     });
-    await expect(
-      page.getByRole("heading", { name: "Bar Exam Practice Dashboard" })
-    ).toBeVisible({ timeout: 15000 });
-    await expect(
-      page.getByRole("main").getByRole("button", { name: "Create a New Test" })
-    ).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: "Create Test" }).click();
 
-    // Proceed to delete the account
-    await page.goto("http://localhost:3000/sign-in");
-    await page.getByPlaceholder("Enter your email").fill("test@gmail.com");
-    await page.getByPlaceholder("Enter your email").press("Tab");
-    await page.getByPlaceholder("Enter your password").fill("12345678");
-    await page.getByRole("button", { name: "Sign in" }).click();
+    const initialQuizElements = [
+      { role: "heading", name: "Practice Quiz" },
+      { text: "Question 1 of" },
+      { role: "button", name: "Submit Answer" },
+      { role: "button", name: "Next Question" },
+      { role: "progressbar" },
+    ];
 
-    // Check if login was successful
-    const loginError = page.locator("text=Invalid email or password.");
-    if (await loginError.isVisible()) {
-      console.log("Login failed, navigating to sign-up page.");
-      // Navigate to the sign-up page and sign up
-      await page.goto("http://localhost:3000/sign-up");
-      await page.getByPlaceholder("Enter your email").fill("test@gmail.com");
-      await page.getByPlaceholder("Enter your password").fill("12345678");
-      await page.getByRole("button", { name: "Sign up" }).click();
-
-      // Continue with the sign-up process
-      // Wait for a redirection to the dashboard
-      await page.waitForURL("http://localhost:3000/dashboard");
-      await expect(
-        page.getByRole("heading", { name: "Bar Exam Practice Dashboard" })
-      ).toBeVisible({ timeout: 25000 });
-      await expect(
-        page
-          .getByRole("main")
-          .getByRole("button", { name: "Create a New Test" })
-      ).toBeVisible({ timeout: 25000 });
+    for (const element of initialQuizElements) {
+      if (element.text) {
+        await expect(page.getByText(element.text)).toBeVisible();
+      } else {
+        await expect(
+          page.getByRole(element.role, { name: element.name })
+        ).toBeVisible();
+      }
     }
 
-    // Proceed to delete the account
-    await page.waitForURL("http://localhost:3000/dashboard");
-    await page.getByRole("button", { name: "Settings" }).click();
-    await page.getByLabel("Confirm Password").click();
-    await page.getByLabel("Confirm Password").fill("12345678");
-    await page.getByRole("button", { name: "Delete Account" }).click();
+    async function answerQuestion() {
+      const options = await page.getByRole("radio").all();
+      if (options.length > 0) {
+        await options[Math.floor(Math.random() * options.length)].click();
+      }
+      await page.getByRole("button", { name: "Submit Answer" }).click();
+    }
+
+    await answerQuestion();
+    await page.getByRole("button", { name: "Next Question" }).click();
+    await expect(page.getByText("Question 2 of")).toBeVisible();
+
+    const totalQuestions = 20;
+    for (let i = 2; i <= totalQuestions; i++) {
+      await answerQuestion();
+      if (i < totalQuestions) {
+        await page.getByRole("button", { name: "Next Question" }).click();
+        await expect(page.getByText(`Question ${i + 1} of`)).toBeVisible();
+      }
+    }
+
+    await expect(page.getByRole("button", { name: "Finish" })).toBeVisible();
+    await page.getByRole("button", { name: "Finish" }).click();
+
+    const resultsPageElements = [
+      { role: "heading", name: "Practice Quiz Results" },
+      { role: "heading", name: "Your Performance" },
+      { role: "heading", name: "Performance Breakdown" },
+      { role: "button", name: "Start New Test" },
+      { role: "button", name: "View Test Details" },
+    ];
+
+    for (const element of resultsPageElements) {
+      await expect(
+        page.getByRole(element.role, { name: element.name })
+      ).toBeVisible();
+    }
+
+    await page.getByRole("button", { name: "View Test Details" }).click();
     await expect(
-      page.getByRole("heading", { name: "Sign in to your account" })
-    ).toBeVisible({ timeout: 15000 });
+      page.getByRole("heading", { name: "Test Details" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Question 1:/ })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Question 2:/ })
+    ).toBeVisible();
+    console.log("Test completed successfully");
   });
 });

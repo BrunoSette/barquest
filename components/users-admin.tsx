@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { User } from "@/lib/db/schema";
 
-export default function UsersTableAndGraphs() {
+export default function UsersAdmin() {
   const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<
     {
@@ -127,8 +127,7 @@ export default function UsersTableAndGraphs() {
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Updated At</TableHead>
+            {/* <TableHead>Created At</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -138,8 +137,10 @@ export default function UsersTableAndGraphs() {
               <TableCell>{user.name || ""}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.role}</TableCell>
-              <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
-              <TableCell>{new Date(user.updatedAt).toLocaleString()}</TableCell>
+              <TableCell>
+                {/* TODO: Is it CreatedAt or created_at? }
+                {/* {new Date(user.createdAt).toLocaleDateString()} */}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -154,9 +155,6 @@ export default function UsersTableAndGraphs() {
             <TableHead>Name</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Updated At</TableHead>
-            <TableHead>Stripe Customer ID</TableHead>
-            <TableHead>Stripe Subscription ID</TableHead>
-            <TableHead>Stripe Product ID</TableHead>
             <TableHead>Plan Name</TableHead>
             <TableHead>Subscription Status</TableHead>
           </TableRow>
@@ -167,14 +165,11 @@ export default function UsersTableAndGraphs() {
               <TableCell className="font-medium">{team.id}</TableCell>
               <TableCell>{team.name || ""}</TableCell>
               <TableCell>
-                {new Date(team.created_at).toLocaleString()}
+                {new Date(team.created_at).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                {new Date(team.updated_at).toLocaleString()}
+                {new Date(team.updated_at).toLocaleDateString()}
               </TableCell>
-              <TableCell>{team.stripe_customer_id}</TableCell>
-              <TableCell>{team.stripe_subscription_id}</TableCell>
-              <TableCell>{team.stripe_product_id}</TableCell>
               <TableCell>{team.plan_name}</TableCell>
               <TableCell>{team.subscription_status}</TableCell>
             </TableRow>

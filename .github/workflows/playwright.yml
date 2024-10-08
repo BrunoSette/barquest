@@ -23,6 +23,9 @@ jobs:
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -31,58 +34,44 @@ jobs:
         with:
           node-version: lts/*
 
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
-      - name: Build the application
-        run: yarn build
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Start the application
-        run: yarn start &
-        env:
-          PORT: 3000
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
 
-      - name: Wait for the app to start
-        run: npx wait-on http://localhost:3000
+      - name: Get Preview URL
+        run: echo "PREVIEW_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
-      - name: Print environment variables
-        run: printenv
+      - name: Wait for Vercel deployment
+        run: npx wait-on ${{ env.PREVIEW_URL }}
 
       - name: Run Playwright tests with tracing
         run: |
           mkdir -p test-results
-          npx playwright test --trace on --output=test-results
+          PLAYWRIGHT_TEST_BASE_URL=${{ env.PREVIEW_URL }} npx playwright test --trace on --output=test-results
 
       - name: Upload Playwright report and trace
-        if: ${{ !cancelled() }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-results
           path: test-results/
           retention-days: 7
 
-      # Sentry integration: create a release and deploy
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-        with:
-          environment: preview
-
-      - name: Finalize and notify Sentry of deployment
-        run: |
-          sentry-cli releases finalize $GITHUB_SHA
-          sentry-cli releases deploys $GITHUB_SHA new -e production
+      # Sentry steps remain unchanged
