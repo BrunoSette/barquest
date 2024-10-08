@@ -18,11 +18,13 @@ export function StatCard({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardTitle className="text-xs sm:text-sm font-medium">
+          {title}
+        </CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">
+        <div className="text-large md:text-2xl lg:text-3xl font-bold">
           {value !== null ? value : <Skeleton className="w-[100%] h-[16px]" />}
         </div>
         {subtitle && (

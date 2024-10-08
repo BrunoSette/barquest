@@ -68,9 +68,9 @@ export function DashboardComponent({
         </Link>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-2 grid-cols-3">
         <StatCard
-          title="Total Questions Attempted"
+          title="Total Questions"
           value={totalAnswers}
           icon={BookOpen}
           subtitle={
@@ -97,13 +97,12 @@ export function DashboardComponent({
           icon={CheckCircle}
           subtitle={
             correctAnswers !== null && totalAnswers > 0
-              ? `And ${totalAnswers - correctAnswers} incorrect in ${
+              ? `${totalAnswers - correctAnswers} Incorrect in ${
                   testHistory.length
-                } tests taken`
+                } tests`
               : undefined
           }
         />
-
         <StatCard
           title="Total Score"
           value={
