@@ -98,8 +98,8 @@ export function DashboardComponent({
           subtitle={
             correctAnswers !== null && totalAnswers > 0
               ? `${totalAnswers - correctAnswers} Incorrect in ${
-                  testHistory.length
-                } tests`
+                  testHistory.length === 1 ? '1 test' : `${testHistory.length} tests`
+                }`
               : undefined
           }
         />
