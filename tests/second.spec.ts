@@ -229,78 +229,105 @@ test.describe("User Journey Tests", () => {
 
   test("test dashboard data", async () => {
     await login("teste@teste.ca", "12345678");
+    const numberOfQuestions = 2;
+
     console.log("Login successful - test dashboard data");
 
-    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({
+    // Verify initial dashboard state
+    await verifyDashboardState("Dashboard", "Total Questions0");
+
+    // Create a new test
+    await createNewTest(numberOfQuestions);
+
+    // Complete the quiz
+    await completeQuiz(numberOfQuestions);
+
+    // Verify updated dashboard state
+    await verifyDashboardState(
+      "Dashboard",
+      `Total Questions${numberOfQuestions + 1}`
+    );
+
+    // View and verify test details
+    await viewAndVerifyTestDetails();
+
+    // Delete the test and verify
+    await deleteTestAndVerify();
+
+    await page.close();
+  });
+
+  async function verifyDashboardState(
+    headingText: string,
+    questionsText: string
+  ) {
+    await expect(page.getByRole("heading", { name: headingText })).toBeVisible({
       timeout: TIMEOUT,
     });
-    await expect(page.getByText("Total Questions0")).toBeVisible();
-    console.log("Dashboard data verified");
+    await expect(page.getByText(questionsText)).toBeVisible();
+    console.log(`Dashboard state verified: ${headingText}, ${questionsText}`);
+  }
+
+  async function createNewTest(numberOfQuestions: number) {
     await page
       .getByRole("main")
       .getByRole("button", { name: "Create a New Test" })
       .click();
-
     console.log("Navigated to 'Create a New Test' section");
 
-    await page.locator("#numberOfQuestions").dblclick();
-    await page.keyboard.press("Backspace");
-    await page.keyboard.press("Backspace");
-    await page.keyboard.press("2");
-
+    await page.locator("#numberOfQuestions").fill(numberOfQuestions.toString());
     await page.getByRole("button", { name: "Create Test" }).click();
-    await expect(page.getByText("Question 1 of 2")).toBeVisible();
+    await expect(
+      page.getByText(`Question 1 of ${numberOfQuestions}`)
+    ).toBeVisible();
+  }
 
-    await page.getByRole("radio").first().click();
-
-    await page.getByRole("button", { name: "Submit Answer" }).click();
-    await page.getByRole("button", { name: "Next Question" }).click();
-    console.log("Answered first question");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    await page.getByRole("radio").first().click();
-    await page.getByRole("button", { name: "Submit Answer" }).click();
-    console.log("Answered second question");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  async function completeQuiz(numberOfQuestions: number) {
+    for (let i = 1; i <= numberOfQuestions; i++) {
+      await page.getByRole("radio").first().click();
+      await page.getByRole("button", { name: "Submit Answer" }).click();
+      if (i < numberOfQuestions) {
+        await page.getByRole("button", { name: "Next Question" }).click();
+      }
+      console.log(`Answered question ${i}`);
+      await page.waitForTimeout(1000);
+    }
 
     await expect(page.getByRole("button", { name: "Finish" })).toBeVisible();
     await page.getByRole("button", { name: "Finish" }).click();
     console.log("Finished quiz");
     await page.goto(`${BASE_URL}/dashboard`);
     console.log("Navigated to dashboard");
-    console.log("Verifying dashboard data 3 questions?");
-    await expect(page.getByText("Total Questions3")).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "1", exact: true })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "View Test Details" })
-    ).toBeVisible();
+  }
+
+  async function viewAndVerifyTestDetails() {
     await page.getByRole("button", { name: "View Test Details" }).click();
     await expect(
       page.getByRole("heading", { name: "Test Details" })
     ).toBeVisible();
-    console.log("Verifying questions details");
     await expect(
       page.getByRole("heading", { name: /Question 1:/ })
     ).toBeVisible();
+    console.log("Test details verified");
     await page.getByRole("button", { name: "Close" }).click();
-    console.log("Verifying delete button");
-    await expect(
-      page.getByRole("row", { name: /1/ }).locator("div").getByRole("button")
-    ).toBeVisible();
-    await page
+  }
+
+  async function deleteTestAndVerify() {
+    const deleteButton = page
       .getByRole("row", { name: /1/ })
       .locator("div")
-      .getByRole("button")
-      .click();
-    console.log("Verifying delete modal...  ");
+      .getByRole("button");
+    await expect(deleteButton).toBeVisible();
+    await deleteButton.click();
+
     await expect(page.getByLabel("Are you absolutely sure?")).toBeVisible();
-    console.log("Deleting test...");
     await page.getByRole("button", { name: "Delete" }).click();
-    console.log("Verifying dashboard data updated...");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log("Test deleted");
+
+    await page.waitForTimeout(1000);
     await expect(page.getByText("Total Questions3")).not.toBeVisible();
-    console.log("Test dashboard data completed");
-    await page.close();
-  });
+    await expect(page.getByText("Total Questions0")).toBeVisible();
+
+    console.log("Dashboard data updated after deletion");
+  }
 });
