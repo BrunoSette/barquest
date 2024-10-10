@@ -89,12 +89,17 @@ export function ManageQuestionsComponent() {
   };
 
   const filteredQuestions = questions.filter((q) => {
+    const searchTermLower = searchTerm.toLowerCase();
     const matchesSearch =
-      (q.subject &&
-        q.subject.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (q.subject && q.subject.toLowerCase().includes(searchTermLower)) ||
       (q.questionText &&
-        q.questionText.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+        q.questionText.toLowerCase().includes(searchTermLower)) ||
+      (q.choices &&
+        q.choices.some((choice) =>
+          choice.toLowerCase().includes(searchTermLower)
+        )) ||
+      (q.comments && q.comments.toLowerCase().includes(searchTermLower));
+
     const matchesApprovalStatus = showOnlyUnapproved ? !q.is_approved : true;
 
     return matchesSearch && matchesApprovalStatus;
