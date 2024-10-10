@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   CircleIcon,
@@ -18,25 +15,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUser } from "@/lib/auth";
+import { getUser } from "@/lib/db/queries";
 import { signOut } from "@/app/(login)/actions";
-import { useRouter } from "next/navigation";
 import { DashboardIcon } from "@radix-ui/react-icons";
 
-function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, setUser } = useUser();
-  const router = useRouter();
-
-  async function handleSignOut() {
-    setUser(null);
-    await signOut();
-    router.push("/");
-  }
-
-  const handleMenuItemClick = () => {
-    setIsMenuOpen(false);
-  };
+async function Header() {
+  const user = await getUser();
 
   return (
     <header className="border-b border-gray-200">
@@ -49,7 +33,7 @@ function Header() {
         </Link>
         <div className="flex items-center space-x-2">
           {user ? (
-            <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer size-8">
                   <AvatarImage alt={user.name || ""} />
@@ -63,81 +47,50 @@ function Header() {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="p-0">
-                <DropdownMenuItem
-                  className="w-full cursor-pointer m-1"
-                  onSelect={handleMenuItemClick}
-                >
-                  <Link
-                    href="/dashboard"
-                    className="flex w-full items-center"
-                    onClick={handleMenuItemClick}
-                  >
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                  <Link href="/dashboard" className="flex w-full items-center">
                     <DashboardIcon className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="w-full cursor-pointer m-1"
-                  onSelect={handleMenuItemClick}
-                >
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
                     href="/dashboard/newtest"
                     className="flex w-full items-center"
-                    onClick={handleMenuItemClick}
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     <span>Create Test</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="w-full cursor-pointer m-1"
-                  onSelect={handleMenuItemClick}
-                >
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
                     href="/dashboard/videos"
                     className="flex w-full items-center"
-                    onClick={handleMenuItemClick}
                   >
                     <Video className="mr-2 h-4 w-4" />
                     <span>User Guide</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="w-full cursor-pointer m-1"
-                  onSelect={handleMenuItemClick}
-                >
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
                     href="/dashboard/subscription"
                     className="flex w-full items-center"
-                    onClick={handleMenuItemClick}
                   >
                     <BookCheck className="mr-2 h-4 w-4" />
                     <span>My Subscription</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="w-full cursor-pointer m-1"
-                  onSelect={handleMenuItemClick}
-                >
+                <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
                     href="/dashboard/general"
                     className="flex w-full items-center"
-                    onClick={handleMenuItemClick}
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
-                <form action={handleSignOut} className="p-1">
-                  <button
-                    type="submit"
-                    className="flex w-full"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleMenuItemClick();
-                      handleSignOut();
-                    }}
-                  >
+                <form action={signOut} className="p-1">
+                  <button type="submit" className="flex w-full">
                     <DropdownMenuItem className="w-full cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>
@@ -160,7 +113,11 @@ function Header() {
   );
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <section className="flex flex-col min-h-screen">
       <Header />

@@ -111,6 +111,7 @@ export default function HomePage() {
                   mirror the actual Ontario Bar Exam. With tailored questions,
                   you’ll ensure you&apos;re practicing exactly what you need to
                   know.
+
                 </p>
                 <p className="mt-3 max-w-3xl text-lg text-gray-500">
                   Focus your efforts on the most relevant topics, and track your
