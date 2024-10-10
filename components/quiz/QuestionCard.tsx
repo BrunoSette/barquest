@@ -103,12 +103,16 @@ export default function QuestionCard({
           })}
         </RadioGroup>
         {isTutor && isAnswered && (
-          <p className="text-lg mb-6 text-gray-600">{question.comments}</p>
+          <p className="pt-4 mb-6 text-gray-600">{question.comments}</p>
         )}
       </CardContent>
       <CardFooter className="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2">
         {!isFirstQuestion && (
-          <Button onClick={handlePreviousQuestion} variant="outline" className="w-full sm:w-auto">
+          <Button
+            onClick={handlePreviousQuestion}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Previous Question
           </Button>
@@ -119,13 +123,17 @@ export default function QuestionCard({
             <Button
               onClick={handleSubmitAnswer}
               disabled={selectedAnswer === null}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-orange-500 hover:bg-orange-800 text-white  px-8 py-4 inline-flex items-center justify-center"
             >
               Submit Answer
             </Button>
           )}
           {!isLastQuestion && (
-            <Button onClick={handleNextQuestion} variant="outline" className="w-full sm:w-auto">
+            <Button
+              onClick={handleNextQuestion}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
               Next Question
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
