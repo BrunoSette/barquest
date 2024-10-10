@@ -78,15 +78,24 @@ export function DashboardComponent({
             correctAnswers !== null &&
             totalAnswers > 0
               ? (() => {
+                  const now = new Date();
+                  // Get the date exactly 7 days ago (start of "last week")
+                  const oneWeekAgo = new Date(now);
+                  oneWeekAgo.setDate(now.getDate() - 7);
+
+                  // Get the date at the start of today (end of "last week")
+                  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+
+                  // Filter for tests between oneWeekAgo and startOfToday (only last week's tests)
                   const lastWeekQuestions = testHistory
-                    .filter(
-                      (test) =>
-                        new Date(test.date) >=
-                        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-                    )
+                    .filter((test) => {
+                      const testDate = new Date(test.date);
+                      return testDate >= oneWeekAgo && testDate < startOfToday;
+                    })
                     .reduce((sum, test) => sum + test.questions, 0);
+
                   const difference = totalAnswers - lastWeekQuestions;
-                  return `${difference} from last week`;
+                  return `+${difference} from last week`;
                 })()
               : undefined
           }
@@ -98,8 +107,10 @@ export function DashboardComponent({
           subtitle={
             correctAnswers !== null && totalAnswers > 0
               ? `${totalAnswers - correctAnswers} Incorrect in ${
-                  testHistory.length
-                } tests`
+                  testHistory.length === 1
+                    ? "1 test"
+                    : `${testHistory.length} tests`
+                }`
               : undefined
           }
         />
@@ -116,15 +127,47 @@ export function DashboardComponent({
             correctAnswers !== null &&
             totalAnswers > 0
               ? (() => {
-                  const lastWeekScore = testHistory
-                    .filter(
-                      (test) =>
-                        new Date(test.date) >=
-                        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-                    )
-                    .reduce((sum, test) => sum + test.score, 0);
+                  const now = new Date();
+                  // Get the date exactly 7 days ago (start of "last week")
+                  const oneWeekAgo = new Date(now);
+                  oneWeekAgo.setDate(now.getDate() - 7);
+
+                  // Get the date at the start of today (end of "last week")
+                  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+
+                  // Filter for tests between oneWeekAgo and startOfToday (only last week's tests)
+                  const lastWeekTests = testHistory.filter((test) => {
+                    const testDate = new Date(test.date);
+                    return testDate >= oneWeekAgo && testDate < startOfToday;
+                  });
+
+                  if (lastWeekTests.length === 0) {
+                    // If no tests from last week, set last week score to 0
+                    const currentScore = (correctAnswers / totalAnswers) * 100;
+                    console.log("current score", currentScore);
+                    console.log("last week score", 0);
+                    console.log("difference", currentScore); // Difference is just the current score
+                    return `+${currentScore.toFixed(1)}% from last week`;
+                  }
+
+                  const lastWeekCorrect = lastWeekTests.reduce(
+                    (sum, test) => sum + test.score,
+                    0
+                  );
+                  const lastWeekTotal = lastWeekTests.reduce(
+                    (sum, test) => sum + test.questions,
+                    0
+                  );
+
+                  const lastWeekScore =
+                    lastWeekTotal > 0
+                      ? (lastWeekCorrect / lastWeekTotal) * 100
+                      : 0;
                   const currentScore = (correctAnswers / totalAnswers) * 100;
+                  console.log("current score", currentScore);
+                  console.log("last week score", lastWeekScore);
                   const difference = currentScore - lastWeekScore;
+                  console.log("difference", difference);
                   return `${difference > 0 ? "+" : ""}${difference.toFixed(
                     1
                   )}% from last week`;

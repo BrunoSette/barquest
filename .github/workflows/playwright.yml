@@ -8,8 +8,7 @@ on:
 
 jobs:
   PlayWriteTests:
-  PlayWriteTests:
-    timeout-minutes: 60
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     environment: preview
 
@@ -82,10 +81,6 @@ jobs:
       - name: Run Playwright tests with tracing
         run: |
           mkdir -p test-results
-          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" \
-            npx playwright test --trace on --output=test-results --timeout 90000 --retries 2
-        env:
-          PLAYWRIGHT_TEST_BASE_URL: ${{ env.PREVIEW_URL }}
           xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" \
             npx playwright test --trace on --output=test-results --timeout 90000 --retries 2
         env:
