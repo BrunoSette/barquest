@@ -12,6 +12,7 @@ import {
   Settings,
   Pencil,
   Video,
+  ClipboardList,
   FolderPlus,
   LayoutDashboard,
   BookCheck,
@@ -52,6 +53,11 @@ export default function DashboardLayout({
       icon: FileQuestion,
       label: "Questions",
       subItems: [
+        {
+          href: "/dashboard/questions/summary",
+          icon: ClipboardList,
+          label: "Summary",
+        },
         {
           href: "/dashboard/questions/create",
           icon: FolderPlus,

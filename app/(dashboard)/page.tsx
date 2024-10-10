@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, FileQuestion, Database, ChartArea } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import HeroImage from "../public/imagem2.png";
-import AnalyticsImage from "../public/229shots_so.png";
-import QuestionsImage from "../public/questions.png";
-import IphoneMockup from "../public/iphone.png";
+import HeroImage from "../public/lady.webp";
+import AnalyticsImage from "../public/dashboard.webp";
+import QuestionsImage from "../public/questions.webp";
+import IphoneMockup from "../public/iphone.webp";
 import dynamic from "next/dynamic";
 const PricingComponent = dynamic(
   () => import("@/app/(dashboard)/pricing/page"),
@@ -32,7 +32,7 @@ export default function HomePage() {
                 </p>
                 <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                   <Link href="#pricing">
-                    <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full text-lg px-8 py-4 inline-flex items-center justify-center">
+                    <Button className="bg-orange-500 hover:bg-orange-800 text-white rounded-full text-lg px-8 py-4 inline-flex items-center justify-center">
                       Start My 7 Days Free Trial
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
@@ -43,8 +43,9 @@ export default function HomePage() {
                 <Image
                   src={HeroImage}
                   alt="Student preparing for Ontario Bar Exam"
-                  width={800}
-                  height={600}
+                  width={1280}
+                  height={800}
+                  quality={100}
                   className="rounded-lg object-contain h-80 w-full"
                 />
               </div>
@@ -121,8 +122,9 @@ export default function HomePage() {
                   className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={QuestionsImage}
                   alt="Study materials screenshot"
-                  width={600}
-                  height={500}
+                  width={1200}
+                  height={800}
+                  quality={100}
                 />
               </div>
             </div>
@@ -141,8 +143,9 @@ export default function HomePage() {
                   className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={AnalyticsImage}
                   alt="Performance analytics dashboard"
-                  width={600}
-                  height={500}
+                  width={1187}
+                  height={645}
+                  quality={100}
                 />
               </div>
               <div>
@@ -191,8 +194,9 @@ export default function HomePage() {
                   className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={IphoneMockup}
                   alt="BarQuest on mobile devices"
-                  width={600}
-                  height={500}
+                  width={956}
+                  height={660}
+                  unoptimized={true}
                 />
               </div>
             </div>

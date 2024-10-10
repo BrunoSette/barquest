@@ -17,7 +17,7 @@ export function SubmitButton() {
       }
       type="submit"
       disabled={pending}
-      className="w-full bg-white hover:bg-gray-100 text-black border border-gray-200 rounded-full flex text-lg items-center justify-center"
+      className="w-full bg-white hover:bg-orange-400 hover:text-white text-black border border-gray-200 rounded-full flex text-lg items-center justify-center"
     >
       {pending ? (
         <div className="flex items-center">

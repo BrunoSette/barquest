@@ -1,4 +1,11 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { COLORS } from "@/lib/utils";
@@ -10,7 +17,10 @@ interface PerformanceHistoryChartProps {
   loading: boolean;
 }
 
-export function PerformanceHistoryChart({ testHistory, loading }: PerformanceHistoryChartProps) {
+export function PerformanceHistoryChart({
+  testHistory,
+  loading,
+}: PerformanceHistoryChartProps) {
   const performanceHistory = testHistory.map((test) => ({
     date: new Date(test.date).toLocaleString(),
     score: (test.score / test.questions) * 100,
@@ -27,7 +37,6 @@ export function PerformanceHistoryChart({ testHistory, loading }: PerformanceHis
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={performanceHistory}>
-              <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
                 style={{ fontSize: "12px" }}

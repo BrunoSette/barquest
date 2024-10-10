@@ -37,7 +37,7 @@ export const PerformanceBySubjectCard: React.FC<PerformanceCardProps> = ({
             <BarChart
               data={processedData}
               layout="horizontal"
-              margin={{ top: 10, right: 2, left: 2, bottom: 2 }}
+              // margin={{ top: 18, right: 2, left: 2, bottom: 0 }}
             >
               <XAxis
                 dataKey="subject"
@@ -56,6 +56,7 @@ export const PerformanceBySubjectCard: React.FC<PerformanceCardProps> = ({
                   "Correct",
                 ]}
                 contentStyle={{ fontSize: "14px" }}
+                cursor={{ fill: "transparent" }}
               />
               <Bar dataKey="percentage" fill={COLORS[1]} name="Correct">
                 <LabelList
