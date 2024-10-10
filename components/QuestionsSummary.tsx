@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+
 type SubjectQuestionCount = {
   name: string;
   questions: number;
@@ -12,6 +13,7 @@ type SubjectQuestionCount = {
 type QuestionsSummaryProps = {
   subjectCounts: SubjectQuestionCount[];
 };
+
 
 const Counter = ({
   value,
