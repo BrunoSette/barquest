@@ -1,7 +1,10 @@
 "use server";
 
 import { Question } from "@/lib/db/schema";
+import { cookies } from "next/headers";
 import { db } from "@/lib/db/drizzle";
+import { users } from "@/lib/db/schema";
+
 import { eq, inArray, not, sql, and } from "drizzle-orm";
 import { questions, testHistory, userAnswers } from "@/lib/db/schema";
 
@@ -200,4 +203,19 @@ export async function resetTestState(userId: number) {
     .returning({ id: testHistory.id });
 
   return newTest[0].id;
+}
+
+export async function getUser() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
+
+  if (!token) {
+    return null;
+  }
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, Number(token.value)),
+  });
+
+  return user;
 }
