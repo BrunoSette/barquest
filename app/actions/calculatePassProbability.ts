@@ -3,7 +3,6 @@
 import { db } from "@/lib/db/drizzle";
 import { userAnswers } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-// @ts-ignore
 import { jStat } from "jstat";
 
 interface ProbabilityResult {

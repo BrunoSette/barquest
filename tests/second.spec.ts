@@ -144,6 +144,7 @@ test.describe("User Journey Tests", () => {
     await page
       .getByRole("main")
       .getByRole("button", { name: "Create a New Test" })
+      .first()
       .click({ timeout: TIMEOUT });
     await expect(page.getByRole("heading", { name: "Test Mode" })).toBeVisible({
       timeout: TIMEOUT,
@@ -272,6 +273,7 @@ test.describe("User Journey Tests", () => {
     await page
       .getByRole("main")
       .getByRole("button", { name: "Create a New Test" })
+      .first()
       .click();
     console.log("Navigated to 'Create a New Test' section");
 

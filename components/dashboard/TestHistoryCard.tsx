@@ -56,23 +56,6 @@ export const TestHistoryCard: React.FC<TestHistoryCardProps> = ({
     [testHistory]
   );
 
-  const totalQuestions = useMemo(
-    () =>
-      sortedTestHistory.reduce((acc, test) => acc + Number(test.questions), 0),
-    [sortedTestHistory]
-  );
-
-  const averageScore = useMemo(() => {
-    if (sortedTestHistory.length === 0) return "0";
-    const totalScore = sortedTestHistory.reduce((acc, test) => {
-      if (Number(test.questions) > 0) {
-        return acc + (test.score / Number(test.questions)) * 100;
-      }
-      return acc;
-    }, 0);
-    return (totalScore / sortedTestHistory.length).toFixed(0);
-  }, [sortedTestHistory]);
-
   const handleDelete = async (testId: number) => {
     try {
       await deleteTestHistory(testId);
@@ -161,13 +144,6 @@ export const TestHistoryCard: React.FC<TestHistoryCardProps> = ({
             <TableBody>
               {sortedTestHistory.map(renderTableRow)}
               <TableRow>
-                <TableCell className="text-center font-bold">Total</TableCell>
-                <TableCell className="text-center font-bold">
-                  {averageScore}%
-                </TableCell>
-                <TableCell className="text-center font-bold">
-                  {totalQuestions}
-                </TableCell>
                 <TableCell className="text-center"></TableCell>
                 <TableCell className="text-center"></TableCell>
                 <TableCell className="text-center"></TableCell>

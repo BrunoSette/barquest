@@ -109,7 +109,29 @@ export function DashboardComponent({
         <div className="md:col-span-2">
           {totalAnswers >= 30 ? (
             <ProbabilityGauge
-              probabilityData={probabilityData}
+              probabilityData={
+                probabilityData
+                  ? {
+                      ...probabilityData,
+                      passProbabilityLower:
+                        probabilityData.passProbability -
+                        probabilityData.marginOfError,
+                      passProbabilityUpper:
+                        probabilityData.passProbability +
+                        probabilityData.marginOfError,
+                      lower: Math.max(
+                        0,
+                        probabilityData.passProbability -
+                          probabilityData.marginOfError
+                      ),
+                      upper: Math.min(
+                        100,
+                        probabilityData.passProbability +
+                          probabilityData.marginOfError
+                      ),
+                    }
+                  : null
+              }
               loading={loading}
             />
           ) : (
