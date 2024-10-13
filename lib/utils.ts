@@ -12,11 +12,11 @@ export const getURL = (path: string = "") => {
     process.env.NEXT_PUBLIC_SITE_URL.trim() !== ""
       ? process.env.NEXT_PUBLIC_SITE_URL
       : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-        process?.env?.NEXT_PUBLIC_VERCEL_URL &&
-          process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : // If neither is set, default to localhost for local development.
-          "http://localhost:3000/";
+      process?.env?.NEXT_PUBLIC_VERCEL_URL &&
+        process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
+      ? process.env.NEXT_PUBLIC_VERCEL_URL
+      : // If neither is set, default to localhost for local development.
+        "http://localhost:3000/";
 
   // Trim the URL and remove trailing slash if exists.
   url = url.replace(/\/+$/, "");
@@ -49,7 +49,7 @@ export const COLORS = ["#F97316", "#3B82F6"]; // Orange and Blue
 export const Products = [
   {
     id: "1",
-    name: "BarQuest - Barrister",
+    name: "BarQuest Barrister",
     description: "Barrister Test",
     price: 14700,
     interval: "3 months",
@@ -66,7 +66,7 @@ export const Products = [
   },
   {
     id: "2",
-    name: "BarQuest - Solicitor",
+    name: "BarQuest Solicitor",
     description: "Solicitor Test",
     price: 14700,
     interval: "3 months",
@@ -83,7 +83,7 @@ export const Products = [
   },
   {
     id: "3",
-    name: "BarQuest - Full",
+    name: "BarQuest Full",
     description: "Full Test",
     price: 24700,
     interval: "3 months",
