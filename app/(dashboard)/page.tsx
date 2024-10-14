@@ -6,11 +6,7 @@ import HeroImage from "../public/lady.webp";
 import AnalyticsImage from "../public/dashboard.webp";
 import QuestionsImage from "../public/questions.webp";
 import IphoneMockup from "../public/iphone.webp";
-import dynamic from "next/dynamic";
-const PricingComponent = dynamic(
-  () => import("@/app/(dashboard)/pricing/page"),
-  { ssr: true }
-);
+import { PricingComponent } from "@/app/(dashboard)/pricing/page";
 
 export default function HomePage() {
   return (
