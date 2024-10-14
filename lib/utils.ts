@@ -44,6 +44,14 @@ export const subjects = [
   { id: 8, name: "Real Estate", test: "Solicitor" },
 ];
 
+export const barristerSubjects = subjects.filter(subject => 
+  subject.test === "Barrister" || (Array.isArray(subject.test) && subject.test.includes("Barrister"))
+).map(subject => subject.name);
+
+export const solicitorSubjects = subjects.filter(subject => 
+  subject.test === "Solicitor" || (Array.isArray(subject.test) && subject.test.includes("Solicitor"))
+).map(subject => subject.name);
+
 export const COLORS = ["#F97316", "#3B82F6"]; // Orange and Blue
 
 export const Products = [
