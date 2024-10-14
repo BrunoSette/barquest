@@ -2,10 +2,63 @@ import { checkoutAction } from "@/lib/payments/actions";
 import { Check } from "lucide-react";
 import { getStripePrices, getStripeProducts } from "@/lib/payments/stripe";
 import { SubmitButton } from "./submit-button";
-import { Products } from "@/lib/utils";
 
 // Prices are fresh for one hour max
 export const revalidate = 3600;
+
+export const Products = [
+  {
+    id: "1",
+    name: "BarQuest Barrister",
+    description: "Barrister Test",
+    price: 14700,
+    interval: "3 months",
+    trialDays: 7,
+    features: [
+      "+500 Questions with Commentary",
+      "Unlimited Usage for 3 months",
+      "Real-Time Progress Tracking",
+      "Mobile-Friendly Access",
+      "Instant Feedback",
+      "Regular Content Updates",
+      "7 Days Risk-Free Trial",
+    ],
+  },
+  {
+    id: "2",
+    name: "BarQuest Solicitor",
+    description: "Solicitor Test",
+    price: 14700,
+    interval: "3 months",
+    trialDays: 7,
+    features: [
+      "+500 Questions with Commentary",
+      "Unlimited Usage for 3 months",
+      "Real-Time Progress Tracking",
+      "Mobile-Friendly Access",
+      "Instant Feedback",
+      "Regular Content Updates",
+      "7 Days Risk-Free Trial",
+    ],
+  },
+  {
+    id: "3",
+    name: "BarQuest Full",
+    description: "Full Test",
+    price: 24700,
+    interval: "3 months",
+    trialDays: 7,
+    features: [
+      "+900 Questions with Commentary",
+      "Unlimited Usage for 3 months",
+      "Real-Time Progress Tracking",
+      "Mobile-Friendly Access",
+      "Instant Feedback",
+      "Regular Content Updates",
+      "7 Days Risk-Free Trial",
+    ],
+  },
+];
 
 export async function PricingComponent() {
   const [prices, products] = await Promise.all([
