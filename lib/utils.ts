@@ -44,15 +44,58 @@ export const subjects = [
   { id: 8, name: "Real Estate", test: "Solicitor" },
 ];
 
-export const barristerSubjects = subjects.filter(subject => 
-  subject.test === "Barrister" || (Array.isArray(subject.test) && subject.test.includes("Barrister"))
-).map(subject => subject.name);
-
-export const solicitorSubjects = subjects.filter(subject => 
-  subject.test === "Solicitor" || (Array.isArray(subject.test) && subject.test.includes("Solicitor"))
-).map(subject => subject.name);
-
 export const COLORS = ["#F97316", "#3B82F6"]; // Orange and Blue
 
-
-
+export const Products = [
+  {
+    id: "1",
+    name: "BarQuest Barrister",
+    description: "Barrister Test",
+    price: 14700,
+    interval: "3 months",
+    trialDays: 7,
+    features: [
+      "+2200 Questions with Commentary",
+      "Unlimited Usage",
+      "Real-Time Progress Tracking",
+      "Mobile-Friendly Access",
+      "Instant Feedback",
+      "Regular Content Updates",
+      "7 Days Risk-Free Trial",
+    ],
+  },
+  {
+    id: "2",
+    name: "BarQuest Solicitor",
+    description: "Solicitor Test",
+    price: 14700,
+    interval: "3 months",
+    trialDays: 7,
+    features: [
+      "+2200 Questions with Commentary",
+      "Unlimited Usage",
+      "Real-Time Progress Tracking",
+      "Mobile-Friendly Access",
+      "Instant Feedback",
+      "Regular Content Updates",
+      "7 Days Risk-Free Trial",
+    ],
+  },
+  {
+    id: "3",
+    name: "BarQuest Full",
+    description: "Full Test",
+    price: 24700,
+    interval: "3 months",
+    trialDays: 7,
+    features: [
+      "+4400 Questions with Commentary",
+      "Unlimited Usage",
+      "Real-Time Progress Tracking",
+      "Mobile-Friendly Access",
+      "Instant Feedback",
+      "Regular Content Updates",
+      "7 Days Risk-Free Trial",
+    ],
+  },
+];
