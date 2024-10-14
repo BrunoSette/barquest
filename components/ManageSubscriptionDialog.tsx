@@ -64,7 +64,7 @@ export function PricingDialog({
               <h4 className="text-xl font-semibold">Create a plan and get:</h4>
               <ul className="space-y-2">
                 {[
-                  "Unlimited test creation",
+                  "Unlimited test creation for 3 months",
                   "Advanced analytics",
                   "Graphs and charts",
                   "Customizable test settings",

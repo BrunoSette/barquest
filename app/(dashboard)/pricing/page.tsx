@@ -79,15 +79,17 @@ export default async function PricingPage() {
   }) {
     return (
       <div className="pt-6 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center">
-        <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">{name}</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">
+          {name}
+        </h2>
         <p className="text-sm text-gray-600 mb-4 text-center">
           with {trialDays} day free trial
         </p>
         <p className="text-4xl font-medium text-gray-900 mb-6 text-center">
           ${(price ?? 0) / 100}{" "}
-          <span className="text-xl font-normal text-gray-600">
+          {/* <span className="text-xl font-normal text-gray-600">
             / {interval}
-          </span>
+          </span> */}
         </p>
         <ul className="space-y-4 mb-8 w-full">
           {features.map((feature, index) => (
