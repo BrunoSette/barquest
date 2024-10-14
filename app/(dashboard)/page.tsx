@@ -44,6 +44,8 @@ export default function HomePage() {
                   src={HeroImage}
                   alt="Student preparing for Ontario Bar Exam"
                   width={1280}
+                  loading="eager"
+                  priority={true}
                   height={800}
                   quality={100}
                   className="rounded-lg object-contain h-80 w-full"
@@ -111,7 +113,6 @@ export default function HomePage() {
                   mirror the actual Ontario Bar Exam. With tailored questions,
                   you’ll ensure you&apos;re practicing exactly what you need to
                   know.
-
                 </p>
                 <p className="mt-3 max-w-3xl text-lg text-gray-500">
                   Focus your efforts on the most relevant topics, and track your
@@ -122,6 +123,7 @@ export default function HomePage() {
                 <Image
                   className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={QuestionsImage}
+                  loading="lazy"
                   alt="Study materials screenshot"
                   width={1200}
                   height={800}
@@ -143,6 +145,7 @@ export default function HomePage() {
                 <Image
                   className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={AnalyticsImage}
+                  loading="lazy"
                   alt="Performance analytics dashboard"
                   width={1187}
                   height={645}
@@ -194,6 +197,7 @@ export default function HomePage() {
                 <Image
                   className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={IphoneMockup}
+                  loading="lazy"
                   alt="BarQuest on mobile devices"
                   width={956}
                   height={660}

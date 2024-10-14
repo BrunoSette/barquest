@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { TeamDataWithMembers } from "@/lib/db/schema";
-import { Products, subjects } from "@/lib/utils";
+import { Products } from "@/lib/products";
+import { subjects } from "@/lib/utils";
 import { PricingDialog } from "@/components/ManageSubscriptionDialog";
 import Head from "next/head";
 

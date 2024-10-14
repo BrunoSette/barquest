@@ -4,6 +4,7 @@ import { Question } from "@/lib/db/schema";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db/drizzle";
 import { users } from "@/lib/db/schema";
+import { subjects } from "@/lib/db/schema";
 
 import { eq, inArray, not, sql, and } from "drizzle-orm";
 import { questions, testHistory, userAnswers } from "@/lib/db/schema";
@@ -218,4 +219,18 @@ export async function getUser() {
   });
 
   return user;
+}
+
+export async function getQuestionCountsBySubject() {
+  const result = await db
+    .select({
+      name: subjects.name,
+      questions: sql<number>`count(${questions.id})::int`,
+    })
+    .from(subjects)
+    .leftJoin(questions, eq(subjects.id, questions.subjectId))
+    .groupBy(subjects.id)
+    .orderBy(sql`count(${questions.id}) DESC`);
+
+  return result;
 }

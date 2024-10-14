@@ -5,12 +5,10 @@ import {
   teamMembers,
   teams,
   users,
-  subjects,
-  questions,
 } from "./schema";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth/session";
-import { sql } from "drizzle-orm";
+// import { sql } from "drizzle-orm";
 
 export async function getUser() {
   const sessionCookie = (await cookies()).get("session");
@@ -134,18 +132,4 @@ export async function getTeamForUser(userId: number) {
   });
 
   return result?.teamMembers[0]?.team || null;
-}
-
-export async function getQuestionCountsBySubject() {
-  const result = await db
-    .select({
-      name: subjects.name,
-      questions: sql<number>`count(${questions.id})::int`,
-    })
-    .from(subjects)
-    .leftJoin(questions, eq(subjects.id, questions.subjectId))
-    .groupBy(subjects.id)
-    .orderBy(sql`count(${questions.id}) DESC`);
-
-  return result;
 }

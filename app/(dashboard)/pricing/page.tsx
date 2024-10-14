@@ -2,7 +2,9 @@ import { checkoutAction } from "@/lib/payments/actions";
 import { Check } from "lucide-react";
 import { getStripePrices, getStripeProducts } from "@/lib/payments/stripe";
 import { SubmitButton } from "./submit-button";
-import { Products } from "@/lib/utils";
+import { barristerSubjects, solicitorSubjects } from "@/lib/utils";
+import { Products } from "@/lib/products";
+import { useEffect, useState } from 'react';
 
 // Prices are fresh for one hour max
 export const revalidate = 3600;
@@ -36,72 +38,112 @@ export default async function PricingPage() {
         as a Barrister or Solicitor.
       </h2>
       <div className="flex flex-wrap justify-center gap-8">
-        {productData.map(
-          ({
-            name,
-            stripePrice,
-            interval,
-            trialDays,
-            features,
-            stripeProduct,
-          }) =>
-            stripeProduct &&
-            stripePrice && (
-              <PricingCard
-                key={stripeProduct.id}
-                name={name}
-                price={stripePrice.unitAmount}
-                interval={interval}
-                trialDays={trialDays}
-                features={features}
-                priceId={stripePrice.id}
-              />
-            )
-        )}
+        <DynamicPricingCards productData={productData} />
       </div>
     </main>
   );
+}
 
-  function PricingCard({
-    name,
-    price,
-    interval,
-    trialDays,
-    features,
-    priceId,
-  }: {
-    name: string;
-    price: number | null;
-    interval: string;
-    trialDays: number;
-    features: string[];
-    priceId?: string;
-  }) {
-    return (
-      <div className="pt-6 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center">
-        <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">{name}</h2>
-        <p className="text-sm text-gray-600 mb-4 text-center">
-          with {trialDays} day free trial
-        </p>
-        <p className="text-4xl font-medium text-gray-900 mb-6 text-center">
-          ${(price ?? 0) / 100}{" "}
-          <span className="text-xl font-normal text-gray-600">
-            / {interval}
-          </span>
-        </p>
-        <ul className="space-y-4 mb-8 w-full">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-center justify-center">
-              <Check className="h-5 w-5 text-orange-500 mr-2 flex-shrink-0" />
-              <span className="text-gray-700">{feature}</span>
-            </li>
-          ))}
-        </ul>
-        <form action={checkoutAction} className="w-full flex justify-center">
-          <input type="hidden" name="priceId" value={priceId} />
-          <SubmitButton />
-        </form>
-      </div>
-    );
+function DynamicPricingCards({ productData }) {
+  const [questionCounts, setQuestionCounts] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/question-counts')
+      .then(response => response.json())
+      .then(data => setQuestionCounts(data))
+      .catch(error => console.error('Error fetching question counts:', error));
+  }, []);
+
+  if (!questionCounts) {
+    return <div>Loading...</div>;
   }
+
+  const barristerQuestions = questionCounts
+    .filter((subject) => barristerSubjects.includes(subject.name))
+    .reduce((acc, curr) => acc + curr.questions, 0);
+
+  const solicitorQuestions = questionCounts
+    .filter((subject) => solicitorSubjects.includes(subject.name))
+    .reduce((acc, curr) => acc + curr.questions, 0);
+
+  const totalQuestions = questionCounts.reduce(
+    (acc, curr) => acc + curr.questions,
+    0
+  );
+
+  return productData.map(
+    ({
+      name,
+      stripePrice,
+      interval,
+      trialDays,
+      features,
+      stripeProduct,
+    }) =>
+      stripeProduct &&
+      stripePrice && (
+        <PricingCard
+          key={stripeProduct.id}
+          name={name}
+          price={stripePrice.unitAmount}
+          interval={interval}
+          trialDays={trialDays}
+          features={features.map(feature => 
+            feature.includes('Questions with Commentary')
+              ? feature.replace('Questions with Commentary', `${
+                  name.includes('Barrister') ? barristerQuestions :
+                  name.includes('Solicitor') ? solicitorQuestions :
+                  totalQuestions
+                } Questions with Commentary`)
+              : feature
+          )}
+          priceId={stripePrice.id}
+        />
+      )
+  );
+}
+
+function PricingCard({
+  name,
+  price,
+  interval,
+  trialDays,
+  features,
+  priceId,
+}: {
+  name: string;
+  price: number | null;
+  interval: string;
+  trialDays: number;
+  features: string[];
+  priceId?: string;
+}) {
+  return (
+    <div className="pt-6 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center">
+      <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">
+        {name}
+      </h2>
+      <p className="text-sm text-gray-600 mb-4 text-center">
+        with {trialDays} day free trial
+      </p>
+      <p className="text-4xl font-medium text-gray-900 mb-6 text-center">
+        ${(price ?? 0) / 100}{" "}
+        <span className="text-xl font-normal text-gray-600">
+          / {interval}
+        </span>
+      </p>
+      <ul className="space-y-4 mb-8 w-full">
+        {features.map((feature, index) => (
+          <li key={index} className="flex items-center justify-center">
+            <Check className="h-5 w-5 text-orange-500 mr-2 flex-shrink-0" />
+            <span className="text-gray-700">{feature}</span>
+          </li>
+        ))}
+      </ul>
+      <form action={checkoutAction} className="w-full flex justify-center">
+        <input type="hidden" name="priceId" value={priceId} />
+        <SubmitButton />
+      </form>
+    </div>
+  );
 }
