@@ -7,7 +7,7 @@ import { Products } from "@/lib/utils";
 // Prices are fresh for one hour max
 export const revalidate = 3600;
 
-export default async function PricingPage() {
+export async function PricingComponent() {
   const [prices, products] = await Promise.all([
     getStripePrices(),
     getStripeProducts(),
@@ -79,7 +79,9 @@ export default async function PricingPage() {
   }) {
     return (
       <div className="pt-6 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center">
-        <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">{name}</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">
+          {name}
+        </h2>
         <p className="text-sm text-gray-600 mb-4 text-center">
           with {trialDays} day free trial
         </p>
@@ -105,3 +107,5 @@ export default async function PricingPage() {
     );
   }
 }
+
+export default PricingComponent;
