@@ -111,7 +111,6 @@ export default function HomePage() {
                   mirror the actual Ontario Bar Exam. With tailored questions,
                   you’ll ensure you&apos;re practicing exactly what you need to
                   know.
-
                 </p>
                 <p className="mt-3 max-w-3xl text-lg text-gray-500">
                   Focus your efforts on the most relevant topics, and track your
@@ -288,6 +287,24 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <p className="text-base text-gray-400">
             &copy; 2024 BarPrep. All rights reserved.
+            <Link
+              href="/terms-of-use"
+              className="text-orange-500 hover:underline ml-4"
+            >
+              Terms of Use
+            </Link>
+            <Link
+              href="/privacy-policy"
+              className="text-orange-500 hover:underline ml-4"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="mailto:support@barquest.ca"
+              className="text-orange-500 hover:underline ml-4"
+            >
+              Contact Us
+            </Link>
           </p>
         </div>
       </footer>
