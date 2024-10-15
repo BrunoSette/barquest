@@ -83,7 +83,7 @@ export const Products = [
   },
   {
     id: "3",
-    name: "BarQuest Full",
+    name: "Barquest - Full",
     description: "Full Test",
     price: 24700,
     interval: "3 months",

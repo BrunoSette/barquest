@@ -147,36 +147,60 @@ export async function handleSubscriptionChange(
 }
 
 export async function getStripePrices() {
-  const prices = await stripe.prices.list({
-    expand: ["data.product"],
-    active: true,
-    type: "recurring",
-  });
+  try {
+    console.log("Starting to fetch Stripe prices...");
+    const prices = await stripe.prices.list({
+      expand: ["data.product"],
+      active: true,
+      // Remove the type: "recurring" filter
+    });
 
-  return prices.data.map((price) => ({
-    id: price.id,
-    productId:
-      typeof price.product === "string" ? price.product : price.product.id,
-    unitAmount: price.unit_amount,
-    currency: price.currency,
-    interval: price.recurring?.interval,
-    trialPeriodDays: price.recurring?.trial_period_days,
-  }));
+    console.log("Fetched prices:", JSON.stringify(prices.data, null, 2));
+
+    const mappedPrices = prices.data.map((price) => ({
+      id: price.id,
+      productId:
+        typeof price.product === "string" ? price.product : price.product.id,
+      unitAmount: price.unit_amount,
+      currency: price.currency,
+      interval: price.recurring?.interval || "one_time",
+      trialPeriodDays: price.recurring?.trial_period_days,
+    }));
+
+    console.log("Mapped prices:", JSON.stringify(mappedPrices, null, 2));
+
+    return mappedPrices;
+  } catch (error) {
+    console.error("Error fetching Stripe prices:", error);
+    return [];
+  }
 }
 
 export async function getStripeProducts() {
-  const products = await stripe.products.list({
-    active: true,
-    expand: ["data.default_price"],
-  });
+  try {
+    console.log("Starting to fetch Stripe products...");
+    const products = await stripe.products.list({
+      active: true,
+      expand: ["data.default_price"],
+    });
 
-  return products.data.map((product) => ({
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    defaultPriceId:
-      typeof product.default_price === "string"
-        ? product.default_price
-        : product.default_price?.id,
-  }));
+    console.log("Fetched products:", JSON.stringify(products.data, null, 2));
+
+    const mappedProducts = products.data.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      defaultPriceId:
+        typeof product.default_price === "string"
+          ? product.default_price
+          : product.default_price?.id,
+    }));
+
+    console.log("Mapped products:", JSON.stringify(mappedProducts, null, 2));
+
+    return mappedProducts;
+  } catch (error) {
+    console.error("Error fetching Stripe products:", error);
+    return [];
+  }
 }
