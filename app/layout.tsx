@@ -4,7 +4,6 @@ import { Manrope } from "next/font/google";
 import { UserProvider } from "@/lib/auth";
 import { getUser } from "@/lib/db/queries";
 import { GoogleTagManager } from "@next/third-parties/google";
-import Script from "next/script";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -32,30 +31,29 @@ export default function RootLayout({
       className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
     >
       <head>
-        <Script
-          id="gtm-script"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-53LR5KCC');
-            `,
-          }}
+        {/* <link rel="icon" href="/favicon.ico" /> */}
+        <meta
+          name="description"
+          content="Your Ultimate Prep Tool for the Ontario Bar Exam"
         />
+        <meta
+          name="keywords"
+          content="BarQuest, Bar Exam, Ontario, Prep Tool, Law School, Legal Education"
+        />
+        <meta name="author" content="BarQuest" />
+        <meta
+          property="og:title"
+          content="BarQuest - Your Ultimate Prep Tool"
+        />
+        <meta
+          property="og:description"
+          content="Your Ultimate Prep Tool for the Ontario Bar Exam"
+        />
+        <meta property="og:url" content="https://barquest.ca" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="BarQuest" />
       </head>
       <body className="min-h-[100dvh] bg-gray-50">
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-53LR5KCC"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          ></iframe>
-        </noscript>
-
         <GoogleTagManager gtmId="GTM-53LR5KCC" />
         <SpeedInsights />
         <UserProvider userPromise={userPromise}>{children}</UserProvider>
