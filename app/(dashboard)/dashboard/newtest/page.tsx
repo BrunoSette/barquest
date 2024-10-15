@@ -7,7 +7,7 @@ export default async function NewTestPage() {
 
   if (!user) {
     console.log("No user found, redirecting to login");
-    redirect("/login");
+    redirect("/sign-in");
   }
 
   console.log("User found:", user);
