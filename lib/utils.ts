@@ -12,11 +12,11 @@ export const getURL = (path: string = "") => {
     process.env.NEXT_PUBLIC_SITE_URL.trim() !== ""
       ? process.env.NEXT_PUBLIC_SITE_URL
       : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-        process?.env?.NEXT_PUBLIC_VERCEL_URL &&
-          process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : // If neither is set, default to localhost for local development.
-          "http://localhost:3000/";
+      process?.env?.NEXT_PUBLIC_VERCEL_URL &&
+        process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
+      ? process.env.NEXT_PUBLIC_VERCEL_URL
+      : // If neither is set, default to localhost for local development.
+        "http://localhost:3000/";
 
   // Trim the URL and remove trailing slash if exists.
   url = url.replace(/\/+$/, "");
@@ -55,7 +55,7 @@ export const Products = [
     interval: "3 months",
     trialDays: 7,
     features: [
-      "+2200 Questions with Commentary",
+      "+500 Questions with Commentary",
       "Unlimited Usage",
       "Real-Time Progress Tracking",
       "Mobile-Friendly Access",
@@ -72,7 +72,7 @@ export const Products = [
     interval: "3 months",
     trialDays: 7,
     features: [
-      "+2200 Questions with Commentary",
+      "+500 Questions with Commentary",
       "Unlimited Usage",
       "Real-Time Progress Tracking",
       "Mobile-Friendly Access",
@@ -89,7 +89,7 @@ export const Products = [
     interval: "3 months",
     trialDays: 7,
     features: [
-      "+4400 Questions with Commentary",
+      "+900 Questions with Commentary",
       "Unlimited Usage",
       "Real-Time Progress Tracking",
       "Mobile-Friendly Access",
