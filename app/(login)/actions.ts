@@ -63,6 +63,7 @@ const signInSchema = z.object({
 
 export const signIn = validatedAction(signInSchema, async (data, formData) => {
   const { email, password } = data;
+  const lowerCaseEmail = email.toLowerCase(); // Convert email to lowercase
 
   const userWithTeam = await db
     .select({
@@ -72,7 +73,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
     .from(users)
     .leftJoin(teamMembers, eq(users.id, teamMembers.userId))
     .leftJoin(teams, eq(teamMembers.teamId, teams.id))
-    .where(eq(users.email, email))
+    .where(eq(users.email, lowerCaseEmail)) // Use lowercase email
     .limit(1);
 
   if (userWithTeam.length === 0) {
@@ -112,11 +113,12 @@ const signUpSchema = z.object({
 
 export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const { email, password, inviteId } = data;
+  const lowerCaseEmail = email.toLowerCase(); // Convert email to lowercase
 
   const existingUser = await db
     .select()
     .from(users)
-    .where(eq(users.email, email))
+    .where(eq(users.email, lowerCaseEmail)) // Use lowercase email
     .limit(1);
 
   if (existingUser.length > 0) {
@@ -126,7 +128,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const passwordHash = await hashPassword(password);
 
   const newUser: NewUser = {
-    email,
+    email: lowerCaseEmail, // Store email in lowercase
     passwordHash,
     role: "owner", // Default role, will be overridden if there's an invitation
   };
