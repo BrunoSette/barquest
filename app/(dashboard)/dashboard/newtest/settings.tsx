@@ -136,6 +136,7 @@ export function Settings({
               onChange={() => handleSubjectChange(subject.id)}
               disabled={
                 !(
+                  (planName === "BarQuest Full" && isActiveOrTrialing) ||
                   (planName === Products[productIndex].name &&
                     isActiveOrTrialing) ||
                   (planName === Products[2].name && isActiveOrTrialing)
@@ -145,7 +146,8 @@ export function Settings({
             <Label htmlFor={subject.name}>{subject.name}</Label>
           </div>
         ))}
-        {((planName === Products[productIndex].name && isActiveOrTrialing) ||
+        {((planName === "BarQuest Full" && isActiveOrTrialing) ||
+          (planName === Products[productIndex].name && isActiveOrTrialing) ||
           (planName === Products[2].name && isActiveOrTrialing)) && (
           <Button
             type="button"
