@@ -46,6 +46,7 @@ export function PerformanceHistoryChart({
                     ? "Invalid Date"
                     : format(parsedDate, "dd/MM");
                 }}
+                reversed={true}
               />
               <YAxis type="number" style={{ fontSize: "12px" }} />
               <Tooltip contentStyle={{ fontSize: "12px" }} />
