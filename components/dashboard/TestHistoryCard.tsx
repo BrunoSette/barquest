@@ -28,8 +28,7 @@ import { TestHistoryCardProps, TestHistoryItem } from "@/app/types";
 
 const formatDate = (date: string | number | Date | undefined) => {
   if (!date) return "N/A";
-  return new Date(date).toLocaleString("en-US", {
-    timeZone: "UTC",
+  return new Date(date).toLocaleString(undefined, {
     year: "numeric",
     month: "numeric",
     day: "numeric",
@@ -99,7 +98,13 @@ export const TestHistoryCard: React.FC<TestHistoryCardProps> = ({
       <TableCell className="text-center">
         <TestDetailsDialog
           testId={test.id}
-          testDate={test.date ? new Date(test.date).toUTCString() : undefined}
+          testDate={
+            test.date
+              ? new Date(test.date).toLocaleString("en-US", {
+                  timeZone: "UTC",
+                })
+              : undefined
+          }
         />
       </TableCell>
       <TableCell className="p-0">
