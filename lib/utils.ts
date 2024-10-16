@@ -72,7 +72,7 @@ export const Products = [
     interval: "3 months",
     trialDays: 7,
     features: [
-      "+500 Questions with Commentary",
+      "+600 Questions with Commentary",
       "Unlimited Usage",
       "Real-Time Progress Tracking",
       "Mobile-Friendly Access",
@@ -89,7 +89,7 @@ export const Products = [
     interval: "3 months",
     trialDays: 7,
     features: [
-      "+900 Questions with Commentary",
+      "+1000 Questions with Commentary",
       "Unlimited Usage",
       "Real-Time Progress Tracking",
       "Mobile-Friendly Access",
