@@ -11,9 +11,7 @@ export function SubmitButton() {
   return (
     <Button
       onClick={() =>
-        sendGAEvent("event", "buttonClicked", {
-          value: "Get Started",
-        })
+        sendGAEvent("event", "begin_checkout", { value: "Get Started" })
       }
       type="submit"
       disabled={pending}
