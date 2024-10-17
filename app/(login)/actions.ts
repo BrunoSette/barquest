@@ -478,13 +478,13 @@ export const forgotPassword = validatedAction(
       .where(eq(users.email, email))
       .limit(1);
 
-    const userWithTeam = await getUserWithTeam(user[0].id);
+    // const userWithTeam = await getUserWithTeam(user[0].id);
 
-    await logActivity(
-      userWithTeam?.teamId,
-      user[0].id,
-      ActivityType.FORGOT_PASSWORD
-    );
+    // await logActivity(
+    //   userWithTeam?.teamId,
+    //   user[0].id,
+    //   ActivityType.FORGOT_PASSWORD
+    // );
 
     const successMessage =
       "If an account exists, a password reset email will be sent.";
