@@ -56,7 +56,7 @@ export async function sendResetPasswordEmail(
     react: ResetPasswordEmail({
       username,
       email: to,
-      resetPasswordLink: `http://localhost:3000/reset-password?token=${token}`,
+      resetPasswordLink: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password?token=${token}`,
     }),
   });
 

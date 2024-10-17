@@ -3,6 +3,8 @@
 import { z } from "zod";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
+import { resend } from "@/lib/email/resend";
+
 import {
   User,
   users,
@@ -134,6 +136,15 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   };
 
   const [createdUser] = await db.insert(users).values(newUser).returning();
+
+  // Create Resend contact after successful sign-up
+  if (createdUser) {
+    await resend.contacts.create({
+      email: lowerCaseEmail,
+      unsubscribed: false,
+      audienceId: "7c43c8a9-1840-4029-b11f-496cd7e75a6e",
+    });
+  }
 
   if (!createdUser) {
     return { error: "Failed to create user. Please try again." };
