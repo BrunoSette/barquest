@@ -6,6 +6,8 @@ import Link from "next/link";
 import AnalyticsImage from "../public/dashboard.webp";
 import QuestionsImage from "../public/questions.webp";
 import IphoneMockup from "../public/iphone.webp";
+import { YouTubeEmbed } from "@next/third-parties/google";
+
 import dynamic from "next/dynamic";
 const PricingComponent = dynamic(
   () => import("@/app/(dashboard)/pricing/page"),
@@ -41,15 +43,11 @@ export default function HomePage() {
               </div>
               <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
                 <div className="rounded-lg overflow-hidden h-80 w-full">
-                  <iframe
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/HZJjA1J4C1g?si=Fzh6BmKxNCPWUKye&rel=0"
-                    title="BarQuest Demo"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                  ></iframe>
+                  <YouTubeEmbed
+                    videoid="HZJjA1J4C1g"
+                    height={315}
+                    params="controls=0&rel=0&modestbranding=1&fs=1&showinfo=0"
+                  />
                 </div>
               </div>
             </div>
