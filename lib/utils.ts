@@ -31,7 +31,7 @@ export const getURL = (path: string = "") => {
 
 export const subjects = [
   { id: 1, name: "Business Law", test: "Solicitor" },
-  { id: 2, name: "Criminal Law", test: "Solicitor" },
+  { id: 2, name: "Criminal Law", test: "Barrister" },
   { id: 3, name: "Civil Litigation", test: "Barrister" },
   { id: 4, name: "Estate Planning", test: "Solicitor" },
   { id: 5, name: "Family Law", test: "Barrister" },
