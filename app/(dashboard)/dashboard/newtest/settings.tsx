@@ -64,30 +64,105 @@ export function Settings({
     []
   );
 
-  const handleSubjectChange = useCallback((subjectId: number) => {
-    setSelectedSubjects((prev) =>
-      prev.includes(subjectId)
-        ? prev.filter((id) => id !== subjectId)
-        : [...prev, subjectId]
-    );
-  }, []);
+  const [selectedBarristerSubjects, setSelectedBarristerSubjects] = useState<
+    number[]
+  >([]);
+  const [selectedSolicitorSubjects, setSelectedSolicitorSubjects] = useState<
+    number[]
+  >([]);
 
-  const handleSelectAllSubjects = useCallback((subjects: { id: number }[]) => {
-    setSelectedSubjects((prev) => {
-      const allSelected = subjects.every((subject) =>
-        prev.includes(subject.id)
+  const handleSubjectChange = useCallback(
+    (subjectId: number, isBarrister: boolean) => {
+      const setSubjects = isBarrister
+        ? setSelectedBarristerSubjects
+        : setSelectedSolicitorSubjects;
+      setSubjects((prev) =>
+        prev.includes(subjectId)
+          ? prev.filter((id) => id !== subjectId)
+          : [...prev, subjectId]
       );
-      if (allSelected) {
-        return prev.filter(
-          (id) => !subjects.some((subject) => subject.id === id)
+    },
+    []
+  );
+
+  const handleSelectAllSubjects = useCallback(
+    (subjects: { id: number }[], isBarrister: boolean) => {
+      const setSubjects = isBarrister
+        ? setSelectedBarristerSubjects
+        : setSelectedSolicitorSubjects;
+      setSubjects((prev) => {
+        const allSelected = subjects.every((subject) =>
+          prev.includes(subject.id)
         );
-      } else {
-        return [
-          ...new Set([...prev, ...subjects.map((subject) => subject.id)]),
-        ];
-      }
-    });
-  }, []);
+        return allSelected ? [] : subjects.map((subject) => subject.id);
+      });
+    },
+    []
+  );
+
+  const renderSubjects = useCallback(
+    (
+      subjectList: typeof subjects,
+      productIndex: number,
+      isBarrister: boolean
+    ) => (
+      <div>
+        {subjectList.map((subject) => (
+          <div key={subject.id} className="flex items-center space-x-2 p-2">
+            <input
+              type="checkbox"
+              id={`${subject.name}-${isBarrister ? "barrister" : "solicitor"}`}
+              className="h-4 w-4 rounded"
+              checked={
+                isBarrister
+                  ? selectedBarristerSubjects.includes(subject.id)
+                  : selectedSolicitorSubjects.includes(subject.id)
+              }
+              onChange={() => handleSubjectChange(subject.id, isBarrister)}
+              disabled={
+                !(
+                  (planName === Products[productIndex].name &&
+                    isActiveOrTrialing) ||
+                  (planName === Products[2].name && isActiveOrTrialing)
+                )
+              }
+            />
+            <Label
+              htmlFor={`${subject.name}-${
+                isBarrister ? "barrister" : "solicitor"
+              }`}
+            >
+              {subject.name}
+            </Label>
+          </div>
+        ))}
+        {((planName === Products[productIndex].name && isActiveOrTrialing) ||
+          (planName === Products[2].name && isActiveOrTrialing)) && (
+          <Button
+            type="button"
+            className="bg-orange-500 mt-4 hover:bg-orange-600 text-white"
+            onClick={() => handleSelectAllSubjects(subjectList, isBarrister)}
+          >
+            {subjectList.every((subject) =>
+              isBarrister
+                ? selectedBarristerSubjects.includes(subject.id)
+                : selectedSolicitorSubjects.includes(subject.id)
+            )
+              ? "Deselect All"
+              : "Select All"}
+          </Button>
+        )}
+      </div>
+    ),
+    [
+      selectedBarristerSubjects,
+      selectedSolicitorSubjects,
+      handleSubjectChange,
+      handleSelectAllSubjects,
+      planName,
+      isActiveOrTrialing,
+    ]
+  );
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -97,10 +172,16 @@ export function Settings({
       localStorage.clear();
 
       try {
+        const allSelectedSubjects = [
+          ...new Set([
+            ...selectedBarristerSubjects,
+            ...selectedSolicitorSubjects,
+          ]),
+        ];
         const queryParams = new URLSearchParams({
           isTutor: String(isTutor),
           isTimed: String(isTimed),
-          selectedSubjects: JSON.stringify(selectedSubjects),
+          selectedSubjects: JSON.stringify(allSelectedSubjects),
           questionMode,
           numberOfQuestions,
         });
@@ -116,57 +197,11 @@ export function Settings({
     [
       isTutor,
       isTimed,
-      selectedSubjects,
+      selectedBarristerSubjects,
+      selectedSolicitorSubjects,
       questionMode,
       numberOfQuestions,
       router,
-    ]
-  );
-
-  const renderSubjects = useCallback(
-    (subjectList: typeof subjects, productIndex: number) => (
-      <div>
-        {subjectList.map((subject) => (
-          <div key={subject.id} className="flex items-center space-x-2 p-2">
-            <input
-              type="checkbox"
-              id={subject.name}
-              className="h-4 w-4 rounded"
-              checked={selectedSubjects.includes(subject.id)}
-              onChange={() => handleSubjectChange(subject.id)}
-              disabled={
-                !(
-                  (planName === Products[productIndex].name &&
-                    isActiveOrTrialing) ||
-                  (planName === Products[2].name && isActiveOrTrialing)
-                )
-              }
-            />
-            <Label htmlFor={subject.name}>{subject.name}</Label>
-          </div>
-        ))}
-        {((planName === Products[productIndex].name && isActiveOrTrialing) ||
-          (planName === Products[2].name && isActiveOrTrialing)) && (
-          <Button
-            type="button"
-            className="bg-orange-500 mt-4 hover:bg-orange-600 text-white"
-            onClick={() => handleSelectAllSubjects(subjectList)}
-          >
-            {subjectList.every((subject) =>
-              selectedSubjects.includes(subject.id)
-            )
-              ? "Deselect All"
-              : "Select All"}
-          </Button>
-        )}
-      </div>
-    ),
-    [
-      selectedSubjects,
-      handleSubjectChange,
-      handleSelectAllSubjects,
-      planName,
-      isActiveOrTrialing,
     ]
   );
 
@@ -247,13 +282,13 @@ export function Settings({
                     <h2 className="font-medium text-gray-900 mb-4">
                       Barrister
                     </h2>
-                    {renderSubjects(barristerSubjects, 0)}
+                    {renderSubjects(barristerSubjects, 0, true)}
                   </div>
                   <div>
                     <h2 className="font-medium text-gray-900 mb-4">
                       Solicitor
                     </h2>
-                    {renderSubjects(solicitorSubjects, 1)}
+                    {renderSubjects(solicitorSubjects, 1, false)}
                   </div>
                 </div>
               </CardContent>
