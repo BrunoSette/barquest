@@ -3,7 +3,7 @@ title: "Creating and Using a Comprehensive Exam Index"
 date: "2024-10-18"
 description: "Preparing for the Ontario Bar Exam is a complex and daunting task. With an open-book format, many candidates assume that simply having access to study materials is enough. However, without an organized system for navigating those materials, you can waste valuable time flipping through pages. One of the most effective strategies for tackling the exam is creating a comprehensive exam index. This document will explain how to build and use an exam index, ensuring that you can access the relevant information quickly and efficiently during the exam."
 image: "/deal.jpg"
-tags: ["exam", "study", "learning"]
+tags: ["exam index", "study", "ontario bar exam"]
 ---
 
 Preparing for the Ontario Bar Exam is a complex and daunting task. With an open-book format, many candidates assume that simply having access to study materials is enough. However, without an organized system for navigating those materials, you can waste valuable time flipping through pages. One of the most effective strategies for tackling the exam is creating a comprehensive exam index. This document will explain how to build and use an exam index, ensuring that you can access the relevant information quickly and efficiently during the exam.

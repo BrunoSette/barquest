@@ -3,7 +3,7 @@ title: "Breakdown of the Barrister and Solicitor Exams"
 date: "2024-10-18"
 description: "The Barrister and Solicitor exams are the two primary licensing exams that law graduates must pass to become licensed lawyers in Ontario."
 image: "/exam.jpg"
-tags: ["barrister", "solicitor", "study", "learning"]
+tags: ["barrister", "solicitor", "ontario bar exam", "learning"]
 ---
 
 The Barrister and Solicitor exams are the two primary licensing exams that law graduates must pass to become licensed lawyers in Ontario. Administered by the Law Society of Ontario (LSO), these exams assess a candidate’s knowledge, skills, and professional responsibility required to practice law. Both exams are challenging and require rigorous preparation, covering vast areas of substantive law and ethical responsibilities. In this guide, we’ll explore the structure of each exam, key topics covered, the open-book format, and effective strategies for success.

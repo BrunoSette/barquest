@@ -3,7 +3,7 @@ title: "Effective Study Strategies for the Ontario Bar Exam"
 date: "2024-10-18"
 description: "Discuss proven techniques for managing the vast syllabus, such as time management, index creation, and how to strategically tackle open-book exams​"
 image: "/iphone.webp"
-tags: ["exam", "study", "learning"]
+tags: ["strategy", "study", "ontario bar exam"]
 ---
 
 Preparing for the Ontario Bar Exam is a challenging and time-intensive process. With a vast syllabus covering multiple areas of law, candidates must develop strategic approaches to ensure they cover all necessary material efficiently. The Ontario Bar Exam is open-book, which adds another layer of complexity, as candidates must navigate their study materials quickly during the exam. This guide will outline proven techniques for managing time, creating an effective index, and strategically approaching the open-book exam format.
