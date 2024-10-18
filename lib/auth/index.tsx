@@ -6,6 +6,7 @@ import {
   ReactNode,
   useState,
   useEffect,
+  useCallback,
 } from 'react';
 import { use } from 'react';
 import { User } from '@/lib/db/schema';
@@ -13,6 +14,7 @@ import { User } from '@/lib/db/schema';
 type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
+  fetchUser: () => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -35,12 +37,30 @@ export function UserProvider({
   let initialUser = use(userPromise);
   let [user, setUser] = useState<User | null>(initialUser);
 
+  const fetchUser = useCallback(async () => {
+    if (user !== null) return;
+    try {
+      const response = await fetch("/api/users");
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user as User);
+      } else {
+        console.error("Failed to fetch user:", response.statusText);
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      setUser(null);
+    }
+  }, [user]);
+
   useEffect(() => {
     setUser(initialUser);
   }, [initialUser]);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, fetchUser }}>
       {children}
     </UserContext.Provider>
   );

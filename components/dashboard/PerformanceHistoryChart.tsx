@@ -43,7 +43,7 @@ export function PerformanceHistoryChart({
                 tickFormatter={(date) => {
                   const parsedDate = new Date(date);
                   return isNaN(parsedDate.getTime())
-                    ? "Invalid Date"
+                    ? ""
                     : format(parsedDate, "dd/MM");
                 }}
                 reversed={true}

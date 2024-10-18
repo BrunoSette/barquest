@@ -175,6 +175,9 @@ export function useTestLogic(
     await submitAnswer(
       userId,
       questions[testState.currentQuestion].id,
+      isTimed,
+      isTutor,
+      questionMode,
       selectedAnswer,
       testState.testHistoryId
     );
@@ -204,7 +207,7 @@ export function useTestLogic(
       console.log("Updated test state after submitting answer:", newState);
       return newState;
     });
-  }, [userId, questions, testState, selectedAnswer, answeredQuestions]);
+  }, [userId, questions, isTimed, isTutor, questionMode, testState, selectedAnswer, answeredQuestions]);
 
   const handleCompleteTest = useCallback(async () => {
     console.log("Completing test");

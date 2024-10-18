@@ -103,6 +103,9 @@ export async function getTestState(userId: number) {
 export async function submitAnswer(
   userId: number,
   questionId: number,
+  isTimed: boolean,
+  isTutor: boolean,
+  questionMode: string,
   selectedAnswer: number,
   testHistoryId: number | null
 ) {
@@ -125,9 +128,9 @@ export async function submitAnswer(
         userId,
         score: isCorrect ? 1 : 0,
         questions: 1,
-        timed: false,
-        tutor: false,
-        questionmode: "all",
+        timed: isTimed,
+        tutor: isTutor,
+        questionmode: questionMode,
         newQuestions: 1,
         date: new Date(),
       })
@@ -140,6 +143,9 @@ export async function submitAnswer(
         score: sql`${testHistory.score} + ${isCorrect ? 1 : 0}`,
         questions: sql`${testHistory.questions} + 1`,
         newQuestions: sql`${testHistory.newQuestions} + 1`,
+        timed: isTimed,
+        tutor: isTutor,
+        questionmode: questionMode,
       })
       .where(eq(testHistory.id, testHistoryId));
   }
@@ -160,7 +166,7 @@ export async function completeTest(
   if (testHistoryId) {
     await db
       .update(testHistory)
-      .set({ timed: true }) // Using 'timed' to indicate completion
+      .set({ userId: userId })
       .where(eq(testHistory.id, testHistoryId));
   }
 }

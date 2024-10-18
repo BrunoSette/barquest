@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { user, fetchUser } = useUser();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
@@ -72,6 +72,10 @@ export default function DashboardLayout({
     },
     { href: "/dashboard/users", icon: Users, label: "Users" },
   ];
+
+  useEffect(() => {
+    fetchUser();
+  }, [])
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">
