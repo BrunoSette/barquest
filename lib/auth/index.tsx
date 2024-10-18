@@ -38,6 +38,7 @@ export function UserProvider({
   let [user, setUser] = useState<User | null>(initialUser);
 
   const fetchUser = useCallback(async () => {
+    if (user !== null) return;
     try {
       const response = await fetch("/api/users");
 
@@ -52,7 +53,7 @@ export function UserProvider({
       console.error("Error fetching user:", error);
       setUser(null);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     setUser(initialUser);
