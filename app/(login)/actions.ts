@@ -4,6 +4,7 @@ import { z } from "zod";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
 import { resend } from "@/lib/email/resend";
+import { WelcomeEmail } from "@/emails/welcome";
 
 import {
   User,
@@ -38,6 +39,7 @@ import {
 import {
   sendResetPasswordEmail,
   sendInvitationEmail,
+  sendWelcomeEmail,
 } from "@/lib/email/email-service";
 
 async function logActivity(
@@ -144,6 +146,9 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
       unsubscribed: false,
       audienceId: "7c43c8a9-1840-4029-b11f-496cd7e75a6e",
     });
+
+    // Directly call sendWelcomeEmail instead of using fetch
+    await sendWelcomeEmail(lowerCaseEmail);
   }
 
   if (!createdUser) {

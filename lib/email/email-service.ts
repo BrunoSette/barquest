@@ -1,6 +1,9 @@
-import { resend } from "./resend";
 import { InviteUserEmail } from "@/emails/invite";
 import { ResetPasswordEmail } from "@/emails/reset-password";
+import { Resend } from "resend";
+import { WelcomeEmail } from "@/emails/welcome";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendInvitationEmail(
   to: string,
@@ -65,4 +68,28 @@ export async function sendResetPasswordEmail(
   }
 
   return { data };
+}
+
+export async function sendWelcomeEmail(email: string) {
+  try {
+    const fiveMinuteFromNow = new Date(Date.now() + 5000 * 60).toISOString();
+
+    const { data, error } = await resend.emails.send({
+      from: "BarQuest <support@barquest.ca>",
+      to: [email],
+      subject: "Welcome to BarQuest",
+      react: WelcomeEmail(email),
+      scheduledAt: fiveMinuteFromNow,
+    });
+
+    if (error) {
+      console.error("Failed to send welcome email:", error);
+      return { error };
+    }
+
+    return { data };
+  } catch (error) {
+    console.error("Error sending welcome email:", error);
+    return { error };
+  }
 }
