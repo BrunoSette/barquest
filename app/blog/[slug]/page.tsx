@@ -1,4 +1,4 @@
-import { getPostBySlug, getAllPosts } from "@/lib/posts";
+import { getPostBySlug } from "@/lib/posts";
 import { CalendarIcon, ClockIcon, TagIcon } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -94,8 +94,7 @@ export default async function PostPage({ params }: { params: Params }) {
       <footer className="bg-white dark:bg-gray-800 mt-12">
         <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-gray-500 dark:text-gray-400">
-            © {new Date().getFullYear()} Our Beautiful Blog. All rights
-            reserved.
+            © {new Date().getFullYear()} Barquest Blog. All rights reserved.
           </p>
         </div>
       </footer>
