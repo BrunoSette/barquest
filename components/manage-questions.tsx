@@ -55,7 +55,7 @@ export function ManageQuestionsComponent() {
         const response = await fetch("/api/questions");
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data:", data);
+          // console.log("Fetched data:", data);
 
           const mappedQuestions = data.map((item: any) => ({
             id: item.id.toString(),

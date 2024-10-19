@@ -30,8 +30,6 @@ export async function getPostBySlug(slug: string) {
     tags: data.tags,
     image: data.image,
     description: data.description,
-    author: data.author,
-    readingTime: data.readingTime,
     contentHtml, // This is now the HTML string
   };
 }

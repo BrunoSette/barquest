@@ -25,7 +25,7 @@ import { useUser } from "@/lib/auth";
 export default function Header() {
   const { user } = useUser();
 
-  console.log("HEADER", user);
+  // console.log("HEADER", user);
 
   return (
     <header className="border-b border-gray-200">

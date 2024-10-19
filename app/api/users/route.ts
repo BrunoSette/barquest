@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       FROM users;
     `;
 
-    console.log("Executing query to fetch all users");
+    // console.log("Executing query to fetch all users");
 
     const result = await client.query(query);
 

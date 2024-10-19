@@ -11,13 +11,13 @@ export async function POST(req: NextRequest) {
     await req.json();
 
   // Add logging to see if the test_history_id is being passed correctly
-  console.log("Received data:", {
-    user_id,
-    question_id,
-    selected_answer,
-    is_correct,
-    test_history_id,
-  });
+  // console.log("Received data:", {
+  //   user_id,
+  //   question_id,
+  //   selected_answer,
+  //   is_correct,
+  //   test_history_id,
+  // });
 
   if (
     !user_id ||

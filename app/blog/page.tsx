@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export default async function BlogPage() {
   const posts = await getAllPosts();
-  console.log("Posts:", posts); // Keep this for debugging
+  // console.log("Posts:", posts); // Keep this for debugging
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

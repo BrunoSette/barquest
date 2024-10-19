@@ -144,9 +144,7 @@ export function DashboardComponent({
                   if (lastWeekTests.length === 0) {
                     // If no tests from last week, set last week score to 0
                     const currentScore = (correctAnswers / totalAnswers) * 100;
-                    console.log("current score", currentScore);
-                    console.log("last week score", 0);
-                    console.log("difference", currentScore); // Difference is just the current score
+                     // Difference is just the current score
                     return `+${currentScore.toFixed(1)}% from last week`;
                   }
 

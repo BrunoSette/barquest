@@ -1,5 +1,5 @@
 import { getPostBySlug } from "@/lib/posts";
-import { ClockIcon, TagIcon } from "lucide-react";
+import { TagIcon } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -16,8 +16,6 @@ interface Post {
   title: string;
   contentHtml: string;
   slug: string;
-  author: string;
-  readingTime: string;
   tags: string[];
   image: string;
   description?: string;

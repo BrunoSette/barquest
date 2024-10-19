@@ -43,7 +43,7 @@ export default function UsersAdmin() {
         if (response.ok) {
           const data = await response.json();
           setUsers(data);
-          console.log("Fetched users:", data);
+          // console.log("Fetched users:", data);
         } else {
           console.error("Failed to fetch users:", response.statusText);
         }

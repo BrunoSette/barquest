@@ -13,10 +13,10 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     ? Object.fromEntries(searchParams)
     : {};
 
-  console.log(
-    "SearchParams in MultipleChoiceTest:",
-    JSON.stringify(searchParamsObject, null, 2)
-  );
+  // console.log(
+  //   "SearchParams in MultipleChoiceTest:",
+  //   JSON.stringify(searchParamsObject, null, 2)
+  // );
 
   const {
     questions,
@@ -39,27 +39,27 @@ export default function MultipleChoiceTest({ userId }: { userId: number }) {
     answeredQuestions,
   } = useTestLogic(userId, searchParamsObject);
 
-  useEffect(() => {
-    console.log("MultipleChoiceTest rendered with state:", {
-      currentQuestion,
-      score,
-      isTestComplete,
-      isAnswered,
-      timeLeft,
-      testHistoryId,
-      selectedAnswer,
-      numberOfQuestions,
-    });
-  }, [
-    currentQuestion,
-    score,
-    isTestComplete,
-    isAnswered,
-    timeLeft,
-    testHistoryId,
-    selectedAnswer,
-    numberOfQuestions,
-  ]);
+  // useEffect(() => {
+  //   console.log("MultipleChoiceTest rendered with state:", {
+  //     currentQuestion,
+  //     score,
+  //     isTestComplete,
+  //     isAnswered,
+  //     timeLeft,
+  //     testHistoryId,
+  //     selectedAnswer,
+  //     numberOfQuestions,
+  //   });
+  // }, [
+  //   currentQuestion,
+  //   score,
+  //   isTestComplete,
+  //   isAnswered,
+  //   timeLeft,
+  //   testHistoryId,
+  //   selectedAnswer,
+  //   numberOfQuestions,
+  // ]);
 
   if (isLoading) {
     console.log("Test is loading");
