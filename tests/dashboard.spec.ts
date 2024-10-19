@@ -88,9 +88,13 @@ test.describe("Dashboard Data Tests", () => {
       .getByLabel("Are you absolutely sure?")
       .waitFor({ state: "visible" });
     await page.getByRole("button", { name: "Delete" }).click();
-    await expect(page.getByText("Total Questions0")).toBeVisible();
-    console.log(
-      `Test "${test.info().title}" successful ✅, closing browser...`
-    );
+    await page.reload();
+    const totalQuestionsZero = page.getByText("Total Questions0");
+    await expect(totalQuestionsZero).toBeVisible();
+    if (await totalQuestionsZero.isVisible()) {
+      console.log(
+        `Test "${test.info().title}" successful ✅, closing browser...`
+      );
+    }
   }
 });
