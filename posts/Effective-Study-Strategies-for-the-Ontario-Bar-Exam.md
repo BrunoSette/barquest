@@ -1,6 +1,5 @@
 ---
 title: "Effective Study Strategies for the Ontario Bar Exam"
-date: "2024-10-18"
 description: "Discuss proven techniques for managing the vast syllabus, such as time management, index creation, and how to strategically tackle open-book exams​"
 image: "/iphone.webp"
 tags: ["strategy", "study", "ontario bar exam"]

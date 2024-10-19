@@ -1,6 +1,5 @@
 ---
 title: "How to Prepare for Professional Responsibility Questions"
-date: "2024-10-18"
 description: "The Professional Responsibility (PR) component is a crucial part of both the Barrister and Solicitor exams in Ontario. This section evaluates your understanding of the ethical and professional standards required of a lawyer, as well as your ability to apply those standards in practical situations. Many students find this section challenging because it requires not only a grasp of the rules but also the ability to analyze complex situations and make sound ethical decisions."
 image: "/lady.webp"
 tags: ["professional responsibility", "study", "bar exam"]

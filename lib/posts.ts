@@ -7,12 +7,15 @@ import { readFile } from "fs/promises";
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
+// Get slugs without the .md extension
 export function getPostSlugs() {
-  return fs.readdirSync(postsDirectory).filter((file) => file.endsWith(".md"));
+  return fs
+    .readdirSync(postsDirectory)
+    .map((file) => file.replace(/\.md$/, ""));
 }
 
 export async function getPostBySlug(slug: string) {
-  const fullPath = path.join(process.cwd(), "posts", `${slug}`);
+  const fullPath = path.join(postsDirectory, `${slug}.md`); // Append .md back here
   const fileContents = await readFile(fullPath, "utf8");
   const { data, content } = matter(fileContents);
 

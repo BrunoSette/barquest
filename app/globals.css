@@ -93,7 +93,7 @@
   }
 
   a {
-    @apply text-primary hover:text-primary-foreground underline;
+    @apply text-primary  hover:underline;
   }
 
   /* img {

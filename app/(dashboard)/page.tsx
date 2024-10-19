@@ -2,11 +2,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, FileQuestion, Database, ChartArea } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-// import HeroImage from "../public/lady.webp";
+import CTA from "@/components/cta";
 import AnalyticsImage from "../public/dashboard.webp";
 import QuestionsImage from "../public/questions.webp";
 import IphoneMockup from "../public/iphone.webp";
 import { YouTubeEmbed } from "@next/third-parties/google";
+import Footer from "@/components/footer";
 
 import dynamic from "next/dynamic";
 const PricingComponent = dynamic(
@@ -258,57 +259,11 @@ export default function HomePage() {
           <PricingComponent />
         </section>
 
-        <section className="py-16 bg-orange-500">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-              <div>
-                <h2 className="text-3xl font-bold text-white sm:text-4xl">
-                  Ready to Ace the Ontario Bar Exam?
-                </h2>
-                <p className="mt-3 max-w-3xl text-lg text-orange-100">
-                  Our platform gives you everything you need to fully prepare
-                  and pass with confidence. Stop stressing over outdated
-                  materials—focus on mastering the content that matters most.
-                </p>
-              </div>
-              <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-                <Link href="#pricing">
-                  <Button className="bg-white hover:bg-gray-100 text-orange-500 rounded-full text-xl px-12 py-6 inline-flex items-center justify-center">
-                    Start Your Free Account Today
-                    <ArrowRight className="ml-3 h-6 w-6" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <CTA />
       </main>
 
-      <footer className="bg-gray-800 text-white">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <p className="text-base text-gray-400">
-            &copy; 2024 BarPrep. All rights reserved.
-            <Link
-              href="/terms-of-use"
-              className="text-orange-500 hover:underline ml-4"
-            >
-              Terms of Use
-            </Link>
-            <Link
-              href="/privacy-policy"
-              className="text-orange-500 hover:underline ml-4"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="mailto:support@barquest.ca"
-              className="text-orange-500 hover:underline ml-4"
-            >
-              Contact Us
-            </Link>
-          </p>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

@@ -1,8 +1,7 @@
 ---
 title: "Breakdown of the Barrister and Solicitor Exams"
-date: "2024-10-18"
 description: "The Barrister and Solicitor exams are the two primary licensing exams that law graduates must pass to become licensed lawyers in Ontario."
-image: "/exam.jpg"
+image: "/library.jpg"
 tags: ["barrister", "solicitor", "ontario bar exam", "learning"]
 ---
 

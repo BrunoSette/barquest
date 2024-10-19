@@ -1,5 +1,5 @@
 import { getPostBySlug } from "@/lib/posts";
-import { CalendarIcon, ClockIcon, TagIcon } from "lucide-react";
+import { ClockIcon, TagIcon } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -13,7 +13,6 @@ interface Params {
 
 interface Post {
   title: string;
-  date: string;
   contentHtml: string;
   slug: string;
   author: string;
@@ -23,23 +22,52 @@ interface Post {
   description?: string;
 }
 
-export default async function PostPage({ params }: { params: Params }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
   const post: Post | null = await getPostBySlug(params.slug);
 
-  if (!post || !post.title || !post.date) {
+  if (!post) {
+    return {
+      title: "Post Not Found",
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.description || `Read ${post.title} on our blog`,
+    openGraph: {
+      title: post.title,
+      description: post.description || `Read ${post.title} on our blog`,
+      images: [{ url: post.image }],
+    },
+  };
+}
+
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const resolvedParams = await params;
+  const post: Post | null = await getPostBySlug(resolvedParams.slug);
+
+  if (!post || !post.title) {
     throw new Error(
-      `Post data incomplete or not found for slug: ${params.slug}`
+      `Post data incomplete or not found for slug: ${resolvedParams.slug}`
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto py-4 px-4 sm:py-6 sm:px-6 lg:px-8">
           <nav>
             <Link
               href="/blog"
-              className="text-primary hover:text-primary-dark transition-colors"
+              className="text-primary hover:text-primary-dark transition-colors text-sm sm:text-base"
             >
               ← Back to all posts
             </Link>
@@ -47,36 +75,34 @@ export default async function PostPage({ params }: { params: Params }) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-4xl mx-auto py-4 px-4 sm:py-6 sm:px-6 lg:px-8">
         <article className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div className="relative h-64 sm:h-80 md:h-96">
+          <div className="relative h-48 sm:h-64 md:h-80 lg:h-96">
             <Image
-              src={post.image || "/placeholder.svg?height=384&width=768"}
+              src={post.image}
               alt={post.title}
               fill
               className="object-cover"
             />
           </div>
-          <CardHeader className="space-y-4">
-            <CardTitle className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+          <CardHeader className="space-y-3 sm:space-y-4">
+            <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
               {post.title}
             </CardTitle>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                <time dateTime={post.date}>
-                  {new Date(post.date).toLocaleDateString()}
-                </time>
-              </div>
-              <div className="flex items-center">
-                <ClockIcon className="mr-2 h-4 w-4" />
+                <ClockIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 <span>{post.readingTime}</span>
               </div>
               <div className="flex items-center">
-                <TagIcon className="mr-2 h-4 w-4" />
-                <div className="flex flex-wrap gap-2">
+                <TagIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   {post.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="text-xs sm:text-sm"
+                    >
                       {tag}
                     </Badge>
                   ))}
@@ -85,19 +111,11 @@ export default async function PostPage({ params }: { params: Params }) {
             </div>
           </CardHeader>
           <Separator />
-          <CardContent className="prose dark:prose-invert max-w-none p-6">
+          <CardContent className="prose dark:prose-invert max-w-none p-4 sm:p-6 text-sm sm:text-base">
             <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
           </CardContent>
         </article>
       </main>
-
-      <footer className="bg-white dark:bg-gray-800 mt-12">
-        <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 dark:text-gray-400">
-            © {new Date().getFullYear()} Barquest Blog. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
