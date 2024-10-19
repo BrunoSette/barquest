@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 interface Params {
+  [key: string]: string; // Add index signature
   slug: string;
 }
 
