@@ -45,33 +45,48 @@ test.describe("Dashboard Data Tests", () => {
     await page.locator("#numberOfQuestions").fill("2");
     await page.getByRole("button", { name: "Create Test" }).click();
 
+    // Answer questions
+    const totalQuestions = 2; // Adjust this number
+    for (let i = 1; i <= totalQuestions; i++) {
+      const options = await page.getByRole("radio").all();
+      if (options.length > 0) {
+        await options[Math.floor(Math.random() * options.length)].click();
+      }
+
+      await page
+        .locator('button[role="radio"][data-state="unchecked"]')
+        .first()
+        .click({ force: true });
+      await page
+        .getByRole("button", { name: "Submit Answer" })
+        .waitFor({ state: "visible" });
+      await page.getByRole("button", { name: "Submit Answer" }).click();
+      if (i < totalQuestions) {
+        await page.getByRole("button", { name: "Next Question" }).click();
+        await expect(page.getByText(`Question ${i + 1} of`)).toBeVisible();
+      }
+    }
+
+    await page.getByRole("button", { name: "Finish" }).click();
+
     // Complete quiz and verify dashboard update
-    await completeQuiz(2);
+    await page.goto(`${BASE_URL}/dashboard`);
+
+    await deleteTestAndVerify();
     await expect(page.getByText("Total Questions3")).toBeVisible();
 
     // Delete test and verify dashboard
     await deleteTestAndVerify();
   });
 
-  async function completeQuiz(numberOfQuestions: number) {
-    for (let i = 1; i <= numberOfQuestions; i++) {
-      await page.getByRole("radio").first().click();
-      await page.getByRole("button", { name: "Submit Answer" }).click();
-      if (i < numberOfQuestions) {
-        await page.getByRole("button", { name: "Next Question" }).click();
-      }
-    }
-    await page.getByRole("button", { name: "Finish" }).click();
-    await page.goto(`${BASE_URL}/dashboard`);
-  }
-
   async function deleteTestAndVerify() {
     const deleteButton = page
-      .getByRole("row", { name: /1/ })
-      .locator("div")
-      .getByRole("button");
+      .locator('button[aria-haspopup="dialog"]')
+      .filter({ has: page.locator("svg.lucide-trash2") });
     await deleteButton.click();
-    await expect(page.getByLabel("Are you absolutely sure?")).toBeVisible();
+    await page
+      .getByLabel("Are you absolutely sure?")
+      .waitFor({ state: "visible" });
     await page.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByText("Total Questions0")).toBeVisible();
     console.log(

@@ -28,7 +28,7 @@ test.describe("Create Test and Complete Quiz", () => {
   }
 
   test("create a new test and complete quiz", async () => {
-       console.log(`Test "${test.info().title}" initiated...`);
+    console.log(`Test "${test.info().title}" initiated...`);
 
     await login("brunosette@gmail.com", "12345678");
 
@@ -39,15 +39,26 @@ test.describe("Create Test and Complete Quiz", () => {
     await expect(page.getByRole("heading", { name: "Test Mode" })).toBeVisible({
       timeout: TIMEOUT,
     });
+    await page.locator('#numberOfQuestions').fill('3');
+    await expect(page.locator('#numberOfQuestions')).toHaveValue('3');
+
     await page.getByRole("button", { name: "Create Test" }).click();
 
     // Answer questions
-    const totalQuestions = 20; // Adjust this number
+    const totalQuestions = 3; // Adjust this number
     for (let i = 1; i <= totalQuestions; i++) {
       const options = await page.getByRole("radio").all();
       if (options.length > 0) {
         await options[Math.floor(Math.random() * options.length)].click();
       }
+
+      await page
+        .locator('button[role="radio"][data-state="unchecked"]')
+        .first()
+        .click({ force: true });
+      await page
+        .getByRole("button", { name: "Submit Answer" })
+        .waitFor({ state: "visible" });
       await page.getByRole("button", { name: "Submit Answer" }).click();
       if (i < totalQuestions) {
         await page.getByRole("button", { name: "Next Question" }).click();
