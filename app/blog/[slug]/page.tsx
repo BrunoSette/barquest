@@ -22,12 +22,14 @@ interface Post {
   description?: string;
 }
 
+// Awaiting params inside generateMetadata
 export async function generateMetadata({
   params,
 }: {
-  params: Params;
+  params: Promise<Params>;
 }): Promise<Metadata> {
-  const post: Post | null = await getPostBySlug(params.slug);
+  const resolvedParams = await params; // Awaiting params
+  const post: Post | null = await getPostBySlug(resolvedParams.slug);
 
   if (!post) {
     return {
@@ -46,12 +48,18 @@ export async function generateMetadata({
   };
 }
 
-export default async function PostPage({ params }: { params: Params }) {
-  const post: Post | null = await getPostBySlug(params.slug);
+// Awaiting params inside PostPage
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const resolvedParams = await params; // Awaiting params here
+  const post: Post | null = await getPostBySlug(resolvedParams.slug);
 
   if (!post || !post.title) {
     throw new Error(
-      `Post data incomplete or not found for slug: ${params.slug}`
+      `Post data incomplete or not found for slug: ${resolvedParams.slug}`
     );
   }
 
