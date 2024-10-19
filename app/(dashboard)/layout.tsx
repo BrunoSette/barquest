@@ -1,4 +1,3 @@
-import { getUser } from "@/lib/db/queries";
 import Header from "@/components/header";
 
 export default async function Layout({
