@@ -12,10 +12,13 @@ test.describe("User Journey Tests", () => {
   test.beforeEach(async ({ browser }) => {
     page = await browser.newPage();
     console.log(`Using base URL: ${BASE_URL}`);
+    console.log(`Test "${test.info().title}" initiated...`);
   });
 
   test.afterEach(async () => {
-    console.log("Test successful, closing browser...");
+    console.log(
+      `Test "${test.info().title}" successful ✅, closing browser...`
+    );
     await page.close();
   });
 
@@ -137,6 +140,7 @@ test.describe("User Journey Tests", () => {
   });
 
   test("create a new test and complete quiz", async () => {
+    console.log("Creating a new test test initiated...");
     await login("brunosette@gmail.com", "12345678");
 
     // Navigate to the "Create a New Test" section from the dashboard
@@ -230,7 +234,7 @@ test.describe("User Journey Tests", () => {
   test("test dashboard data", async () => {
     await login("teste@teste.ca", "12345678");
     const numberOfQuestions = 2;
-
+    console.log("Initializing test dashboard data...");
     console.log("Login successful - test dashboard data");
 
     // Verify initial dashboard state
@@ -255,6 +259,68 @@ test.describe("User Journey Tests", () => {
     await deleteTestAndVerify();
 
     await page.close();
+  });
+
+  test("check home page and blog links", async () => {
+    await page.goto(`${BASE_URL}/`);
+
+    // Check main headings
+    const headings = [
+      "Your Ultimate Prep Tool for the",
+      "BarQuest - Full",
+      "BarQuest - Solicitor"
+    ];
+    for (const heading of headings) {
+      await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    }
+
+    // Check "Play" button
+    await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
+
+    // Check and navigate to footer links
+    const footerLinks = [
+      { name: "Terms of Use", url: "/terms-of-use" },
+      { name: "Privacy Policy", url: "/privacy-policy" },
+      { name: "Contact Us", url: null }
+    ];
+
+    for (const link of footerLinks) {
+      await expect(page.getByRole("link", { name: link.name })).toBeVisible();
+      if (link.url) {
+        await page.getByRole("link", { name: link.name }).click();
+        await expect(page).toHaveURL(`${BASE_URL}${link.url}`);
+        await page.goBack();
+      }
+    }
+
+    // Check and navigate to blog
+    await expect(page.getByRole("link", { name: "Our blog" })).toBeVisible();
+    await page.getByRole("link", { name: "Our blog" }).click();
+    await expect(page).toHaveURL(`${BASE_URL}/blog`);
+
+    // Check blog post titles and navigation
+    const blogPostTitles = [
+      "Tips for Studying for the Ontario Bar Exam While Working Full Time",
+      "Time Management Tips for the Ontario Bar Exam",
+      "Is It Too Late to Study for the Bar Exams?",
+      "How to Pass the Ontario Bar Exams",
+      "How long to study for the Ontario Bar Exam",
+      "How to Pass the Ontario Bar Exam",
+      "How to Prepare for Professional Responsibility Questions",
+      "Effective Study Strategies for the Ontario Bar Exam",
+      "Creating and Using a Comprehensive Exam Index",
+      "Breakdown of the Barrister and Solicitor Exams",
+    ];
+
+    for (const title of blogPostTitles) {
+      await expect(page.getByRole("heading", { name: title })).toBeVisible();
+      await page.getByRole("heading", { name: title }).click();
+      await expect(page).toHaveURL(new RegExp(`${BASE_URL}/blog/.*`));
+      await expect(page.getByRole("heading", { name: title })).toBeVisible();
+      console.log(`Verified blog post: ${title}`);
+      await page.goBack();
+      await expect(page).toHaveURL(`${BASE_URL}/blog`);
+    }
   });
 
   async function verifyDashboardState(
@@ -329,5 +395,6 @@ test.describe("User Journey Tests", () => {
     await expect(page.getByText("Total Questions0")).toBeVisible();
 
     console.log("Dashboard data updated after deletion");
+    console.log("Test dashboard data Passed! ✅");
   }
 });
