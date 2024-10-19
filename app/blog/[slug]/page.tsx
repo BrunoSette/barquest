@@ -46,17 +46,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function PostPage({
-  params,
-}: {
-  params: Promise<Params>;
-}) {
-  const resolvedParams = await params;
-  const post: Post | null = await getPostBySlug(resolvedParams.slug);
+export default async function PostPage({ params }: { params: Params }) {
+  const post: Post | null = await getPostBySlug(params.slug);
 
   if (!post || !post.title) {
     throw new Error(
-      `Post data incomplete or not found for slug: ${resolvedParams.slug}`
+      `Post data incomplete or not found for slug: ${params.slug}`
     );
   }
 
