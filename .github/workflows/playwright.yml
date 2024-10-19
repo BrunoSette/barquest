@@ -23,9 +23,6 @@ jobs:
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -37,46 +34,27 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
-
-      - name: Get Preview URL
-        run: echo "PREVIEW_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
-
-      - name: Get Preview URL
-        run: echo "PREVIEW_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
+      - name: Build project
+        run: pnpm run build
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
-      # - name: Wait for Vercel deployment
-      #   run: |
-      #     echo "Waiting 30 seconds for deployment to be ready..."
-      #     sleep 30
-      #     echo "Deployment is ready!"
+      - name: Start the application
+        run: pnpm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for application to be ready
+        run: |
+          echo "Waiting for application to be ready..."
+          while ! nc -z localhost 3000; do
+            sleep 1
+          done
+          echo "Application is ready!"
 
       - name: Run Playwright tests with tracing
         run: |
@@ -84,7 +62,7 @@ jobs:
           xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" \
             npx playwright test --trace on --output=test-results --timeout 90000 --retries 2
         env:
-          PLAYWRIGHT_TEST_BASE_URL: ${{ env.PREVIEW_URL }}
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
 
       - name: Upload Playwright report and trace
         if: always()
