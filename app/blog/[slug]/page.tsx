@@ -95,10 +95,6 @@ export default async function PostPage({
             </CardTitle>
             <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center">
-                <ClockIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                <span>{post.readingTime}</span>
-              </div>
-              <div className="flex items-center">
                 <TagIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 <div className="flex flex-wrap gap-1 sm:gap-2">
                   {post.tags.map((tag) => (

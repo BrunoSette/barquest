@@ -1,7 +1,7 @@
 ---
 title: "How Long to Study for the Ontario Bar Exam"
 description: "Preparing for the Ontario Bar Exam is a significant undertaking. The exam covers vast amounts of material, and it’s crucial to allow yourself enough time to thoroughly review each subject. Understanding the exam structure, setting clear goals, and managing your time effectively are essential to success."
-image: "/lawyer.jpg"
+image: "/study2.jpg"
 tags: ["professional responsibility", "study", "bar exam"]
 ---
 
