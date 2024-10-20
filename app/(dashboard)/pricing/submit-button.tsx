@@ -8,11 +8,13 @@ import { sendGAEvent } from "@next/third-parties/google";
 export function SubmitButton() {
   const { pending } = useFormStatus();
 
+  const handleClick = () => {
+    sendGAEvent({ event: "conversion_event_begin_checkout", value: 1 });
+  };
+
   return (
     <Button
-      onClick={() =>
-        sendGAEvent("event", "begin_checkout", { value: "Get Started" })
-      }
+      onClick={handleClick}
       type="submit"
       disabled={pending}
       className="w-full bg-white hover:bg-orange-400 hover:text-white text-black border border-gray-200 rounded-full flex text-lg items-center justify-center"
