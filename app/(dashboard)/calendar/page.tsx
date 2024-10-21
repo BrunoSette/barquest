@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -31,8 +31,44 @@ export default function CalendarPage() {
   const [solicitorExamDate, setSolicitorExamDate] = useState("2024-11-19");
   const [events, setEvents] = useState<any[]>([]);
   const [isCalendarGenerated, setIsCalendarGenerated] = useState(false);
+  const [totalStudyHours, setTotalStudyHours] = useState(0);
   const calendarRef = useRef(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    calculateTotalStudyHours();
+  }, [studyDays, hoursPerDay, barristerExamDate, solicitorExamDate]);
+
+  const calculateTotalStudyHours = () => {
+    const today = new Date();
+    const barristerExam = barristerExamDate
+      ? new Date(barristerExamDate)
+      : null;
+    const solicitorExam = solicitorExamDate
+      ? new Date(solicitorExamDate)
+      : null;
+
+    let endDate =
+      barristerExam && solicitorExam
+        ? isBefore(barristerExam, solicitorExam)
+          ? solicitorExam
+          : barristerExam
+        : barristerExam || solicitorExam;
+
+    if (!endDate) return;
+
+    const daysUntilEnd = differenceInDays(endDate, today);
+
+    let total = 0;
+    for (let i = 0; i < daysUntilEnd; i++) {
+      const dayOfWeek = format(addDays(today, i), "EEEE").toLowerCase();
+      if (studyDays.includes(dayOfWeek)) {
+        total += hoursPerDay[dayOfWeek];
+      }
+    }
+
+    setTotalStudyHours(total);
+  };
 
   const generateSchedule = () => {
     if (!barristerExamDate && !solicitorExamDate) {
@@ -211,7 +247,7 @@ export default function CalendarPage() {
             content="Create and manage your exam dates for Barrister and Solicitor tests"
           />
         </Head>
-        <h1 className="text-2xl font-bold mb-6">Study Calendar</h1>
+        <h1 className="text-2xl font-bold mb-6">Create your Study Calendar</h1>
         <Card className="mb-6">
           <CardContent className="p-4">
             <form
@@ -280,6 +316,10 @@ export default function CalendarPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div className="text-lg font-semibold">
+                Total study hours before exam: {totalStudyHours}
               </div>
 
               <Button

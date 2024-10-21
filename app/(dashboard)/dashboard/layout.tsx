@@ -41,7 +41,7 @@ export default function DashboardLayout({
       label: "Create a New Test",
     },
     { href: "/dashboard/videos", icon: Video, label: "User Guide" },
-    { href: "/dashboard/calendar", icon: Calendar, label: "Calendar" },
+    { href: "/calendar", icon: Calendar, label: "Calendar" },
 
     {
       href: "/dashboard/subscription",
