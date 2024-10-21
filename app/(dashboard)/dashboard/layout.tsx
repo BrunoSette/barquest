@@ -12,6 +12,7 @@ import {
   Settings,
   Pencil,
   Video,
+  Calendar,
   ClipboardList,
   FolderPlus,
   LayoutDashboard,
@@ -40,6 +41,8 @@ export default function DashboardLayout({
       label: "Create a New Test",
     },
     { href: "/dashboard/videos", icon: Video, label: "User Guide" },
+    { href: "/dashboard/calendar", icon: Calendar, label: "Calendar" },
+
     {
       href: "/dashboard/subscription",
       icon: BookCheck,
@@ -75,7 +78,7 @@ export default function DashboardLayout({
 
   useEffect(() => {
     fetchUser();
-  }, [])
+  }, []);
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">

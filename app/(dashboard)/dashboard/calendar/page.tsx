@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { getUser } from "@/lib/db/queries";
-import { redirect } from "next/navigation";
+import { useState, useRef } from "react";
 import Head from "next/head";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { addDays, differenceInDays, format, isBefore } from "date-fns";
 
@@ -16,103 +13,35 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Toast } from "@/components/ui/toast";
+import { ToastProvider } from "@/components/ui/toast";
+import { barristerTopics, solicitorTopics, daysOfWeek } from "./topics";
+import { useToast } from "@/hooks/use-toast";
 
-const barristerTopics = [
-  "Civil Litigation",
-  "Criminal Litigation",
-  "Professional Ethics",
-  "Evidence",
-  "Advocacy",
-];
+interface Topic {
+  topic: string;
+  pages: number;
+}
 
-const solicitorTopics = [
-  "Business Law and Practice",
-  "Property Law and Practice",
-  "Litigation",
-  "Professional Conduct and Regulation",
-  "Wills and Administration of Estates",
-];
-
-const daysOfWeek = [
-  { id: "monday", label: "Monday" },
-  { id: "tuesday", label: "Tuesday" },
-  { id: "wednesday", label: "Wednesday" },
-  { id: "thursday", label: "Thursday" },
-  { id: "friday", label: "Friday" },
-  { id: "saturday", label: "Saturday" },
-  { id: "sunday", label: "Sunday" },
-];
-
-export default function CalendarPage({ user }: { user: any }) {
-  const [studyDays, setStudyDays] = useState(daysOfWeek.map((day) => day.id));
+export default function CalendarPage() {
+  const [studyDays, setStudyDays] = useState<string[]>([]);
   const [hoursPerDay, setHoursPerDay] = useState(
-    Object.fromEntries(daysOfWeek.map((day) => [day.id, 4]))
+    Object.fromEntries(daysOfWeek.map((day) => [day.id, 2]))
   );
-  const [barristerExamDate, setBarristerExamDate] = useState("");
-  const [solicitorExamDate, setSolicitorExamDate] = useState("");
-  const [events, setEvents] = useState([]);
-  const [calendarView, setCalendarView] = useState("dayGridMonth");
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
+  const [barristerExamDate, setBarristerExamDate] = useState("2024-11-05");
+  const [solicitorExamDate, setSolicitorExamDate] = useState("2024-11-19");
+  const [events, setEvents] = useState<any[]>([]);
+  const [isCalendarGenerated, setIsCalendarGenerated] = useState(false);
   const calendarRef = useRef(null);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://apis.google.com/js/api.js";
-    script.onload = () => {
-      window.gapi.load("client:auth2", initClient);
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  const initClient = () => {
-    window.gapi.client.init({
-      apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
-      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      discoveryDocs: [
-        "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
-      ],
-      scope: "https://www.googleapis.com/auth/calendar.events",
-    }).then(() => {
-      // Listen for sign-in state changes
-      window.gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-      // Handle the initial sign-in state
-      updateSigninStatus(window.gapi.auth2.getAuthInstance().isSignedIn.get());
-    });
-  };
-
-  const updateSigninStatus = (isSignedIn: boolean) => {
-    setIsSignedIn(isSignedIn);
-  };
-
-  const handleSignInClick = () => {
-    window.gapi.auth2.getAuthInstance().signIn();
-  };
-
-  const handleSignOutClick = () => {
-    window.gapi.auth2.getAuthInstance().signOut();
-  };
-
-  // if (!user) {
-  //   console.log("No user found, redirecting to login");
-  //   redirect("/sign-in");
-  // }
+  const { toast } = useToast();
 
   const generateSchedule = () => {
-    if (!barristerExamDate && !solicitorExamDate) return;
+    if (!barristerExamDate && !solicitorExamDate) {
+      toast({
+        title: "Error",
+        description: "Please set at least one exam date.",
+      });
+      return;
+    }
 
     const today = new Date();
     const barristerExam = barristerExamDate
@@ -141,37 +70,73 @@ export default function CalendarPage({ user }: { user: any }) {
       }
     }
 
-    const topics = [
-      ...(barristerExam ? barristerTopics : []),
-      ...(solicitorExam ? solicitorTopics : []),
+    const flattenTopics = (topicsObj: any): Topic[] => {
+      return Object.values(topicsObj).flat() as Topic[];
+    };
+
+    const topics: Topic[] = [
+      ...(barristerExam ? flattenTopics(barristerTopics) : []),
+      ...(solicitorExam ? flattenTopics(solicitorTopics) : []),
     ];
-    const hoursPerTopic = Math.floor(totalStudyHours / topics.length);
+
+    const totalPages: number = topics.reduce(
+      (sum: number, topic: Topic) => sum + topic.pages,
+      0
+    );
+    const hoursPerPage = totalStudyHours / totalPages;
 
     let currentDate = today;
-    const newEvents = [];
+    const newEvents: any[] = [];
 
-    topics.forEach((topic) => {
-      let topicHours = hoursPerTopic;
-      while (topicHours > 0 && currentDate < endDate) {
-        const dayOfWeek = format(currentDate, "EEEE").toLowerCase();
-        if (studyDays.includes(dayOfWeek)) {
-          const studyHours = Math.min(topicHours, hoursPerDay[dayOfWeek]);
-          const examType = barristerTopics.includes(topic)
+    while (currentDate < endDate) {
+      const dayOfWeek = format(currentDate, "EEEE").toLowerCase();
+      if (studyDays.includes(dayOfWeek)) {
+        const dailyHours = hoursPerDay[dayOfWeek];
+        let remainingHours = dailyHours;
+        const dayEvents: any[] = [];
+
+        while (remainingHours > 0 && topics.length > 0) {
+          const topic = topics[0];
+          const topicHours = Math.min(
+            remainingHours,
+            Math.ceil(topic.pages * hoursPerPage)
+          );
+
+          const examType = Object.values(barristerTopics)
+            .flat()
+            .some((t: Topic) => t.topic === topic.topic)
             ? "Barrister"
             : "Solicitor";
-          newEvents.push({
-            title: `${examType}: ${topic}`,
+
+          dayEvents.push({
+            title: `${topic.topic} (${topicHours}h)`,
             start: currentDate,
-            end: new Date(currentDate.getTime() + studyHours * 60 * 60 * 1000),
+            allDay: true,
             color: examType === "Barrister" ? "#3788d8" : "#38b000",
           });
-          topicHours -= studyHours;
+
+          remainingHours -= topicHours;
+          topic.pages -= Math.floor(topicHours / hoursPerPage);
+
+          if (topic.pages <= 0) {
+            topics.shift();
+          } else {
+            // Move the partially completed topic to the end of the array
+            topics.push(topics.shift()!);
+          }
         }
-        currentDate = addDays(currentDate, 1);
+
+        newEvents.push(...dayEvents);
       }
-    });
+      currentDate = addDays(currentDate, 1);
+    }
 
     setEvents(newEvents);
+    setIsCalendarGenerated(true);
+    toast({
+      title: "Schedule Generated",
+      description: "Your study schedule has been created successfully.",
+    });
   };
 
   const handleDayToggle = (day: string) => {
@@ -186,190 +151,183 @@ export default function CalendarPage({ user }: { user: any }) {
 
   const handlePrint = () => {
     if (calendarRef.current) {
-      const calendarApi = calendarRef.current.getApi();
+      const calendarApi = (calendarRef.current as any).getApi();
       calendarApi.render();
-      window.print();
+
+      const printWindow = window.open("", "_blank");
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Study Calendar</title>
+              <style>
+                @page { size: landscape; }
+                body { margin: 0; }
+                #calendar { width: 100%; height: 100vh; }
+                .calendar-footer { position: absolute; bottom: 10px; right: 10px; font-size: 12px; color: #888; }
+              </style>
+            </head>
+            <body>
+              <div id="calendar"></div>
+              <div class="calendar-footer">Calendar made in barquest.ca</div>
+              <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+              <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet">
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  var calendarEl = document.getElementById('calendar');
+                  var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    events: ${JSON.stringify(events)},
+                    headerToolbar: false
+                  });
+                  calendar.render();
+                  setTimeout(() => { window.print(); window.close(); }, 1000);
+                });
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
     }
   };
 
-  const addToGoogleCalendar = async () => {
-    if (!isSignedIn) {
-      try {
-        await window.gapi.auth2.getAuthInstance().signIn();
-      } catch (error) {
-        console.error("Error signing in:", error);
-        setToastMessage("Failed to sign in to Google. Please try again.");
-        setShowToast(true);
-        return;
-      }
-    }
-
-    const batch = window.gapi.client.newBatch();
-
-    events.forEach((event, index) => {
-      const request = window.gapi.client.calendar.events.insert({
-        calendarId: "primary",
-        resource: {
-          summary: event.title,
-          start: {
-            dateTime: event.start.toISOString(),
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          },
-          end: {
-            dateTime: event.end.toISOString(),
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          },
-        },
-      });
-      batch.add(request);
+  const resetCalendar = () => {
+    setEvents([]);
+    setIsCalendarGenerated(false);
+    toast({
+      title: "Calendar Reset",
+      description: "Your study schedule has been reset.",
     });
-
-    try {
-      await batch.execute();
-      setToastMessage("Events added to Google Calendar successfully!");
-      setShowToast(true);
-    } catch (error) {
-      console.error("Error adding events to Google Calendar:", error);
-      setToastMessage(
-        "Failed to add events to Google Calendar. Please try again."
-      );
-      setShowToast(true);
-    }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <Head>
-        <title>Study Calendar - BarQuest</title>
-        <meta
-          name="description"
-          content="Create and manage your exam dates for Barrister and Solicitor tests"
-        />
-      </Head>
-      <h1 className="text-2xl font-bold mb-6">Study Calendar</h1>
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              generateSchedule();
-            }}
-            className="space-y-4"
-          >
-            <div>
-              <Label>Study Days</Label>
-              <div className="flex flex-wrap gap-4 mt-2">
-                {daysOfWeek.map((day) => (
-                  <div key={day.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={day.id}
-                      checked={studyDays.includes(day.id)}
-                      onCheckedChange={() => handleDayToggle(day.id)}
-                    />
-                    <Label htmlFor={day.id}>{day.label}</Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <Label>Study Hours per Day</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-                {daysOfWeek.map((day) => (
-                  <div key={day.id} className="flex items-center space-x-2">
-                    <Label htmlFor={`hours-${day.id}`} className="w-20">
-                      {day.label}
-                    </Label>
-                    <Input
-                      id={`hours-${day.id}`}
-                      type="number"
-                      value={hoursPerDay[day.id]}
-                      onChange={(e) =>
-                        handleHoursChange(day.id, Number(e.target.value))
-                      }
-                      min="0"
-                      max="24"
-                      className="w-20"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <Tabs defaultValue="barrister">
-              <TabsList>
-                <TabsTrigger value="barrister">Barrister Exam</TabsTrigger>
-                <TabsTrigger value="solicitor">Solicitor Exam</TabsTrigger>
-              </TabsList>
-              <TabsContent value="barrister">
-                <div>
-                  <Label htmlFor="barristerExamDate">Barrister Exam Date</Label>
-                  <Input
-                    id="barristerExamDate"
-                    type="date"
-                    value={barristerExamDate}
-                    onChange={(e) => setBarristerExamDate(e.target.value)}
-                  />
+    <ToastProvider>
+      <div className="container mx-auto p-4">
+        <Head>
+          <title>Study Calendar - BarQuest</title>
+          <meta
+            name="description"
+            content="Create and manage your exam dates for Barrister and Solicitor tests"
+          />
+        </Head>
+        <h1 className="text-2xl font-bold mb-6">Study Calendar</h1>
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                generateSchedule();
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <Tabs defaultValue="barrister">
+                  <TabsList>
+                    <TabsTrigger value="barrister">Barrister Exam</TabsTrigger>
+                    <TabsTrigger value="solicitor">Solicitor Exam</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="barrister">
+                    <div>
+                      <Label htmlFor="barristerExamDate">
+                        Barrister Exam Date
+                      </Label>
+                      <Input
+                        id="barristerExamDate"
+                        type="date"
+                        value={barristerExamDate}
+                        onChange={(e) => setBarristerExamDate(e.target.value)}
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="solicitor">
+                    <div>
+                      <Label htmlFor="solicitorExamDate">
+                        Solicitor Exam Date
+                      </Label>
+                      <Input
+                        id="solicitorExamDate"
+                        type="date"
+                        value={solicitorExamDate}
+                        onChange={(e) => setSolicitorExamDate(e.target.value)}
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+                <Label>Study Days and how many hours to study each day</Label>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  {daysOfWeek.map((day) => (
+                    <div key={day.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={day.id}
+                        checked={studyDays.includes(day.id)}
+                        onCheckedChange={() => handleDayToggle(day.id)}
+                      />
+                      <Label htmlFor={day.id}>{day.label}</Label>
+                      {studyDays.includes(day.id) && (
+                        <Input
+                          id={`hours-${day.id}`}
+                          type="number"
+                          value={hoursPerDay[day.id]}
+                          onChange={(e) =>
+                            handleHoursChange(day.id, Number(e.target.value))
+                          }
+                          min="0"
+                          max="24"
+                          className="w-16 ml-2"
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </TabsContent>
-              <TabsContent value="solicitor">
-                <div>
-                  <Label htmlFor="solicitorExamDate">Solicitor Exam Date</Label>
-                  <Input
-                    id="solicitorExamDate"
-                    type="date"
-                    value={solicitorExamDate}
-                    onChange={(e) => setSolicitorExamDate(e.target.value)}
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-            <Button type="submit">Generate Schedule</Button>
-          </form>
-        </CardContent>
-      </Card>
-      <div className="mb-4 flex justify-between items-center">
-        <Select value={calendarView} onValueChange={setCalendarView}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="dayGridMonth">Month</SelectItem>
-            <SelectItem value="timeGridWeek">Week</SelectItem>
-            <SelectItem value="timeGridDay">Day</SelectItem>
-          </SelectContent>
-        </Select>
-        <div className="space-x-2">
-          <Button onClick={handlePrint}>Print Calendar</Button>
-          {isSignedIn ? (
-            <Button onClick={addToGoogleCalendar}>Add to Google Calendar</Button>
-          ) : (
-            <Button onClick={handleSignInClick}>Sign in to Google Calendar</Button>
-          )}
-          {isSignedIn && (
-            <Button onClick={handleSignOutClick}>Sign out from Google Calendar</Button>
-          )}
-        </div>
+              </div>
+
+              <Button
+                className="bg-orange-400 hover:bg-orange-600 text-white"
+                type="submit"
+              >
+                Generate Schedule
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {isCalendarGenerated && (
+          <>
+            <div className="calendar-container mb-6">
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "",
+                }}
+                events={events}
+                height="auto"
+                eventContent={(arg) => (
+                  <div style={{ fontSize: "0.9em" }}>{arg.event.title}</div>
+                )}
+              />
+            </div>
+            <div className="mb-4 flex justify-between items-center">
+              <Button
+                className="bg-orange-400 hover:bg-orange-600 text-white"
+                onClick={handlePrint}
+              >
+                Print Calendar
+              </Button>
+              <Button
+                className="bg-red-400 hover:bg-red-600 text-white"
+                onClick={resetCalendar}
+              >
+                Reset Calendar
+              </Button>
+            </div>
+          </>
+        )}
       </div>
-      <div className="calendar-container mb-6">
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView={calendarView}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-          }}
-          events={events}
-          height="auto"
-        />
-      </div>
-      {showToast && (
-        <Toast
-          title="Notification"
-          description={toastMessage}
-          onClose={() => setShowToast(false)}
-        />
-      )}
-    </div>
+    </ToastProvider>
   );
 }
