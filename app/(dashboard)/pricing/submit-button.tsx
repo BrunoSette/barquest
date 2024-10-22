@@ -9,13 +9,14 @@ export function SubmitButton() {
   const { pending } = useFormStatus();
 
   const handleClick = () => {
-    sendGAEvent({ event: "conversion_event_begin_checkout", value: 1 });
+    console.log("handleClick")
+    sendGAEvent({ event: "begin_checkout_event", value: "begin_checkout" });
   };
 
   return (
     <Button
       onClick={handleClick}
-      type="submit"
+      type="button" 
       disabled={pending}
       className="w-full bg-white hover:bg-orange-400 hover:text-white text-black border border-gray-200 rounded-full flex text-lg items-center justify-center"
     >
