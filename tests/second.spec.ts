@@ -15,10 +15,20 @@ test.describe("User Journey Tests", () => {
     console.log(`Test "${test.info().title}" initiated...`);
   });
 
-  test.afterEach(async () => {
-    console.log(
-      `Test "${test.info().title}" successful ✅, closing browser...`
-    );
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.status === "passed") {
+      console.log(`Test "${test.info().title}" Successful ✅`);
+    } else {
+      console.log(
+        `Test "${test.info().title}" Unsuccessful ❌, trying again...`
+      );
+      // Implement retry logic
+      if (testInfo.retry === testInfo.project.retries) {
+        console.log(
+          `Test "${test.info().title}" failed after all retries. Giving up. 😢`
+        );
+      }
+    }
     await page.close();
   });
 
@@ -268,7 +278,7 @@ test.describe("User Journey Tests", () => {
     const headings = [
       "Your Ultimate Prep Tool for the",
       "BarQuest - Full",
-      "BarQuest - Solicitor"
+      "BarQuest - Solicitor",
     ];
     for (const heading of headings) {
       await expect(page.getByRole("heading", { name: heading })).toBeVisible();
@@ -281,7 +291,7 @@ test.describe("User Journey Tests", () => {
     const footerLinks = [
       { name: "Terms of Use", url: "/terms-of-use" },
       { name: "Privacy Policy", url: "/privacy-policy" },
-      { name: "Contact Us", url: null }
+      { name: "Contact Us", url: null },
     ];
 
     for (const link of footerLinks) {
