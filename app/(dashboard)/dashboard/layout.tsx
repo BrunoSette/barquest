@@ -40,11 +40,11 @@ export default function DashboardLayout({
       label: "Create a New Test",
     },
     { href: "/dashboard/videos", icon: Video, label: "User Guide" },
-    {
-      href: "/dashboard/subscription",
-      icon: BookCheck,
-      label: "My Subscription",
-    },
+    // {
+    //   href: "/dashboard/subscription",
+    //   icon: BookCheck,
+    //   label: "My Subscription",
+    // },
     { href: "/dashboard/general", icon: Settings, label: "Settings" },
   ];
 

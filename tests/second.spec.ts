@@ -53,7 +53,7 @@ test.describe("User Journey Tests", () => {
       { role: "button", name: "Dashboard" },
       { role: "button", name: "Create a New Test", withinNavigation: true },
       { role: "button", name: "User Guide" },
-      { role: "button", name: "My Subscription" },
+      // { role: "button", name: "My Subscription" },
       { role: "button", name: "Settings" },
     ];
 

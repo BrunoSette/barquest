@@ -227,12 +227,12 @@ export function Settings({
           <h1 className="text-lg lg:text-2xl font-medium text-gray-900">
             Create a New Test
           </h1>
-          <Button
+          {/* <Button
             onClick={() => setShowPricingDialog(true)}
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
             {isActiveOrTrialing ? "Manage Subscription" : "Upgrade Plan"}
-          </Button>
+          </Button> */}
         </div>
 
         <PricingDialog
