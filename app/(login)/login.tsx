@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { CircleIcon, Loader2 } from "lucide-react";
 import { signIn, signUp, forgotPassword, resetPassword } from "./actions";
 import { ActionState } from "@/lib/auth/middleware";
-import { sendGAEvent } from "@next/third-parties/google";
 
 const actionMap = {
   signin: signIn,
@@ -161,7 +160,6 @@ export function Login({
               type="submit"
               className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
               disabled={pending}
-              onClick={() => sendGAEvent("event", modeEvent)}
             >
               {pending ? (
                 <>
