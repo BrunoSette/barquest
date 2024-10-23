@@ -114,6 +114,27 @@ export async function createCustomerPortalSession(team: Team | null) {
   });
 }
 
+export async function handleSendGAEvent(
+  customerId: string,
+  event: string,
+) {
+  const MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID; // GA4 Measurement ID
+  const API_SECRET = process.env.GA_MEASUREMENT_API_SECRET; // GA4 Measurement Protocol API secret
+
+  fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`, {
+    method: "POST",
+    body: JSON.stringify({
+      client_id: customerId,
+      events: [{
+        name: event,
+        params: {
+          customerId,
+        },
+      }]
+    })
+  });
+}
+
 export async function handleSubscriptionChange(
   subscription: Stripe.Subscription
 ) {

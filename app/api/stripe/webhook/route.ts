@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { handleSubscriptionChange, stripe } from '@/lib/payments/stripe';
+import { handleSubscriptionChange, handleSendGAEvent, stripe } from '@/lib/payments/stripe';
 import { NextRequest, NextResponse } from 'next/server';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -20,10 +20,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const subscription = event.data.object as Stripe.Subscription;
+  const customerId = subscription.customer as string;
   switch (event.type) {
+    case 'invoice.payment_failed':
+      await handleSendGAEvent(customerId, "purchase_failed");
+      break;
+    case 'invoice.payment_succeeded':
+      await handleSendGAEvent(customerId, "purchase_succeeded");
+      break;
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted':
-      const subscription = event.data.object as Stripe.Subscription;
       await handleSubscriptionChange(subscription);
       break;
     default:
