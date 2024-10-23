@@ -32,7 +32,7 @@ export default function RootLayout({
     >
       <head></head>
       <body className="min-h-[100dvh] bg-gray-50">
-        <GoogleTagManager gtmId="GTM-53LR5KCC" />
+        {/* <GoogleTagManager gtmId="GTM-53LR5KCC" /> */}
         <GoogleAnalytics  gaId="G-H2CWYESDT8" />
         <SpeedInsights />
         <UserProvider userPromise={userPromise}>{children}</UserProvider>
