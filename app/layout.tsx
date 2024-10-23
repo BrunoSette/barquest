@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { UserProvider } from "@/lib/auth";
 import { getUser } from "@/lib/db/queries";
-import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -32,8 +32,7 @@ export default function RootLayout({
     >
       <head></head>
       <body className="min-h-[100dvh] bg-gray-50">
-        {/* <GoogleTagManager gtmId="GTM-53LR5KCC" /> */}
-        <GoogleAnalytics  gaId="G-H2CWYESDT8" />
+        <GoogleTagManager gtmId="GTM-53LR5KCC" />
         <SpeedInsights />
         <UserProvider userPromise={userPromise}>{children}</UserProvider>
       </body>
