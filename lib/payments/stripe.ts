@@ -22,6 +22,7 @@ export async function createCheckoutSession({
 
   if (!team || !user) {
     redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+    return;
   }
 
   const session = await stripe.checkout.sessions.create({
@@ -51,54 +52,92 @@ export async function createCheckoutSession({
 export async function createCustomerPortalSession(team: Team | null) {
   if (!team || !team.stripeCustomerId || !team.stripeProductId) {
     redirect("/pricing");
-  }
-
-  try {
-    const session = await stripe.billingPortal.sessions.create({
-      customer: team.stripeCustomerId,
-      return_url: `${process.env.BASE_URL}/dashboard`,
-    });
-
-    if (session.url) {
-      redirect(session.url);
-    } else {
-      console.error("Customer portal session URL is undefined");
-      redirect("/error");
-    }
-  } catch (error) {
-    console.error("Error creating customer portal session:", error);
-    redirect("/error");
-  }
-}
-
-export async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
-  const customerId = session.customer as string | null;
-  const paymentStatus = session.payment_status;
-
-  console.log("Handling payment success for session:", session.id);
-  console.log("Customer ID:", customerId);
-  console.log("Payment Status:", paymentStatus);
-
-  if (!customerId) {
-    console.warn("No customer associated with this session.");
-    // Handle logic for sessions without a customer, if applicable
-    redirect("/dashboard?payment_success=true");
     return;
   }
+
+  let configuration: Stripe.BillingPortal.Configuration;
+  const configurations = await stripe.billingPortal.configurations.list();
+
+  if (configurations.data.length > 0) {
+    configuration = configurations.data[0];
+  } else {
+    const product = await stripe.products.retrieve(team.stripeProductId);
+    if (!product.active) {
+      throw new Error("Team's product is not active in Stripe");
+    }
+
+    const prices = await stripe.prices.list({
+      product: product.id,
+      active: true,
+    });
+    if (prices.data.length === 0) {
+      throw new Error("No active prices found for the team's product");
+    }
+
+    configuration = await stripe.billingPortal.configurations.create({
+      business_profile: {
+        headline: "Manage your subscription",
+      },
+      features: {
+        payment_method_update: {
+          enabled: true,
+        },
+        subscription_update: {
+          enabled: true,
+          default_allowed_updates: ["price", "quantity", "promotion_code"],
+          proration_behavior: "create_prorations",
+          products: [
+            {
+              product: product.id,
+              prices: prices.data.map((price) => price.id),
+            },
+          ],
+        },
+        subscription_cancel: {
+          enabled: true,
+          mode: "at_period_end",
+          cancellation_reason: {
+            enabled: true,
+            options: [
+              "too_expensive",
+              "missing_features",
+              "switched_service",
+              "unused",
+              "other",
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  return stripe.billingPortal.sessions.create({
+    customer: team.stripeCustomerId,
+    return_url: `${process.env.BASE_URL}/dashboard`,
+    configuration: configuration.id,
+  });
+}
+
+export async function handleSubscriptionChange(
+  subscription: Stripe.Subscription
+) {
+  const customerId = subscription.customer as string;
+  const subscriptionId = subscription.id;
+  const status = subscription.status;
 
   const team = await getTeamByStripeCustomerId(customerId);
 
   if (!team) {
     console.error("Team not found for Stripe customer:", customerId);
-    redirect("/error?reason=team_not_found");
+    redirect("/sign-up?redirect=checkout");
     return;
   }
 
-  if (paymentStatus === "paid") {
+  if (status === "active") {
     try {
-      const lineItems = session.line_items?.data;
+      const lineItems = subscription.items.data;
       if (!lineItems || lineItems.length === 0) {
-        console.error("No line items found in session");
+        console.error("No line items found in subscription");
         redirect("/error?reason=no_line_items");
         return;
       }
@@ -111,7 +150,7 @@ export async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
       }
 
       await updateTeamSubscription(team.id, {
-        stripeSubscriptionId: null,
+        stripeSubscriptionId: subscriptionId,
         stripeProductId: product.id,
         planName: product.name,
         subscriptionStatus: "active",
@@ -122,7 +161,7 @@ export async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
       redirect("/error?reason=update_failed");
     }
   } else {
-    console.error("Payment not successful, status:", paymentStatus);
+    console.error("Payment not successful, status:", status);
     redirect("/dashboard?payment_failed=true");
   }
 }
