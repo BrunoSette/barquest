@@ -107,10 +107,10 @@ export async function GET(request: NextRequest) {
       .update(teams)
       .set({
         stripeCustomerId: customerId,
-        stripeSubscriptionId: null, //subscriptionId,
+        // stripeSubscriptionId: null, //subscriptionId,
         stripeProductId: productId,
-        planName: null, //(plan.product as Stripe.Product).name,
-        subscriptionStatus: null, //subscription.status,
+        // planName: null, //(plan.product as Stripe.Product).name,
+        // subscriptionStatus: null, //subscription.status,
         updatedAt: new Date(),
       })
       .where(eq(teams.id, userTeam[0].teamId));
