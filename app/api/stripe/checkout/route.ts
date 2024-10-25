@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["customer", "subscription", "payment_intent", "line_items"],
+      expand: ['customer', 'line_items.data.price.product'],
     });
 
     // Check if customer is a string or null
@@ -26,32 +26,49 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    const paymentStatus = session.payment_status;
-    console.log("Payment Status:", paymentStatus);
-    const paymentIntent = session.payment_intent;
-    if (typeof paymentIntent === "string" || !paymentIntent) {
-      throw new Error("Invalid payment intent data from Stripe.");
+    const lineItems = session.line_items?.data;
+    if (!lineItems || lineItems.length === 0) {
+      throw new Error('No line items found for this session.');
     }
+
+    console.log("lineitems:", JSON.stringify(lineItems, null, 4));
+    const product = lineItems[0].price?.product;
+    if (!product) {
+      throw new Error('No product found for this session.');
+    }
+
+    const productId =
+      typeof product === 'string'
+        ? product
+        : product?.id;
+
+    console.log("productId:", productId);
+
     const customerId = session.customer.id;
+    // const subscriptionId =
+    //   typeof session.subscription === 'string'
+    //     ? session.subscription
+    //     : session.subscription?.id;
 
-    const subscriptionId =
-      typeof session.subscription === "string"
-        ? session.subscription
-        : session.subscription?.id;
+    // if (!subscriptionId) {
+    //   throw new Error('No subscription found for this session.');
+    // }
 
-    let productId, plan;
-    if (subscriptionId) {
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-        expand: ["items.data.price.product"],
-      });
-      plan = subscription.items.data[0]?.price;
-      productId = (plan.product as Stripe.Product).id;
-      if (!productId) {
-        console.warn("No product ID found for this subscription.");
-        // Handle logic for sessions without a product ID, if applicable
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-      }
-    }
+    // const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    //   expand: ['items.data.price.product'],
+    // });
+
+    // const plan = subscription.items.data[0]?.price;
+
+    // if (!plan) {
+    //   throw new Error('No plan found for this subscription.');
+    // }
+
+    // const productId = (plan.product as Stripe.Product).id;
+
+    // if (!productId) {
+    //   throw new Error('No product ID found for this subscription.');
+    // }
 
     const userId = session.client_reference_id;
     if (!userId) {
@@ -90,10 +107,10 @@ export async function GET(request: NextRequest) {
       .update(teams)
       .set({
         stripeCustomerId: customerId,
-        stripeSubscriptionId: subscriptionId,
+        stripeSubscriptionId: null, //subscriptionId,
         stripeProductId: productId,
-        planName: plan?.nickname || "",
-        subscriptionStatus: paymentIntent.status,
+        planName: null, //(plan.product as Stripe.Product).name,
+        subscriptionStatus: null, //subscription.status,
         updatedAt: new Date(),
       })
       .where(eq(teams.id, userTeam[0].teamId));

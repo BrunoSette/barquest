@@ -11,7 +11,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-06-20",
 });
 
-export async function createCheckoutSession({
+export async function createSubscriptionCheckoutSession({
   team,
   priceId,
 }: {
@@ -47,6 +47,38 @@ export async function createCheckoutSession({
     console.error("Stripe session URL is undefined");
     redirect("/error");
   }
+}
+
+export async function createProductCheckoutSession({
+  team,
+  priceId,
+}: {
+  team: Team | null;
+  priceId: string;
+}) {
+  const user = await getUser();
+
+  if (!team || !user) {
+    redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.BASE_URL}/pricing`,
+    customer: team.stripeCustomerId || undefined,
+    client_reference_id: user.id.toString(),
+    allow_promotion_codes: true,
+  });
+
+  redirect(session.url!);
 }
 
 export async function createCustomerPortalSession(team: Team | null) {
