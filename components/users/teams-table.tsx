@@ -14,12 +14,11 @@ export default async function TeamsTable() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold mb-4">Stripe Info</h2>
+      <h2 className="text-2xl font-bold mb-4">Stripe Users: {teams.length}</h2>
       <Table>
         <TableCaption>A list of all teams in the system.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Updated At</TableHead>
@@ -30,8 +29,7 @@ export default async function TeamsTable() {
         <TableBody>
           {teams.map((team: any) => (
             <TableRow key={team.id}>
-              <TableCell className="font-medium">{team.id}</TableCell>
-              <TableCell>{team.name || ""}</TableCell>
+              <TableCell>{(team.name || "").replace(/'s Team$/, "")}</TableCell>
               <TableCell>
                 {new Date(team.created_at).toLocaleDateString()}
               </TableCell>

@@ -14,7 +14,7 @@ export default async function UsersTable() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold mb-4">Users</h2>
+      <h2 className="text-2xl font-bold mb-4">Total Users: {users.length}</h2>
       <Table>
         <TableCaption>A list of all users in the system.</TableCaption>
         <TableHeader>
