@@ -233,15 +233,14 @@ export default function HomePage() {
                     "During your 7-day free trial, you'll have full access to all the features of your selected plan, including our extensive question banks, real-time progress tracking, instant feedback, and mobile-friendly access. This allows you to experience the full value of BarQuest before committing to a subscription.",
                 },
                 {
-                  question:
-                    "How do I cancel if I'm not satisfied?",
+                  question: "How do I cancel if I'm not satisfied?",
                   answer:
-                    "Canceling is easy! If you decide that BarQuest isn't the right fit for you, simply log into your account settings and follow the cancellation instructions. For assistance, our support team is always here to help.",
+                    "Canceling is easy! If you decide that BarQuest isn't the right fit for you in the first 7 days, simply send an email to support@barquest.ca and we'll cancel your order immediately.",
                 },
                 {
-                  question: "When will I be charged after the free trial?",
-                  answer:
-                    "You won't be charged during the 7-day free trial. Your subscription will automatically begin at the end of the trial period unless you cancel beforehand.",
+                  question: "When will I be charged after starting my free trial?",
+                  answer: 
+                    "Your 7-day free trial starts as soon as you sign up. During this period, you'll have full access to all features at no cost. After the trial ends, you'll be charged a one-time payment that gives you 90 days of access to BarQuest, unless you cancel before the trial period ends. You can cancel anytime during the trial with no charges.",
                 },
               ].map((item, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg">

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { YouTubeEmbed } from "@next/third-parties/google";
 
 // Mock data for video content
 const videoContent = [
@@ -18,56 +19,55 @@ const videoContent = [
     videos: [
       {
         id: "1",
-        title: "Welcome to BarQuest: An Introduction",
-        youtubeId: "9n8-PyyeugQ",
+        title: "Welcome to BarQuest: Your Ultimate Bar Exam Study Tool",
+        youtubeId: "HZJjA1J4C1g",
       },
-      { id: "2", title: "Creating your First Test", youtubeId: "9n8-PyyeugQ" },
       {
-        id: "3",
-        title: "Monitoring Your Progress: Using Analytics and Feedback Tools",
-        youtubeId: "9n8-PyyeugQ",
+        id: "2",
+        title: "How to Pass the Ontario Bar Exam",
+        youtubeId: "5dnzKrvOpAc",
       },
     ],
   },
-  {
-    category: "Help & Study Tips",
-    videos: [
-      {
-        id: "4",
-        title: "Understanding the Ontario Bar Exam Format",
-        youtubeId: "9n8-PyyeugQ",
-      },
-      {
-        id: "5",
-        title: "Time Management Strategies",
-        youtubeId: "iONDebHX9qk",
-      },
-      { id: "6", title: "Avoiding Common Pitfalls", youtubeId: "dQw4w9WgXcQ" },
+  // {
+  //   category: "Help & Study Tips",
+  //   videos: [
+  //     {
+  //       id: "4",
+  //       title: "Understanding the Ontario Bar Exam Format",
+  //       youtubeId: "9n8-PyyeugQ",
+  //     },
+  //     {
+  //       id: "5",
+  //       title: "Time Management Strategies",
+  //       youtubeId: "iONDebHX9qk",
+  //     },
+  //     { id: "6", title: "Avoiding Common Pitfalls", youtubeId: "dQw4w9WgXcQ" },
 
-      {
-        id: "7",
-        title: "Stress Management During Bar Exam Prep",
-        youtubeId: "J4BrO_i2DsU",
-      },
-      {
-        id: "8",
-        title: "How to Organize your Study Materials",
-        youtubeId: "J4BrO_i2DsU",
-      },
-    ],
-  },
-  {
-    category: "Troubleshooting",
-    videos: [
-      {
-        id: "9",
-        title: "Common Issues and Solutions",
-        youtubeId: "9n8-PyyeugQ",
-      },
-      { id: "10", title: "Contacting Support", youtubeId: "9n8-PyyeugQ" },
-      { id: "11", title: "Updating the Software", youtubeId: "9n8-PyyeugQ" },
-    ],
-  },
+  //     {
+  //       id: "7",
+  //       title: "Stress Management During Bar Exam Prep",
+  //       youtubeId: "J4BrO_i2DsU",
+  //     },
+  //     {
+  //       id: "8",
+  //       title: "How to Organize your Study Materials",
+  //       youtubeId: "J4BrO_i2DsU",
+  //     },
+  //   ],
+  // },
+  // {
+  //   category: "Troubleshooting",
+  //   videos: [
+  //     {
+  //       id: "9",
+  //       title: "Common Issues and Solutions",
+  //       youtubeId: "9n8-PyyeugQ",
+  //     },
+  //     { id: "10", title: "Contacting Support", youtubeId: "9n8-PyyeugQ" },
+  //     { id: "11", title: "Updating the Software", youtubeId: "9n8-PyyeugQ" },
+  //   ],
+  // },
 ];
 
 export function InstructionsAndTipsComponent() {
@@ -119,12 +119,11 @@ export function InstructionsAndTipsComponent() {
                       className="relative"
                       style={{ paddingBottom: "56.25%", height: 0 }}
                     >
-                      <iframe
-                        src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="absolute top-0 left-0 w-full h-full"
-                      ></iframe>
+                      <YouTubeEmbed
+                        videoid={selectedVideo.youtubeId}
+                        height={315}
+                        params="controls=1&rel=0&modestbranding=1&fs=1&showinfo=0"
+                      />
                     </div>
                     <h3 className="text-xl font-semibold mt-4">
                       {selectedVideo.title}
