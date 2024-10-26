@@ -38,7 +38,7 @@ export async function createSubscriptionCheckoutSession({
     cancel_url: `${process.env.BASE_URL}`,
     customer: team.stripeCustomerId || undefined, // Ensure this is set if needed
     client_reference_id: user.id.toString(),
-    allow_promotion_codes: true,
+    allow_promotion_codes: false,
   });
 
   if (session.url) {
@@ -75,7 +75,7 @@ export async function createProductCheckoutSession({
     cancel_url: `${process.env.BASE_URL}/pricing`,
     customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
-    allow_promotion_codes: true,
+    allow_promotion_codes: false,
   });
 
   redirect(session.url!);
@@ -150,25 +150,27 @@ export async function createCustomerPortalSession(team: Team | null) {
   });
 }
 
-export async function handleSendGAEvent(
-  customerId: string,
-  event: string,
-) {
+export async function handleSendGAEvent(customerId: string, event: string) {
   const MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID; // GA4 Measurement ID
   const API_SECRET = process.env.GA_MEASUREMENT_API_SECRET; // GA4 Measurement Protocol API secret
 
-  fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`, {
-    method: "POST",
-    body: JSON.stringify({
-      client_id: customerId,
-      events: [{
-        name: event,
-        params: {
-          customerId,
-        },
-      }]
-    })
-  });
+  fetch(
+    `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        client_id: customerId,
+        events: [
+          {
+            name: event,
+            params: {
+              customerId,
+            },
+          },
+        ],
+      }),
+    }
+  );
 }
 
 export async function handleSubscriptionChange(
