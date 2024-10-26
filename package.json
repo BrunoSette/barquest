@@ -14,7 +14,7 @@
     "email": "email dev --port 3001"
   },
   "dependencies": {
-    "@next/third-parties": "15.0.0",
+    "@next/third-parties": "15.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.2",
@@ -49,14 +49,14 @@
     "gray-matter": "^4.0.3",
     "jose": "^5.9.2",
     "lucide-react": "^0.446.0",
-    "next": "15.0.0",
+    "next": "15.0.1",
     "next-mdx-remote": "^5.0.0",
     "pg": "^8.13.0",
     "postcss": "^8.4.47",
     "postgres": "^3.4.4",
-    "react": "19.0.0-rc-65a56d0e-20241020",
-    "react-dom": "19.0.0-rc-65a56d0e-20241020",
-    "react-is": "19.0.0-rc-65a56d0e-20241020",
+    "react": "19.0.0-rc-69d4b800-20241021",
+    "react-dom": "19.0.0-rc-69d4b800-20241021",
+    "react-is": "19.0.0-rc-69d4b800-20241021",
     "recharts": "2.13.0-alpha.5",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
@@ -75,7 +75,7 @@
     "@playwright/test": "^1.47.2",
     "drizzle-kit": "^0.24.2",
     "eslint": "^8",
-    "eslint-config-next": "15.0.0",
+    "eslint-config-next": "15.0.1",
     "react-email": "3.0.1"
   },
   "pnpm": {
