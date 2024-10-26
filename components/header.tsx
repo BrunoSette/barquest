@@ -76,7 +76,7 @@ export default function Header() {
                     <span>User Guide</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="w-full cursor-pointer m-1">
+                {/* <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
                     href="/dashboard/subscription"
                     className="flex w-full items-center"
@@ -84,7 +84,7 @@ export default function Header() {
                     <BookCheck className="mr-2 h-4 w-4" />
                     <span>My Subscription</span>
                   </Link>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem className="w-full cursor-pointer m-1">
                   <Link
                     href="/dashboard/general"

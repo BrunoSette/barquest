@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -29,53 +29,70 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { user, fetchUser } = useUser();
 
+  const [hasSubscription, setHasSubscription] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
 
-  const generalNavItems = [
-    { href: "/dashboard/", icon: LayoutDashboard, label: "Dashboard" },
-    {
-      href: "/dashboard/newtest/",
-      icon: BadgeCheck,
-      label: "Create a New Test",
-    },
-    { href: "/dashboard/videos", icon: Video, label: "User Guide" },
-    {
-      href: "/dashboard/subscription",
-      icon: BookCheck,
-      label: "My Subscription",
-    },
-    { href: "/dashboard/general", icon: Settings, label: "Settings" },
-  ];
+  const generalNavItems = useMemo(() => {
+    const items = [
+      { href: "/dashboard/", icon: LayoutDashboard, label: "Dashboard" },
+      { href: "/dashboard/newtest/", icon: BadgeCheck, label: "Create a New Test" },
+      { href: "/dashboard/videos", icon: Video, label: "User Guide" },
+    ];
 
-  const adminNavItems = [
-    {
-      icon: FileQuestion,
-      label: "Questions",
-      subItems: [
-        {
-          href: "/dashboard/questions/summary",
-          icon: ClipboardList,
-          label: "Summary",
-        },
-        {
-          href: "/dashboard/questions/create",
-          icon: FolderPlus,
-          label: "Create",
-        },
-        {
-          href: "/dashboard/questions/edit",
-          icon: Pencil,
-          label: "Edit",
-        },
-      ],
-    },
-    { href: "/dashboard/users", icon: Users, label: "Users" },
-  ];
+    if (hasSubscription) items.push(
+      { href: "/dashboard/subscription", icon: BookCheck, label: "My Subscription" }
+    );
+
+    items.push(
+      { href: "/dashboard/general", icon: Settings, label: "Settings" },
+    );
+
+    return items;
+  }, [hasSubscription]);
+
+  const adminNavItems = useMemo(
+    () => [
+      {
+        icon: FileQuestion,
+        label: "Questions",
+        subItems: [
+          {
+            href: "/dashboard/questions/summary",
+            icon: ClipboardList,
+            label: "Summary",
+          },
+          {
+            href: "/dashboard/questions/create",
+            icon: FolderPlus,
+            label: "Create",
+          },
+          {
+            href: "/dashboard/questions/edit",
+            icon: Pencil,
+            label: "Edit",
+          },
+        ],
+      },
+      { href: "/dashboard/users", icon: Users, label: "Users" },
+    ],
+    []
+  );
+
+  const fetchUserSubscription = useCallback(async () => {
+    await fetch("/api/user-subscription").then((response) => {
+      return response.json();
+    }).then((data) => {
+      setHasSubscription(data.subscription || false);
+    }).catch((error) => {
+      console.log("error", error);
+    });
+  }, []);
 
   useEffect(() => {
     fetchUser();
-  }, [])
+    fetchUserSubscription();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">

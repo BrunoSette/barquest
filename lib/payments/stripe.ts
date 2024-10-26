@@ -11,7 +11,45 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-06-20",
 });
 
-export async function createCheckoutSession({
+export async function createSubscriptionCheckoutSession({
+  team,
+  priceId,
+}: {
+  team: Team | null;
+  priceId: string;
+}) {
+  const user = await getUser();
+
+  if (!team || !user) {
+    redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+    return;
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.BASE_URL}`,
+    customer: team.stripeCustomerId || undefined, // Ensure this is set if needed
+    client_reference_id: user.id.toString(),
+    allow_promotion_codes: true,
+  });
+
+  if (session.url) {
+    redirect(session.url);
+  } else {
+    console.error("Stripe session URL is undefined");
+    redirect("/error");
+  }
+}
+
+export async function createProductCheckoutSession({
   team,
   priceId,
 }: {
@@ -32,15 +70,12 @@ export async function createCheckoutSession({
         quantity: 1,
       },
     ],
-    mode: "subscription",
+    mode: "payment",
     success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.BASE_URL}/pricing`,
     customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
     allow_promotion_codes: true,
-    subscription_data: {
-      trial_period_days: 7,
-    },
   });
 
   redirect(session.url!);
@@ -49,6 +84,7 @@ export async function createCheckoutSession({
 export async function createCustomerPortalSession(team: Team | null) {
   if (!team || !team.stripeCustomerId || !team.stripeProductId) {
     redirect("/pricing");
+    return;
   }
 
   let configuration: Stripe.BillingPortal.Configuration;
@@ -146,58 +182,82 @@ export async function handleSubscriptionChange(
 
   if (!team) {
     console.error("Team not found for Stripe customer:", customerId);
+    redirect("/sign-up?redirect=checkout");
     return;
   }
 
-  if (status === "active" || status === "trialing") {
-    const plan = subscription.items.data[0]?.plan;
-    await updateTeamSubscription(team.id, {
-      stripeSubscriptionId: subscriptionId,
-      stripeProductId: plan?.product as string,
-      planName: (plan?.product as Stripe.Product).name,
-      subscriptionStatus: status,
-    });
-  } else if (status === "canceled" || status === "unpaid") {
-    await updateTeamSubscription(team.id, {
-      stripeSubscriptionId: null,
-      stripeProductId: null,
-      planName: null,
-      subscriptionStatus: status,
-    });
+  if (status === "active") {
+    try {
+      const lineItems = subscription.items.data;
+      if (!lineItems || lineItems.length === 0) {
+        console.error("No line items found in subscription");
+        redirect("/error?reason=no_line_items");
+        return;
+      }
+
+      const product = lineItems[0]?.price?.product as Stripe.Product;
+      if (!product) {
+        console.error("Product not found in line items");
+        redirect("/error?reason=product_not_found");
+        return;
+      }
+
+      await updateTeamSubscription(team.id, {
+        stripeSubscriptionId: subscriptionId,
+        stripeProductId: product.id,
+        planName: product.name,
+        subscriptionStatus: "active",
+      });
+      redirect("/dashboard?payment_success=true");
+    } catch (error) {
+      console.error("Error updating team subscription:", error);
+      redirect("/error?reason=update_failed");
+    }
+  } else {
+    console.error("Payment not successful, status:", status);
+    redirect("/dashboard?payment_failed=true");
   }
 }
 
 export async function getStripePrices() {
-  const prices = await stripe.prices.list({
-    expand: ["data.product"],
-    active: true,
-    type: "recurring",
-  });
+  try {
+    const prices = await stripe.prices.list({
+      expand: ["data.product"],
+      active: true,
+      type: "one_time",
+    });
 
-  return prices.data.map((price) => ({
-    id: price.id,
-    productId:
-      typeof price.product === "string" ? price.product : price.product.id,
-    unitAmount: price.unit_amount,
-    currency: price.currency,
-    interval: price.recurring?.interval,
-    trialPeriodDays: price.recurring?.trial_period_days,
-  }));
+    return prices.data.map((price) => ({
+      id: price.id,
+      productId:
+        typeof price.product === "string" ? price.product : price.product.id,
+      unitAmount: price.unit_amount,
+      currency: price.currency,
+    }));
+  } catch (error) {
+    console.error("Error fetching Stripe prices:", error);
+    return [];
+  }
 }
 
 export async function getStripeProducts() {
-  const products = await stripe.products.list({
-    active: true,
-    expand: ["data.default_price"],
-  });
+  try {
+    const products = await stripe.products.list({
+      active: true,
+      expand: ["data.default_price"],
+    });
 
-  return products.data.map((product) => ({
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    defaultPriceId:
-      typeof product.default_price === "string"
-        ? product.default_price
-        : product.default_price?.id,
-  }));
+    return products.data.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      defaultPriceId:
+        typeof product.default_price === "string"
+          ? product.default_price
+          : product.default_price?.id,
+    }));
+  } catch (error) {
+    console.error("Error fetching Stripe products:", error);
+    return [];
+  }
 }

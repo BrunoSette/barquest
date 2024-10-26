@@ -234,9 +234,9 @@ export default function HomePage() {
                 },
                 {
                   question:
-                    "How do I cancel my subscription if I'm not satisfied?",
+                    "How do I cancel if I'm not satisfied?",
                   answer:
-                    "Canceling your subscription is easy! If you decide that BarQuest isn't the right fit for you, simply log into your account settings and follow the cancellation instructions. For assistance, our support team is always here to help.",
+                    "Canceling is easy! If you decide that BarQuest isn't the right fit for you, simply log into your account settings and follow the cancellation instructions. For assistance, our support team is always here to help.",
                 },
                 {
                   question: "When will I be charged after the free trial?",
