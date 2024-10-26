@@ -36,7 +36,13 @@ async function fetchTestDetails(testId: number): Promise<TestDetail[]> {
 
 function TestDetails({ testDetails }: { testDetails: TestDetail[] }) {
   if (!Array.isArray(testDetails) || testDetails.length === 0) {
-    return <div>No test details available</div>;
+    return (
+      <div className="space-y-4">
+        <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+        <div className="h-4 w-1/2 bg-gray-200 rounded animate-pulse" />
+        <div className="h-4 w-2/3 bg-gray-200 rounded animate-pulse" />
+      </div>
+    );
   }
 
   return (

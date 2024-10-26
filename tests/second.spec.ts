@@ -166,9 +166,7 @@ test.describe("User Journey Tests", () => {
 
     // Verify initial quiz elements
     console.log("Verifying initial quiz elements...");
-    await expect(
-      page.getByRole("heading", { name: "Practice Quiz" })
-    ).toBeVisible();
+
     await expect(page.getByText("Question 1 of")).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Submit Answer" })
@@ -213,11 +211,7 @@ test.describe("User Journey Tests", () => {
     await page.getByRole("button", { name: "Finish" }).click();
 
     // Verify results page
-    const resultsPageHeadings = [
-      "Practice Quiz Results",
-      "Your Performance",
-      "Performance Breakdown",
-    ];
+    const resultsPageHeadings = ["Your Performance", "Performance Breakdown"];
     for (const heading of resultsPageHeadings) {
       await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     }

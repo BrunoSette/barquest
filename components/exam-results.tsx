@@ -31,9 +31,7 @@ export function ExamResults({
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        Practice Quiz Results
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Quiz Results</h1>
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
@@ -48,29 +46,7 @@ export function ExamResults({
             <Progress value={percentage} className="h-4" />
             <p className="text-center mt-2 text-2xl font-bold">{percentage}%</p>
           </div>
-          {/* <div className="w-64 h-64 mb-8"> */}
-          {/* <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={resultData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {resultData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer> */}
-          {/* </div> */}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-md">
             <Link href="/dashboard" passHref>
               <Button className="w-full bg-blue-500 hover:bg-blue-700 text-white p-5">
