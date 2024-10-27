@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import {
   Select,
   SelectContent,
@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Question } from "@/types/question";
 import { useState, useEffect } from "react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 type EditQuestionDialogProps = {
   isOpen: boolean;
@@ -124,24 +125,26 @@ export function EditQuestionDialog({
             </div>
           ))}
 
-          {/* Correct Answer */}
+          {/* Correct Answer - Single selection radio buttons */}
           <div>
             <Label className="block text-sm font-medium text-gray-700">
               Correct Answer
             </Label>
             <RadioGroup
-              value={editedQuestion.correctAnswer}
+              value={editedQuestion.correctAnswer.toString()}
               onValueChange={(value) =>
-                setEditedQuestion({ ...editedQuestion, correctAnswer: value })
+                setEditedQuestion({
+                  ...editedQuestion,
+                  correctAnswer: value,
+                })
               }
               className="mt-2 space-y-2"
             >
               {editedQuestion.choices.map((choice, index) => (
                 <div className="flex items-center space-x-2" key={index}>
                   <RadioGroupItem
-                    value={choice}
+                    value={index.toString()}
                     id={`edit-correct-${index}`}
-                    className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                   />
                   <Label
                     htmlFor={`edit-correct-${index}`}

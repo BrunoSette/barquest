@@ -4,7 +4,7 @@ import { Question } from "@/lib/db/schema";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db/drizzle";
 import { users } from "@/lib/db/schema";
-
+import { subjects } from "@/lib/db/schema";
 import { eq, inArray, not, sql, and } from "drizzle-orm";
 import { questions, testHistory, userAnswers } from "@/lib/db/schema";
 
@@ -14,20 +14,26 @@ export async function getQuestions(
   numberOfQuestions: number,
   questionMode: string
 ): Promise<Question[]> {
-  console.log(
-    `Requesting ${numberOfQuestions} questions for subjects: ${selectedSubjects.join(
-      ", "
-    )}, mode: ${questionMode}`
-  );
+  // Start with base conditions
 
-  let query = db.select().from(questions);
+  //TODO: ONLY GET APPROVED QUESTIONS
+  // let conditions = [eq(questions.is_approved, true)];
 
+  //ANY conditions
+  let conditions: any[] = [];
+
+  // Add subject condition if subjects are selected
   if (selectedSubjects.length > 0) {
-    query = query.where(
-      inArray(questions.subjectId, selectedSubjects)
-    ) as typeof query;
+    conditions.push(inArray(questions.subjectId, selectedSubjects));
   }
 
+  // Build initial query with conditions
+  let query = db
+    .select()
+    .from(questions)
+    .where(and(...conditions));
+
+  // Handle unanswered questions mode
   if (questionMode === "unanswered") {
     const answeredQuestions = await db
       .select({ questionId: userAnswers.questionId })
@@ -41,28 +47,30 @@ export async function getQuestions(
     console.log(`User has answered ${answeredQuestionIds.length} questions`);
 
     if (answeredQuestionIds.length > 0) {
-      query = query.where(
-        not(inArray(questions.id, answeredQuestionIds))
-      ) as typeof query;
+      query = db
+        .select()
+        .from(questions)
+        .where(
+          and(...conditions, not(inArray(questions.id, answeredQuestionIds)))
+        );
     }
   }
 
-  // Add randomization to the query
-  query = query.orderBy(sql`RANDOM()`) as typeof query;
+  // Execute the query and then apply randomization
+  const fetchedQuestions = await query;
+  const randomizedQuestions = fetchedQuestions.sort(() => Math.random() - 0.5);
 
   const totalQuestions = await db
     .select({ count: sql<number>`count(*)` })
     .from(questions);
   console.log(`Total questions in database: ${totalQuestions[0].count}`);
 
-  const fetchedQuestions = await query;
-
   console.log(
-    `Fetched ${fetchedQuestions.length} questions out of ${numberOfQuestions} requested`
+    `Fetched ${randomizedQuestions.length} questions out of ${numberOfQuestions} requested`
   );
 
-  // Slice the array to return only the requested number of questions (or all if fewer are available)
-  return fetchedQuestions.slice(0, numberOfQuestions);
+  // Slice the array to return only the requested number of questions
+  return randomizedQuestions.slice(0, numberOfQuestions);
 }
 
 export async function getTestState(userId: number) {
@@ -119,7 +127,7 @@ export async function submitAnswer(
     throw new Error("Question not found");
   }
 
-  const isCorrect = selectedAnswer === question[0].correctAnswer;
+  const isCorrect = selectedAnswer === Number(question[0].correctAnswer);
 
   if (!testHistoryId) {
     const newTest = await db
@@ -224,4 +232,27 @@ export async function getUser() {
   });
 
   return user;
+}
+
+// Add this new server action
+export async function getQuestionsForManagement(): Promise<Question[]> {
+  const questionsData = await db
+    .select({
+      id: questions.id,
+      createdAt: questions.createdAt,
+      updatedAt: questions.updatedAt,
+      subjectId: questions.subjectId,
+      questionText: questions.questionText,
+      answer1: questions.answer1,
+      answer2: questions.answer2,
+      answer3: questions.answer3,
+      answer4: questions.answer4,
+      correctAnswer: questions.correctAnswer,
+      is_approved: questions.is_approved,
+      comments: questions.comments,
+    })
+    .from(questions)
+    .leftJoin(subjects, eq(questions.subjectId, subjects.id));
+
+  return questionsData;
 }

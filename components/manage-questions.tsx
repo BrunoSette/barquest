@@ -13,6 +13,12 @@ import { EditQuestionDialog } from "@/components/manage-questions/EditQuestionDi
 import { DeleteQuestionDialog } from "@/components/manage-questions/DeleteQuestionDialog";
 import { SearchBar } from "@/components/manage-questions/SearchBar";
 import { Question } from "@/types/question";
+import {
+  updateQuestion,
+  deleteQuestion,
+  approveQuestion,
+} from "@/app/actions/questionActions";
+import { getQuestionsForManagement } from "@/app/actions/testActions";
 
 const subjects = [
   "Business Law",
@@ -52,25 +58,24 @@ export function ManageQuestionsComponent() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch("/api/questions");
-        if (response.ok) {
-          const data = await response.json();
-          // console.log("Fetched data:", data);
+        const data = await getQuestionsForManagement();
 
-          const mappedQuestions = data.map((item: any) => ({
+        const mappedQuestions = data.map((item: any) => {
+          // Get the actual answer string based on the correct answer index
+          const correctAnswer = item[`answer${item.correctAnswer}`];
+
+          return {
             id: item.id.toString(),
             subject: subjects[item.subjectId - 1],
             questionText: item.questionText,
             choices: [item.answer1, item.answer2, item.answer3, item.answer4],
-            correctAnswer: item[`answer${item.correctAnswer}`],
+            correctAnswer: correctAnswer,
             is_approved: item.is_approved,
             comments: item.comments,
-          }));
+          };
+        });
 
-          setQuestions(mappedQuestions);
-        } else {
-          addToast("Error", "Failed to fetch questions.", "destructive");
-        }
+        setQuestions(mappedQuestions);
       } catch (error) {
         console.error("Error fetching questions:", error);
         addToast("Error", "Failed to fetch questions.", "destructive");
@@ -118,27 +123,25 @@ export function ManageQuestionsComponent() {
   const handleSaveEdit = async (editedQuestion: Question) => {
     try {
       const subjectId = subjects.indexOf(editedQuestion.subject) + 1;
-      const response = await fetch(`/api/questions`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: editedQuestion.id,
-          subjectId,
-          questionText: editedQuestion.questionText,
-          answer1: editedQuestion.choices[0],
-          answer2: editedQuestion.choices[1],
-          answer3: editedQuestion.choices[2],
-          answer4: editedQuestion.choices[3],
-          correctAnswer:
-            editedQuestion.choices.indexOf(editedQuestion.correctAnswer) + 1,
-          is_approved: editedQuestion.is_approved ?? false,
-          comments: editedQuestion.comments,
-        }),
+
+      // Convert correctAnswer to a number (index + 1)
+      const correctAnswerIndex =
+        editedQuestion.choices.indexOf(editedQuestion.correctAnswer) + 1;
+
+      const result = await updateQuestion({
+        id: editedQuestion.id,
+        subjectId,
+        questionText: editedQuestion.questionText,
+        answer1: editedQuestion.choices[0],
+        answer2: editedQuestion.choices[1],
+        answer3: editedQuestion.choices[2],
+        answer4: editedQuestion.choices[3],
+        correctAnswer: correctAnswerIndex,
+        is_approved: editedQuestion.is_approved ?? false,
+        comments: editedQuestion.comments,
       });
 
-      if (response.ok) {
+      if (result.success) {
         setQuestions(
           questions.map((q) =>
             q.id === editedQuestion.id ? editedQuestion : q
@@ -163,15 +166,9 @@ export function ManageQuestionsComponent() {
   const confirmDelete = async () => {
     if (questionToDelete) {
       try {
-        const response = await fetch(`/api/questions`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: questionToDelete.id }),
-        });
+        const result = await deleteQuestion(questionToDelete.id);
 
-        if (response.ok) {
+        if (result.success) {
           setQuestions(questions.filter((q) => q.id !== questionToDelete.id));
           addToast(
             "Question Deleted",
@@ -187,6 +184,29 @@ export function ManageQuestionsComponent() {
         setIsDeleteDialogOpen(false);
         setQuestionToDelete(null);
       }
+    }
+  };
+
+  const handleApprove = async (question: Question) => {
+    try {
+      const result = await approveQuestion(question.id);
+
+      if (result.success) {
+        setQuestions(
+          questions.map((q) =>
+            q.id === question.id ? { ...question, is_approved: true } : q
+          )
+        );
+        addToast(
+          "Question Approved",
+          "The question has been approved successfully."
+        );
+      } else {
+        addToast("Error", "Failed to approve question.", "destructive");
+      }
+    } catch (error) {
+      console.error("Error approving question:", error);
+      addToast("Error", "Failed to approve question.", "destructive");
     }
   };
 
@@ -212,10 +232,21 @@ export function ManageQuestionsComponent() {
               question={question}
               onEdit={() => handleEdit(question)}
               onDelete={() => handleDelete(question)}
+              onApprove={() => handleApprove(question)}
             />
           ))
         ) : (
-          <p>No questions found.</p>
+          <div className="space-y-4">
+            <div className="animate-pulse">
+              <div className="h-48 bg-gray-200 rounded-lg"></div>
+            </div>
+            <div className="animate-pulse">
+              <div className="h-48 bg-gray-200 rounded-lg"></div>
+            </div>
+            <div className="animate-pulse">
+              <div className="h-48 bg-gray-200 rounded-lg"></div>
+            </div>
+          </div>
         )}
 
         <EditQuestionDialog
