@@ -29,11 +29,11 @@ export default async function PricingPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-4xl font-bold text-center mb-4">
-        Choose the Perfect Plan for You
+        Choose the Perfect Option for You
       </h1>
       <h2 className="text-2xl text-center mb-8">
-        Flexible, comprehensive, and risk-free pricing options to your journey
-        as a Barrister or Solicitor.
+        Flexible and risk-free pricing options to your journey as a Barrister or
+        Solicitor.
       </h2>
       <div className="flex flex-wrap justify-center gap-8">
         {productData.map(
@@ -82,9 +82,9 @@ export default async function PricingPage() {
         <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">
           {name}
         </h2>
-        <p className="text-sm text-gray-600 mb-4 text-center">
+        {/* <p className="text-sm text-gray-600 mb-4 text-center">
           with {trialDays} day free trial
-        </p>
+        </p> */}
         <p className="text-4xl font-medium text-gray-900 mb-6 text-center">
           ${(price ?? 0) / 100}{" "}
           {/* <span className="text-xl font-normal text-gray-600">

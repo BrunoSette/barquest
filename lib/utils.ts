@@ -61,7 +61,7 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "7 Days Risk-Free Trial",
+      "30 Days Money Back Guarantee",
     ],
   },
   {
@@ -78,7 +78,7 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "7 Days Risk-Free Trial",
+      "30 Days Money Back Guarantee",
     ],
   },
   {
@@ -95,7 +95,7 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "7 Days Risk-Free Trial",
+      "30 Days Money Back Guarantee",
     ],
   },
 ];

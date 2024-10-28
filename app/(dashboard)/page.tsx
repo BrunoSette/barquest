@@ -3,9 +3,9 @@ import { ArrowRight, FileQuestion, Database, ChartArea } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import CTA from "@/components/cta";
-import AnalyticsImage from "../public/dashboard.webp";
-import QuestionsImage from "../public/questions.webp";
-import IphoneMockup from "../public/iphone.webp";
+import AnalyticsImage from "../public/dashboard.png";
+import QuestionsImage from "../public/test.gif";
+import IphoneMockup from "../public/phone.jpg";
 import { YouTubeEmbed } from "@next/third-parties/google";
 import Footer from "@/components/footer";
 
@@ -23,7 +23,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8">
               <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-                <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
+                <h1 className="text-5xl font-bold text-gray-900 tracking-tight md:text-6xl">
                   Your Ultimate Prep Tool for the
                   <span className="block text-orange-500">
                     Ontario Bar Exam
@@ -36,7 +36,7 @@ export default function HomePage() {
                 <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                   <Link href="#pricing">
                     <Button className="bg-orange-500 hover:bg-orange-800 text-white rounded-full text-lg px-8 py-4 inline-flex items-center justify-center">
-                      Start My 7 Days Free Trial
+                      Get Started
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
@@ -58,9 +58,6 @@ export default function HomePage() {
         {/* Keep the Key Features Section with Icons */}
         <section id="features" className="py-16 bg-white w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              Key Features
-            </h2>
             <div className="lg:grid lg:grid-cols-3 lg:gap-8">
               {[
                 {
@@ -82,8 +79,8 @@ export default function HomePage() {
                     "Benefit from detailed explanations written by legal experts, helping you understand complex topics and improve your legal reasoning skills.",
                 },
               ].map((feature, index) => (
-                <div key={index} className="mt-10 lg:mt-0">
-                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
+                <div key={index} className="mt-10 lg:mt-0 text-center">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white mx-auto">
                     <feature.icon className="h-6 w-6" />
                   </div>
                   <div className="mt-5">
@@ -101,7 +98,7 @@ export default function HomePage() {
         </section>
 
         {/* Updated section with benefits */}
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-orange-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
               <div>
@@ -119,7 +116,10 @@ export default function HomePage() {
                   progress in real-time with detailed analytics.
                 </p>
               </div>
-              <div className="mt-10 -mx-4 relative lg:mt-0 " aria-hidden="true">
+              <div
+                className="mt-10 -mx-4 relative lg:mt-0 border-2 border-orange-500"
+                aria-hidden="true"
+              >
                 <Image
                   className="relative mx-auto rounded-lg object-contain h-full w-full"
                   src={QuestionsImage}
@@ -228,19 +228,21 @@ export default function HomePage() {
                     "Our system tracks your performance across different topics and question types, providing detailed insights to help you improve.",
                 },
                 {
-                  question: "What is included in the 7-day free trial?",
+                  question:
+                    "What is included in the 30-day money back guarantee?",
                   answer:
-                    "During your 7-day free trial, you'll have full access to all the features of your selected plan, including our extensive question banks, real-time progress tracking, instant feedback, and mobile-friendly access. This allows you to experience the full value of BarQuest before committing to a subscription.",
+                    "With our 30-day money back guarantee, you can try BarQuest risk-free. If you're not satisfied within the first 30 days, simply send an email to support@barquest.ca and we'll refund your order immediately, no questions asked.",
                 },
                 {
                   question: "How do I cancel if I'm not satisfied?",
                   answer:
-                    "Canceling is easy! If you decide that BarQuest isn't the right fit for you in the first 7 days, simply send an email to support@barquest.ca and we'll cancel your order immediately.",
+                    "Canceling is easy! If you decide that BarQuest isn't the right fit for you in the first 30 days, simply send an email to support@barquest.ca and we'll refund your order immediately, no questions asked.",
                 },
+
                 {
-                  question: "When will I be charged after starting my free trial?",
-                  answer: 
-                    "Your 7-day free trial starts as soon as you sign up. During this period, you'll have full access to all features at no cost. After the trial ends, you'll be charged a one-time payment that gives you 90 days of access to BarQuest, unless you cancel before the trial period ends. You can cancel anytime during the trial with no charges.",
+                  question: "What payment methods do you accept?",
+                  answer:
+                    "We accept all major credit cards, including Visa, MasterCard, American Express, and Discover. Payments are processed securely through Stripe.",
                 },
               ].map((item, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg">
