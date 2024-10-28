@@ -35,8 +35,16 @@ export async function createSubscriptionCheckoutSession({
       },
     ],
     mode: "payment",
-    success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.BASE_URL}`,
+    success_url: `${
+      process.env.BASE_URL
+        ? process.env.BASE_URL
+        : `https://${process.env.VERCEL_URL}`
+    }/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${
+      process.env.BASE_URL
+        ? process.env.BASE_URL
+        : `https://${process.env.VERCEL_URL}`
+    }`,
     customer: team.stripeCustomerId || undefined, // Ensure this is set if needed
     client_reference_id: user.id.toString(),
     allow_promotion_codes: false,
