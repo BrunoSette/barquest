@@ -145,6 +145,16 @@ export const testHistory = pgTable("test_history", {
   date: timestamp("date").notNull().defaultNow(), // Date of the test attempt
 });
 
+export const userProducts = pgTable("user_products", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  stripeProductId: text("stripe_product_id"),
+  stripeProductName: varchar("stripe_product_name", { length: 50 }),
+  stripePriceId: text("stripe_price_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(), // Date of the test attempt
+  active: pgBoolean("active").default(true),
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
@@ -229,6 +239,13 @@ export const userAnswersRelations = relations(userAnswers, ({ one }) => ({
   }),
 }));
 
+export const userProductsRelations = relations(userProducts, ({ one }) => ({
+  user: one(users, {
+    fields: [userProducts.userId],
+    references: [users.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;
@@ -254,6 +271,8 @@ export type UserAnswer = typeof userAnswers.$inferSelect;
 export type NewUserAnswer = typeof userAnswers.$inferInsert;
 export type TestHistory = typeof testHistory.$inferSelect;
 export type NewTestHistory = typeof testHistory.$inferInsert;
+export type UserProduct = typeof userProducts.$inferSelect;
+export type NewUserProduct = typeof userProducts.$inferInsert;
 
 export enum ActivityType {
   SIGN_UP = "SIGN_UP",

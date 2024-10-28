@@ -7,6 +7,8 @@ import {
   users,
   subjects,
   questions,
+  userProducts,
+  UserProduct,
 } from "./schema";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth/session";
@@ -105,6 +107,14 @@ export async function getActivityLogs() {
     .where(eq(activityLogs.userId, user.id))
     .orderBy(desc(activityLogs.timestamp))
     .limit(10);
+}
+
+export async function getProductsForUser(userId: number): Promise<UserProduct[]> {
+  const results = await db.query.userProducts.findMany({
+    where: eq(userProducts.userId, userId),
+  });
+
+  return results;
 }
 
 export async function getTeamForUser(userId: number) {

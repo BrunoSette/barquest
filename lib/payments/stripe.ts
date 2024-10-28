@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { redirect } from "next/navigation";
 import { Team } from "@/lib/db/schema";
 import {
+  getProductsForUser,
   getTeamByStripeCustomerId,
   getUser,
   updateTeamSubscription,
@@ -60,6 +61,12 @@ export async function createProductCheckoutSession({
 
   if (!team || !user) {
     redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+  }
+
+  const userProducts = await getProductsForUser(user.id);
+
+  if (userProducts.some((p) => p.stripePriceId == priceId)) {
+    redirect(`/pricing`);
   }
 
   const session = await stripe.checkout.sessions.create({
