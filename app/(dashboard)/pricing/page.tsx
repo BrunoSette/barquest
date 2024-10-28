@@ -3,11 +3,20 @@ import { Check } from "lucide-react";
 import { getStripePrices, getStripeProducts } from "@/lib/payments/stripe";
 import { SubmitButton } from "./submit-button";
 import { Products } from "@/lib/utils";
+import { getProductsForUser, getUser } from "@/lib/db/queries";
+import { UserProduct } from "@/lib/db/schema";
 
 // Prices are fresh for one hour max
 export const revalidate = 3600;
 
 export default async function PricingPage() {
+  const user = await getUser();
+  let userProducts: UserProduct[] = [];
+
+  if (user) {
+    userProducts = await getProductsForUser(user.id);
+  }
+
   const [prices, products] = await Promise.all([
     getStripePrices(),
     getStripeProducts(),
@@ -55,6 +64,7 @@ export default async function PricingPage() {
                 trialDays={trialDays}
                 features={features}
                 priceId={stripePrice.id}
+                isPurchased={userProducts.some((p) => p.active && p.stripeProductName == name)}
               />
             )
         )}
@@ -69,12 +79,14 @@ export default async function PricingPage() {
     trialDays,
     features,
     priceId,
+    isPurchased,
   }: {
     name: string;
     price: number | null;
     interval: string;
     trialDays: number;
     features: string[];
+    isPurchased: boolean;
     priceId?: string;
   }) {
     return (
@@ -101,7 +113,7 @@ export default async function PricingPage() {
         </ul>
         <form action={checkoutAction} className="w-full flex justify-center">
           <input type="hidden" name="priceId" value={priceId} />
-          <SubmitButton />
+          <SubmitButton disabled={isPurchased} />
         </form>
       </div>
     );
