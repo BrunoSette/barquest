@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/drizzle";
-import { users, teams, teamMembers } from "@/lib/db/schema";
+import { users, teams, teamMembers, userProducts } from "@/lib/db/schema";
 import { setSession } from "@/lib/auth/session";
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/payments/stripe";
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     if (!session.customer || typeof session.customer === "string") {
       console.warn("Customer data is not available or is a string.");
       // Handle logic for sessions without a customer, if applicable
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      // return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     const lineItems = session.line_items?.data;
@@ -31,8 +31,13 @@ export async function GET(request: NextRequest) {
       throw new Error('No line items found for this session.');
     }
 
-    console.log("lineitems:", JSON.stringify(lineItems, null, 4));
-    const product = lineItems[0].price?.product;
+    const price = lineItems[0].price;
+    if (!price) {
+      throw new Error('No product price found for this session.');
+    }
+
+    // console.log("lineitems:", JSON.stringify(lineItems, null, 4));
+    const product = price.product;
     if (!product) {
       throw new Error('No product found for this session.');
     }
@@ -42,9 +47,11 @@ export async function GET(request: NextRequest) {
         ? product
         : product?.id;
 
-    console.log("productId:", productId);
+    const productName: string = (product as Stripe.Product).name;
 
-    const customerId = session.customer.id;
+    // console.log("product:", JSON.stringify(product, null, 4));
+
+    // const customerId = session.customer.id;
     // const subscriptionId =
     //   typeof session.subscription === 'string'
     //     ? session.subscription
@@ -106,14 +113,23 @@ export async function GET(request: NextRequest) {
     await db
       .update(teams)
       .set({
-        stripeCustomerId: customerId,
+        // stripeCustomerId: customerId,
         // stripeSubscriptionId: null, //subscriptionId,
         stripeProductId: productId,
-        // planName: null, //(plan.product as Stripe.Product).name,
-        // subscriptionStatus: null, //subscription.status,
+        planName: productName,
+        subscriptionStatus: "active",
         updatedAt: new Date(),
       })
       .where(eq(teams.id, userTeam[0].teamId));
+
+    await db
+      .insert(userProducts)
+      .values({
+        userId: Number(userId),
+        stripeProductId: productId,
+        stripeProductName: productName,
+        stripePriceId: price.id,
+      });
 
     await setSession(user[0]);
     return NextResponse.redirect(new URL("/dashboard", request.url));
