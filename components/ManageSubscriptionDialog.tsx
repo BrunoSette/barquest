@@ -31,8 +31,7 @@ export function PricingDialog({
             You need an active plan to create tests
           </DialogTitle>
           <DialogDescription className="text-center text-lg mt-2">
-            Sign up for a plan to create unlimited tests and access advanced
-            features!
+            Sign up to create unlimited tests and access advanced features !
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-8 py-6">
@@ -61,7 +60,7 @@ export function PricingDialog({
               </Badge>
             </div>
             <div className="space-y-4">
-              <h4 className="text-xl font-semibold">Create a plan and get:</h4>
+              <h4 className="text-xl font-semibold">Sign up and get:</h4>
               <ul className="space-y-2">
                 {[
                   "Unlimited test creation",
@@ -84,7 +83,7 @@ export function PricingDialog({
                 variant="outline"
                 className="w-full h-14 text-lg font-semibold"
               >
-                <CreditCard className="mr-2 h-5 w-5" /> Manage My Subscription
+                <CreditCard className="mr-2 h-5 w-5" /> Start now
               </Button>
             </form>
           </div>

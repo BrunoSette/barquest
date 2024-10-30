@@ -33,14 +33,11 @@ async function deleteTestHistory(testHistoryId: string) {
   revalidatePath("/dashboard");
 }
 
-// Add proper type definition for the page props
+// Update the page props interface to match Next.js expectations
 interface PageProps {
-  searchParams: {
-    success?: string;
-  };
+  searchParams: Promise<{ success?: string }>;
 }
 
-// Update the page component with the correct type
 export default async function DashboardPage({ searchParams }: PageProps) {
   const user = await getUser();
 
@@ -49,7 +46,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   }
 
   const dashboardData = await fetchDashboardData(user.id);
-  const showWelcomeDialog = Boolean(await Promise.resolve(searchParams.success) === "true");
+  // Await the searchParams Promise before using it
+  const resolvedParams = await searchParams;
+  const showWelcomeDialog = resolvedParams.success === "true";
 
   return (
     <DashboardComponent

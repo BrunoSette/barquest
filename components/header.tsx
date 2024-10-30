@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  CircleIcon,
-  Settings,
-  BookCheck,
-  LogOut,
-  BadgeCheck,
-  Video,
-} from "lucide-react";
+import { CircleIcon, Settings, LogOut, BadgeCheck, Video } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,11 +14,9 @@ import { signOut } from "@/app/(login)/actions";
 import { DashboardIcon } from "@radix-ui/react-icons";
 import { useUser } from "@/lib/auth";
 
-
 export default function Header() {
   const { user } = useUser();
 
-  // console.log("HEADER", user);
 
   return (
     <header className="border-b border-gray-200">
