@@ -7,8 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { TeamDataWithMembers } from "@/lib/db/schema";
-import { Products, subjects } from "@/lib/utils";
+import { UserProduct } from "@/lib/db/schema";
+import { mergeProductNames, Products, subjects } from "@/lib/utils";
 import { PricingDialog } from "@/components/ManageSubscriptionDialog";
 import Head from "next/head";
 
@@ -18,9 +18,11 @@ const metadata = {
 };
 
 export function Settings({
-  teamData,
+  userProducts,
+  // teamData,
 }: {
-  teamData: TeamDataWithMembers | null;
+  userProducts: UserProduct[];
+  // teamData: TeamDataWithMembers | null;
 }) {
   const router = useRouter();
   const [isTutor, setIsTutor] = useState(true);
@@ -34,11 +36,10 @@ export function Settings({
   const [error, setError] = useState("");
   const [showPricingDialog, setShowPricingDialog] = useState(false);
 
-  const subscriptionStatus = teamData?.subscriptionStatus || "free";
-  const planName = teamData?.planName || "none";
+  const subscriptionStatus = userProducts.some((p) => p.active) ? "active" : "free";
+  const planName = mergeProductNames(userProducts);
 
-  const isActiveOrTrialing =
-    subscriptionStatus === "active" || subscriptionStatus === "trialing";
+  const isActiveOrTrialing = subscriptionStatus === "active";
 
   useEffect(() => {
     if (!isActiveOrTrialing) {
@@ -121,9 +122,8 @@ export function Settings({
               onChange={() => handleSubjectChange(subject.id, isBarrister)}
               disabled={
                 !(
-                  (planName === Products[productIndex].name &&
-                    isActiveOrTrialing) ||
-                  (planName === Products[2].name && isActiveOrTrialing)
+                  (userProducts.some((p) => p.stripeProductName === Products[productIndex].name) && isActiveOrTrialing) ||
+                  (userProducts.some((p) => p.stripeProductName === Products[2].name) && isActiveOrTrialing)
                 )
               }
             />
@@ -136,8 +136,8 @@ export function Settings({
             </Label>
           </div>
         ))}
-        {((planName === Products[productIndex].name && isActiveOrTrialing) ||
-          (planName === Products[2].name && isActiveOrTrialing)) && (
+        {((userProducts.some((p) => p.stripeProductName === Products[productIndex].name) && isActiveOrTrialing) ||
+          (userProducts.some((p) => p.stripeProductName === Products[2].name) && isActiveOrTrialing)) && (
           <Button
             type="button"
             className="bg-orange-500 mt-4 hover:bg-orange-600 text-white"
@@ -159,7 +159,7 @@ export function Settings({
       selectedSolicitorSubjects,
       handleSubjectChange,
       handleSelectAllSubjects,
-      planName,
+      userProducts,
       isActiveOrTrialing,
     ]
   );

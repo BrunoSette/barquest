@@ -1,0 +1,1 @@
+ALTER TABLE "user_products" ADD COLUMN "stripe_price_id" text;

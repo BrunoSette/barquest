@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { UserProduct } from "./db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -61,7 +62,6 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "30 Days Money Back Guarantee",
     ],
   },
   {
@@ -78,7 +78,6 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "30 Days Money Back Guarantee",
     ],
   },
   {
@@ -95,7 +94,17 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "30 Days Money Back Guarantee",
     ],
   },
 ];
+
+export function mergeProductNames(products: UserProduct[]): string {
+  if (products.length === 0) return "Free";
+  if (products.some((p) => p.stripeProductName?.toLowerCase().includes("full")))
+    return "Full";
+  return products
+    .filter((p) => p.active)
+    .map((p) => p.stripeProductName?.replace("BarQuest - ", ""))
+    .sort()
+    .join(" + ");
+}

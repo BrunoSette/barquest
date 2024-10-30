@@ -228,21 +228,20 @@ export default function HomePage() {
                     "Our system tracks your performance across different topics and question types, providing detailed insights to help you improve.",
                 },
                 {
-                  question:
-                    "What is included in the 30-day money back guarantee?",
-                  answer:
-                    "With our 30-day money back guarantee, you can try BarQuest risk-free. If you're not satisfied within the first 30 days, simply send an email to support@barquest.ca and we'll refund your order immediately, no questions asked.",
-                },
-                {
-                  question: "How do I cancel if I'm not satisfied?",
-                  answer:
-                    "Canceling is easy! If you decide that BarQuest isn't the right fit for you in the first 30 days, simply send an email to support@barquest.ca and we'll refund your order immediately, no questions asked.",
-                },
-
-                {
                   question: "What payment methods do you accept?",
                   answer:
                     "We accept all major credit cards, including Visa, MasterCard, American Express, and Discover. Payments are processed securely through Stripe.",
+                },
+                {
+                  question:
+                    "Can I take unlimited quizzes with my BarQuest purchase?",
+                  answer:
+                    "Absolutely! With your one-time BarQuest purchase, you have access to create and take as many quizzes as you want for a full 90 days. This unlimited access lets you thoroughly prepare and revisit questions to ensure you're exam-ready.",
+                },
+                {
+                  question: "How many questions are included with BarQuest?",
+                  answer:
+                    "BarQuest offers three comprehensive packages: Barrister (+500 questions), Solicitor (+600 questions), and Full (+1,000 questions). Each package includes detailed commentary and covers all relevant exam topics.",
                 },
               ].map((item, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg">
