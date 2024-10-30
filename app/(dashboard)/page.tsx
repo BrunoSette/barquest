@@ -8,7 +8,7 @@ import QuestionsImage from "../public/test.gif";
 import IphoneMockup from "../public/phone.jpg";
 import { YouTubeEmbed } from "@next/third-parties/google";
 import Footer from "@/components/footer";
-
+import Testimonials from "@/components/testimonials";
 import dynamic from "next/dynamic";
 const PricingComponent = dynamic(
   () => import("@/app/(dashboard)/pricing/page"),
@@ -253,6 +253,10 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+        </section>
+
+        <section id="testimonials">
+          <Testimonials />
         </section>
 
         <section id="pricing">

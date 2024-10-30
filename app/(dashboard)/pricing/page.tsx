@@ -6,8 +6,8 @@ import { Products } from "@/lib/utils";
 import { getProductsForUser, getUser } from "@/lib/db/queries";
 import { UserProduct } from "@/lib/db/schema";
 
-// Prices are fresh for one hour max
-export const revalidate = 3600;
+// Prices are fresh for one 10 days max
+export const revalidate = 3600 * 24 * 10;
 
 export default async function PricingPage() {
   const user = await getUser();
@@ -64,7 +64,9 @@ export default async function PricingPage() {
                 trialDays={trialDays}
                 features={features}
                 priceId={stripePrice.id}
-                isPurchased={userProducts.some((p) => p.active && p.stripeProductName == name)}
+                isPurchased={userProducts.some(
+                  (p) => p.active && p.stripeProductName == name
+                )}
               />
             )
         )}
