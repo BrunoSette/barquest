@@ -25,7 +25,7 @@ const MODES = {
   signin: {
     title: "Sign in to your account",
     buttonText: "Sign in",
-    altLink: { text: "Start My 7 Days Free Trial", href: "/#pricing" },
+    altLink: { text: "Create my Account", href: "/#pricing" },
     altPrompt: "New to our platform?",
   },
   signup: {

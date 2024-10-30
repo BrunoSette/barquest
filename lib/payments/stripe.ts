@@ -26,6 +26,9 @@ export async function createSubscriptionCheckoutSession({
     return;
   }
 
+  const baseUrl = process.env.BASE_URL || 
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: [
@@ -35,17 +38,9 @@ export async function createSubscriptionCheckoutSession({
       },
     ],
     mode: "payment",
-    success_url: `${
-      process.env.BASE_URL
-        ? process.env.BASE_URL
-        : `https://${process.env.VERCEL_URL}`
-    }/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${
-      process.env.BASE_URL
-        ? process.env.BASE_URL
-        : `https://${process.env.VERCEL_URL}`
-    }`,
-    customer: team.stripeCustomerId || undefined, // Ensure this is set if needed
+    success_url: `${baseUrl}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${baseUrl}/pricing`,
+    customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
     allow_promotion_codes: false,
   });
@@ -77,6 +72,9 @@ export async function createProductCheckoutSession({
     redirect(`/pricing`);
   }
 
+  const baseUrl = process.env.BASE_URL || 
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: [
@@ -86,8 +84,8 @@ export async function createProductCheckoutSession({
       },
     ],
     mode: "payment",
-    success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.BASE_URL}/pricing`,
+    success_url: `${baseUrl}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${baseUrl}/pricing`,
     customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
     allow_promotion_codes: false,
