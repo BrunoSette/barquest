@@ -62,7 +62,6 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "30 Days Money Back Guarantee",
     ],
   },
   {
@@ -79,7 +78,6 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "30 Days Money Back Guarantee",
     ],
   },
   {
@@ -96,14 +94,14 @@ export const Products = [
       "Mobile-Friendly Access",
       "Instant Feedback",
       "Regular Content Updates",
-      "30 Days Money Back Guarantee",
     ],
   },
 ];
 
 export function mergeProductNames(products: UserProduct[]): string {
   if (products.length === 0) return "Free";
-  if (products.some((p) => p.stripeProductName?.toLowerCase().includes("full"))) return "Full";
+  if (products.some((p) => p.stripeProductName?.toLowerCase().includes("full")))
+    return "Full";
   return products
     .filter((p) => p.active)
     .map((p) => p.stripeProductName?.replace("BarQuest - ", ""))
