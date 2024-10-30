@@ -33,7 +33,15 @@ async function deleteTestHistory(testHistoryId: string) {
   revalidatePath("/dashboard");
 }
 
-export default async function DashboardPage() {
+// Add proper type definition for the page props
+interface PageProps {
+  searchParams: {
+    success?: string;
+  };
+}
+
+// Update the page component with the correct type
+export default async function DashboardPage({ searchParams }: PageProps) {
   const user = await getUser();
 
   if (!user) {
@@ -41,12 +49,14 @@ export default async function DashboardPage() {
   }
 
   const dashboardData = await fetchDashboardData(user.id);
+  const showWelcomeDialog = Boolean(await Promise.resolve(searchParams.success) === "true");
 
   return (
     <DashboardComponent
       userId={user.id}
       initialData={dashboardData}
       deleteTestHistory={deleteTestHistory}
+      showWelcomeDialog={showWelcomeDialog}
     />
   );
 }

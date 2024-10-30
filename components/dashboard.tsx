@@ -5,6 +5,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, BookOpen, CheckCircle, TrendingUp } from "lucide-react";
 import { StatCard } from "./dashboard/StatCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 // Dynamic imports
 const PerformanceBySubjectCard = dynamic(() =>
@@ -42,11 +51,13 @@ interface DashboardProps {
     testHistory: any[]; // Replace 'any' with the correct type
   };
   deleteTestHistory: (testHistoryId: any) => Promise<void>;
+  showWelcomeDialog?: boolean;
 }
 
 export function DashboardComponent({
   initialData,
   deleteTestHistory,
+  showWelcomeDialog = false,
 }: DashboardProps) {
   const { totalAnswers, correctAnswers, answersPerSubject, testHistory } =
     initialData;
@@ -56,6 +67,8 @@ export function DashboardComponent({
     correct: subjectData.correct_answers,
     incorrect: subjectData.total_answers - subjectData.correct_answers,
   }));
+
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(showWelcomeDialog);
 
   return (
     <div className="container mx-auto p-4">
@@ -144,7 +157,7 @@ export function DashboardComponent({
                   if (lastWeekTests.length === 0) {
                     // If no tests from last week, set last week score to 0
                     const currentScore = (correctAnswers / totalAnswers) * 100;
-                     // Difference is just the current score
+                    // Difference is just the current score
                     return `+${currentScore.toFixed(1)}% from last week`;
                   }
 
@@ -195,6 +208,39 @@ export function DashboardComponent({
         deleteTestHistory={deleteTestHistory}
         loading={false}
       />
+
+      <Dialog open={isWelcomeOpen} onOpenChange={setIsWelcomeOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              Welcome to BarQuest! 🎉
+            </DialogTitle>
+            <DialogDescription className="space-y-4 pt-4">
+              <p>
+                Congratulations on joining BarQuest! We are here to help you
+                prepare for your Ontario Bar Exam with confidence.
+              </p>
+              <p>
+                To get started, click the &ldquo;Create a New Test&rdquo; button
+                below to begin your practice. You can track your progress and
+                performance right here on your dashboard.
+              </p>
+              <p>
+                Good luck with your studies! Remember, consistent practice is
+                key to success.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6">
+            <Button
+              asChild
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              <a href="/dashboard/newtest">Create a New Test</a>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
