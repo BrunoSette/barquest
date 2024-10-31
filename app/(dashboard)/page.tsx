@@ -106,10 +106,9 @@ export default function HomePage() {
                   Comprehensive Question Bank
                 </h2>
                 <p className="mt-3 max-w-3xl text-lg text-gray-500">
-                  Gain access to an expertly curated question bank designed to
-                  mirror the actual Ontario Bar Exam. With tailored questions,
-                  you’ll ensure you&apos;re practicing exactly what you need to
-                  know.
+                  Gain access to an expertly curated question bank for the
+                  Ontario Bar Exam. With tailored questions, you’ll ensure
+                  you&apos;re practicing exactly what you need to know.
                 </p>
                 <p className="mt-3 max-w-3xl text-lg text-gray-500">
                   Focus your efforts on the most relevant topics, and track your
@@ -255,9 +254,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="testimonials">
+        {/* <section id="testimonials">
           <Testimonials />
-        </section>
+        </section> */}
 
         <section id="pricing">
           <PricingComponent />
