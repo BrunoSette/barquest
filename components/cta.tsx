@@ -11,8 +11,8 @@ const CTA = () => (
             Ready to Ace the Ontario Bar Exam?
           </h2>
           <p className="mt-3 max-w-3xl text-lg text-orange-100">
-            Our platform gives you everything you need to fully prepare and pass
-            with confidence. Stop stressing over outdated materials—focus on
+            Our platform gives you everything you need to fully prepare with
+            confidence. Stop stressing over outdated materials—focus on
             mastering the content that matters most.
           </p>
         </div>

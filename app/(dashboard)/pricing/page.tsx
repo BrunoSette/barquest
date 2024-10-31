@@ -38,11 +38,10 @@ export default async function PricingPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-4xl font-bold text-center mb-4">
-        Choose the Perfect Option for You
+        Select Your Ideal Path
       </h1>
       <h2 className="text-2xl text-center mb-8">
-        Flexible and risk-free pricing options to your journey as a Barrister or
-        Solicitor.
+        Explore options tailored to your Barrister or Solicitor career.
       </h2>
       <div className="flex flex-wrap justify-center gap-8">
         {productData.map(
@@ -64,7 +63,9 @@ export default async function PricingPage() {
                 trialDays={trialDays}
                 features={features}
                 priceId={stripePrice.id}
-                isPurchased={userProducts.some((p) => p.active && p.stripeProductName == name)}
+                isPurchased={userProducts.some(
+                  (p) => p.active && p.stripeProductName == name
+                )}
               />
             )
         )}
