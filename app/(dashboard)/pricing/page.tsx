@@ -91,13 +91,18 @@ export default async function PricingPage() {
     priceId?: string;
   }) {
     return (
-      <div className="pt-6 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center">
-        <h2 className="text-2xl font-medium text-gray-900 mb-2 text-center">
-          {name}
-        </h2>
-        {/* <p className="text-sm text-gray-600 mb-4 text-center">
-          with {trialDays} day free trial
-        </p> */}
+      <div className="pt-6 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center border border-orange-200 rounded-lg p-4">
+        <div className="relative w-full">
+          <div className="flex flex-col items-center mb-4">
+            <h2 className="text-3xl font-semibold text-gray-900">{name}</h2>
+            {name === "BarQuest - Full" && (
+              <span className=" bg-orange-100 text-orange-600 px-3  rounded-full text-xs font-medium flex items-center justify-center">
+                15% OFF
+              </span>
+            )}
+          </div>
+        </div>
+
         <p className="text-4xl font-medium text-gray-900 mb-6 text-center">
           ${(price ?? 0) / 100}{" "}
           {/* <span className="text-xl font-normal text-gray-600">

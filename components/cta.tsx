@@ -19,7 +19,7 @@ const CTA = () => (
         <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
           <Link href="/#pricing">
             <Button className="bg-white hover:bg-gradient-to-r hover:from-orange-400 hover:to-red-400 text-orange-500 hover:text-white rounded-full text-xl px-12 py-6 inline-flex items-center justify-center transition duration-500 ease-in-out transform hover:scale-110 hover:shadow-lg">
-              Get Access Now
+              Select your Path
               <ArrowRight className="ml-3 h-6 w-6 text-orange-500 transition-transform duration-500 ease-in-out transform hover:translate-x-1" />
             </Button>
           </Link>

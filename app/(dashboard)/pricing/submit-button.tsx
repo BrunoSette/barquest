@@ -9,7 +9,7 @@ export function SubmitButton({ disabled = false }: { disabled: boolean }) {
 
   const btnStyle = disabled
     ? "bg-orange-600 text-white"
-    : "bg-white hover:bg-orange-400 hover:text-white text-black";
+    : "bg-orange-500 hover:bg-orange-600 hover:text-white text-white";
 
   return (
     <Button
