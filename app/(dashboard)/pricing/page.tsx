@@ -43,7 +43,7 @@ export default async function PricingPage() {
       <h2 className="text-2xl text-center mb-8">
         Explore options tailored to your Barrister or Solicitor career.
       </h2>
-      <div className="flex flex-wrap justify-center gap-8">
+      <div className="flex flex-wrap justify-center gap-1">
         {productData.map(
           ({
             name,
@@ -76,8 +76,8 @@ export default async function PricingPage() {
   function PricingCard({
     name,
     price,
-    interval,
-    trialDays,
+    // interval,
+    // trialDays,
     features,
     priceId,
     isPurchased,
@@ -91,9 +91,9 @@ export default async function PricingPage() {
     priceId?: string;
   }) {
     return (
-      <div className="pt-6 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center border border-orange-200 rounded-lg p-4">
+      <div className="pt-4 flex-1 min-w-[300px] max-w-[400px] flex flex-col items-center border border-orange-200 rounded-lg p-4">
         <div className="relative w-full">
-          <div className="flex flex-col items-center mb-4">
+          <div className="flex flex-col items-center mb-2">
             <h2 className="text-3xl font-semibold text-gray-900">{name}</h2>
             {name === "BarQuest - Full" && (
               <span className=" bg-orange-100 text-orange-600 px-3  rounded-full text-xs font-medium flex items-center justify-center">
@@ -103,13 +103,13 @@ export default async function PricingPage() {
           </div>
         </div>
 
-        <p className="text-4xl font-medium text-gray-900 mb-6 text-center">
+        <p className="text-4xl font-medium text-gray-900 mb-4 text-center">
           ${(price ?? 0) / 100}{" "}
           {/* <span className="text-xl font-normal text-gray-600">
             / {interval}
           </span> */}
         </p>
-        <ul className="space-y-4 mb-8 w-full">
+        <ul className="space-y-2 mb-8 w-full">
           {features.map((feature, index) => (
             <li key={index} className="flex items-center justify-center">
               <Check className="h-5 w-5 text-orange-500 mr-2 flex-shrink-0" />
