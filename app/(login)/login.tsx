@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { CircleIcon, Loader2 } from "lucide-react";
 import { signIn, signUp, forgotPassword, resetPassword } from "./actions";
 import { ActionState } from "@/lib/auth/middleware";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const actionMap = {
   signin: signIn,
@@ -145,6 +146,16 @@ export function Login({
                   </Link>
                 </div>
               )}
+            </div>
+          )}
+
+          {mode === "signup" && (
+            <div className="flex items-center space-x-2">
+              <Checkbox id="emailOptIn" name="emailOptIn" />
+              <Label htmlFor="emailOptIn" className="text-sm text-gray-600">
+                I want to sign up to receive updates, exclusive offers, and
+                helpful resources straight to my inbox.
+              </Label>
             </div>
           )}
 

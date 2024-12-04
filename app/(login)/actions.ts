@@ -117,12 +117,13 @@ const signUpSchema = z.object({
 
 export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const { email, password, inviteId } = data;
-  const lowerCaseEmail = email.toLowerCase(); // Convert email to lowercase
+  const lowerCaseEmail = email.toLowerCase();
+  const emailOptIn = formData.get('emailOptIn') === 'on';
 
   const existingUser = await db
     .select()
     .from(users)
-    .where(eq(users.email, lowerCaseEmail)) // Use lowercase email
+    .where(eq(users.email, lowerCaseEmail))
     .limit(1);
 
   if (existingUser.length > 0) {
@@ -132,27 +133,29 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const passwordHash = await hashPassword(password);
 
   const newUser: NewUser = {
-    email: lowerCaseEmail, // Store email in lowercase
+    email: lowerCaseEmail,
     passwordHash,
-    role: "owner", // Default role, will be overridden if there's an invitation
+    role: "owner",
   };
 
   const [createdUser] = await db.insert(users).values(newUser).returning();
 
-  // Create Resend contact after successful sign-up
-  if (createdUser) {
-    await resend.contacts.create({
-      email: lowerCaseEmail,
-      unsubscribed: false,
-      audienceId: "7c43c8a9-1840-4029-b11f-496cd7e75a6e",
-    });
-
-    // Directly call sendWelcomeEmail instead of using fetch
-    await sendWelcomeEmail(lowerCaseEmail);
-  }
-
   if (!createdUser) {
     return { error: "Failed to create user. Please try again." };
+  }
+
+  if (emailOptIn) {
+    try {
+      await resend.contacts.create({
+        email: lowerCaseEmail,
+        unsubscribed: false,
+        audienceId: "7c43c8a9-1840-4029-b11f-496cd7e75a6e",
+      });
+
+      await sendWelcomeEmail(lowerCaseEmail);
+    } catch (error) {
+      console.error('Failed to handle email subscription:', error);
+    }
   }
 
   let teamId: number;
