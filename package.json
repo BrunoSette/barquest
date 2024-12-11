@@ -32,9 +32,9 @@
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.2",
     "@react-email/components": "^0.0.25",
-    "@sentry/nextjs": "^8.42.0",
+    "@sentry/nextjs": "^8.43.0",
     "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^22.10.1",
+    "@types/node": "^22.10.2",
     "@types/pg": "^8.11.10",
     "@types/react": "npm:types-react@19.0.0-rc.1",
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
@@ -50,7 +50,7 @@
     "gray-matter": "^4.0.3",
     "jose": "^5.9.6",
     "lucide-react": "^0.446.0",
-    "next": "^15.0.4",
+    "next": "^15.1.0",
     "next-mdx-remote": "^5.0.0",
     "pg": "^8.13.1",
     "postcss": "^8.4.49",
@@ -70,10 +70,10 @@
     "tailwindcss-animate": "^1.0.7",
     "tailwindcss-react-aria-components": "1.1.5",
     "typescript": "^5.7.2",
-    "zod": "^3.23.8"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
+    "@playwright/test": "^1.49.1",
     "drizzle-kit": "^0.24.2",
     "eslint": "^8.57.1",
     "eslint-config-next": "15.0.1",
