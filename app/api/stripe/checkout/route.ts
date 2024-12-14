@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['customer', 'line_items.data.price.product'],
+      expand: ["customer", "line_items.data.price.product"],
     });
 
     // Check if customer is a string or null
@@ -28,24 +28,21 @@ export async function GET(request: NextRequest) {
 
     const lineItems = session.line_items?.data;
     if (!lineItems || lineItems.length === 0) {
-      throw new Error('No line items found for this session.');
+      throw new Error("No line items found for this session.");
     }
 
     const price = lineItems[0].price;
     if (!price) {
-      throw new Error('No product price found for this session.');
+      throw new Error("No product price found for this session.");
     }
 
     // console.log("lineitems:", JSON.stringify(lineItems, null, 4));
     const product = price.product;
     if (!product) {
-      throw new Error('No product found for this session.');
+      throw new Error("No product found for this session.");
     }
 
-    const productId =
-      typeof product === 'string'
-        ? product
-        : product?.id;
+    const productId = typeof product === "string" ? product : product?.id;
 
     const productName: string = (product as Stripe.Product).name;
 
@@ -122,17 +119,17 @@ export async function GET(request: NextRequest) {
       })
       .where(eq(teams.id, userTeam[0].teamId));
 
-    await db
-      .insert(userProducts)
-      .values({
-        userId: Number(userId),
-        stripeProductId: productId,
-        stripeProductName: productName,
-        stripePriceId: price.id,
-      });
+    await db.insert(userProducts).values({
+      userId: Number(userId),
+      stripeProductId: productId,
+      stripeProductName: productName,
+      stripePriceId: price.id,
+    });
 
     await setSession(user[0]);
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(
+      new URL("/dashboard?success=true", request.url)
+    );
   } catch (error) {
     console.error("Error handling successful checkout:", error);
     return NextResponse.redirect(new URL("/error", request.url));
